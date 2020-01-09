@@ -2,8 +2,12 @@
 
 Author: Luxi Huang
 
+This README.md contains tasks completeness. 
+
+
+
 # Tasks submitted:
-A.000
+A.000git
 # Tasks completed:
 
 ### All homework:
