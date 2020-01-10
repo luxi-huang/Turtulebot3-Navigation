@@ -9,16 +9,12 @@ This README.md contains tasks completeness.
 # Tasks submitted:
 A.000
 A.001
+A.002
+A.003
+A.004
 # Tasks completed:
 
-### All homework:
-
-1. A.001
-2. A.002
-3. A.003
-4. A.004
-
-
+### incomplete homework:
 5. B.000
 6. B.001
 7. B.002
@@ -56,7 +52,15 @@ File "/usr/lib/python2.7/subprocess.py", line 394, in __init__
     raise child_exception
 OSError: [Errno 13] Permission denied
 ```
-solution:add "cat"on launch file:
+wrong solution:add "cat"on launch file:
 ```
  <param name="robot_description" command="cat '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'"/>
 ```
+correct solution:
+```
+<param name="robot_description"
+     command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
+  ```
+  #### fixed problem 4
+  * joint-joint_state_publisher control the wheels in right direction
+  > fixed by edit joint and link origin position. 
