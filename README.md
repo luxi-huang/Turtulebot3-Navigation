@@ -48,3 +48,15 @@ nuturtle_description: notice: package description starts with boilerplate 'nutur
 Solution:rewrite other words in the package.xml file
 
 #### Fixed Error3:
+$ roslaunach ...
+```
+File "/usr/lib/python2.7/subprocess.py", line 394, in __init__
+    errread, errwrite)
+  File "/usr/lib/python2.7/subprocess.py", line 1047, in _execute_child
+    raise child_exception
+OSError: [Errno 13] Permission denied
+```
+solution:add "cat"on launch file:
+```
+ <param name="robot_description" command="cat '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'"/>
+```
