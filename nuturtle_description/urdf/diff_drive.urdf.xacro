@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+
+<robot name="diff_ddrive" xmlns:xacro="https://www.ros.org/wiki/xacro" >
+
+  <link name="base_link" >
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+          <box size="0.5 0.3 0.07"/>
+       </geometry>
+       <material name="green_mat">
+           <color rgba="0 1 0 1" />
+       </material>
+     </visual>
+  </link>
+
+  <link name="link_right_wheel">
+    <visual name="link_right_wheel_visual">
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.1"/>
+      </geometry>
+      <material name="red_mat">
+          <color rgba="1 0 0 0.5" />
+      </material>
+    </visual>
+  </link>
+
+  <joint name="joint_right_wheel" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.05 0.15 0"/>
+    <child link="link_right_wheel"/>
+    <parent link="base_link"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <joint_properties damping="1.0" friction="1.0"/>
+  </joint>
+
+  <link name="link_left_wheel">
+    <visual name="link_left_wheel_visual">
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.1"/>
+      </geometry>
+      <material name="red_mat">
+          <color rgba="1 0 0 0.5" />
+      </material>
+    </visual>
+  </link>
+
+  <joint name="joint_left_wheel" type="continuous">
+    <origin rpy="0 0 0" xyz="0.1 -0.15 0"/>
+    <child link="link_left_wheel"/>
+    <parent link="base_link"/>
+    <axis rpy="0 0 0" xyz="0 1 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <joint_properties damping="1.0" friction="1.0"/>
+  </joint>
+
+  <visual name="caster_bottom_visual">
+    <origin rpy=" 0 0 0" xyz="-0.2 0 0.05"/>
+    <geometry>
+      <sphere radius="${caster_r}"/>
+    </geometry>
+  </visual>
+
+  <link name="link_caster">
+    <visual name="caster_visual">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <material name="blue_mat">
+        <color rgba="0.203125 0.23828125 0.28515625 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="joint_caster" type="fixed">
+    <origin rpy="0 0 0" xyz="0.1 -0.15 0"/>
+    <child link="link_caster"/>
+    <parent link="base_link"/>
+  </joint>
+
+
+
+
+</robot>
