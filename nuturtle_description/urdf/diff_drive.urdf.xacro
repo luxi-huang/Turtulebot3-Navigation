@@ -26,7 +26,7 @@
 
   <link name="link_right_wheel">
     <visual name="link_right_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="0 ${(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
       <geometry>
         <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
       </geometry>
@@ -37,7 +37,7 @@
   </link>
 
   <joint name="right_wheel_axle" type="continuous">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 ${(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
     <child link="link_right_wheel"/>
     <parent link="base_link"/>
     <axis rpy="0 0 0" xyz="0 1 0"/>
@@ -47,7 +47,7 @@
 
   <link name="link_left_wheel">
     <visual name="link_left_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="0 ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
       <geometry>
         <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
       </geometry>
@@ -58,7 +58,7 @@
   </link>
 
   <joint name="left_wheel_axle" type="continuous">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
     <child link="link_left_wheel"/>
     <parent link="base_link"/>
     <axis rpy="0 0 0" xyz="0 1 0"/>
