@@ -66,13 +66,6 @@
     <joint_properties damping="1.0" friction="1.0"/>
   </joint>
 
-  <visual name="caster_bottom_visual">
-    <origin rpy=" 0 0 0" xyz="-0.2 0 0.05"/>
-    <geometry>
-      <sphere radius="0.01"/>
-    </geometry>
-  </visual>
-
   <link name="link_caster">
     <visual name="caster_visual">
       <origin rpy="0 0 0" xyz="${chassis_length/2-wheel_radius/2+chassis_thinkness/4} 0 ${wheel_radius/2-chassis_thinkness/4}"/>
