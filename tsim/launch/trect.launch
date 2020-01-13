@@ -5,4 +5,13 @@
 
     <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
 
+    <param name="x" value="3" />
+    <param name="y" value="2" />
+    <param name="width" value="4" />
+    <param name="height" value="5" />
+    <param name="trans_vel" value="2" />
+    <param name="rot_vel" value="1" />
+    <param name="frequency" value="100" />
+
+    
 </launch>
