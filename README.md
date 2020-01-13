@@ -63,4 +63,8 @@ correct solution:
   ```
   #### fixed problem 4
   * joint-joint_state_publisher control the wheels in right direction
-  > fixed by edit joint and link origin position. 
+  > fixed by edit joint and link origin position.
+
+```
+catkin_make --only-pkg-with-deps my_package
+```

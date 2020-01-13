@@ -1,0 +1,8 @@
+<launch>
+    <!-- My Package launch file -->
+    <node pkg="tsim" type="turtle_rect" name="turtle_rect"  output="screen">
+    </node>
+
+    <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+
+</launch>
