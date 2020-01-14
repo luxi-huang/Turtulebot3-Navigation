@@ -102,10 +102,10 @@ namespace rigid2d
         Vector2D operator()(Vector2D v) const;
 
         /// \brief invert the transformation
-        /// \return the inverse transformation. 
+        /// \return the inverse transformation.
         Transform2D inv() const;
 
-        /// \brief compose this transform with another and store the result 
+        /// \brief compose this transform with another and store the result
         /// in this object
         /// \param rhs - the first transform to apply
         /// \returns a reference to the newly transformed operator
