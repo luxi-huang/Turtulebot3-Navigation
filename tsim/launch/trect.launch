@@ -3,6 +3,9 @@
     <node pkg="tsim" type="turtle_rect" name="turtle_rect"  output="screen">
     </node>
 
+    <node pkg="tsim" type="reset_sever" name="reset_sever"  output="screen">
+    </node>
+
     <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
 
     <param name="x" value="3" />
@@ -13,5 +16,5 @@
     <param name="rot_vel" value="1" />
     <param name="frequency" value="100" />
 
-    
+
 </launch>

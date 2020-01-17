@@ -5,41 +5,20 @@
 #include "turtlesim/SetPen.h"
 #include "turtlesim/TeleportAbsolute.h"
 #include "std_srvs/Empty.h"
-
+#include <cstdlib>
 using namespace std; // use for count
 
 ros::Publisher velocity_publisher;
 ros::Subscriber pose_subscriber;
 turtlesim::Pose turtlesim_pose;
-// ros::NodeHandle n;
+// ros::NodeHandles n;
 
 void go_stright(double speed, double distance, bool ifForward);
 void rotate (double angular_vel, double relative_rotate_angle_degree, bool clockwise);
 void set_relative_angle(double desired_angle_degree);
 void poseCallback(const turtlesim::Pose::ConstPtr & pose_message);
-void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance);
 int turtle_setpen_client(int off);
-int turtle_teleport_client(float x_coordinate, float y_coordinate, float theta);
 int traj_rest_client();
-
-
-bool traj_reset(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res)
-{
-
-	int x_value;
-	int y_value;
-	ros::NodeHandle n;
-	n.getParam("x",x_value);
-	n.getParam("y",y_value);
-	turtlesim::Pose pose;
-	pose.x = x_value;
-	pose.y = y_value;
-	pose.theta=0;
-	go_to_goal(pose,0.001);
-	return true;
-}
-
-
 
 int main(int argc, char **argv)
 {
@@ -48,8 +27,6 @@ int main(int argc, char **argv)
 	publich: n;
 	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 1000);
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
-	ros::ServiceServer service = n.advertiseService("/trajectory_reset",traj_reset);
-
 
 	// get parameter
 	int x_value;
@@ -76,34 +53,23 @@ int main(int argc, char **argv)
 	ROS_INFO ("rot_vel :%d, The rotational velocity of the robot",rot_vel);
 	ROS_INFO ("frequency :%d, The frequency of the control loop",frequency);
 
-	turtle_setpen_client(1); // setpen off
-	turtle_teleport_client(x_value, y_value, 0);
-	turtle_setpen_client(0); // setpen off
-  ros::Duration(1).sleep();
-
-		// traj_rest_client();
-	do{
-		// turtle_setpen_client(1); // setpen off
-		// turtle_teleport_client(x_value, y_value, 0);
-		// turtle_setpen_client(0); // setpen off
-		go_stright(trans_vel,width,true);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,width,true);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true);
-		ros::Duration(1).sleep();
+	ros::Rate loop_rate(1000);
+	while (ros::ok()){
+		ros::spinOnce();
+		ros::Duration(2).sleep();
 		traj_rest_client();
+		ros::Duration(2).sleep();
+		turtle_setpen_client(0);
+		go_stright(trans_vel,width,true);
 		rotate(rot_vel,90.0,false);
-
-	}while(1);
-
-
-	ros::spin();
+		go_stright(trans_vel,height,true);
+		rotate(rot_vel,90.0,false);
+		go_stright(trans_vel,width,true);
+		rotate(rot_vel,90.0,false);
+		go_stright(trans_vel,height,true);
+	}
 }
 
-// go straight function,input is speed, distance and direction
 void go_stright(double speed, double distance, bool ifForward){
 	geometry_msgs::Twist go_stright_msg;
 
@@ -193,31 +159,6 @@ void set_relative_angle (double desired_angle_degree){
 
 }
 
-void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
-
-	geometry_msgs::Twist goal_msg;
-	double left_distance;
-	ros::Rate loop_rate(100);
-	do{
-		goal_msg.linear.x = 1*sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
-		goal_msg.linear.y =0;
-		goal_msg.linear.z =0;
-
-		goal_msg.angular.x = 0;
-		goal_msg.angular.y = 0;
-		goal_msg.angular.z =2*(atan2(goal_pose.y-turtlesim_pose.y, goal_pose.x-turtlesim_pose.x)-turtlesim_pose.theta);
-
-		velocity_publisher.publish(goal_msg);
-
-		ros::spinOnce();
-		loop_rate.sleep();
-		left_distance = sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
-	}while(left_distance>distance_tolerance);
-	goal_msg.linear.x =0;
-	goal_msg.angular.z = 0;
-	velocity_publisher.publish(goal_msg);
-}
-
 int turtle_setpen_client(int off){
 	ros::NodeHandle n;
 	ros::ServiceClient client= n.serviceClient<turtlesim::SetPen>("turtle1/set_pen");
@@ -241,54 +182,19 @@ int turtle_setpen_client(int off){
 	return 0;
 }
 
-
-int turtle_teleport_client(float x_coordinate,float y_coordinate,float theta){
-	ros::NodeHandle n;
-	ros::ServiceClient teleport_client= n.serviceClient<turtlesim::TeleportAbsolute>("turtle1/teleport_absolute");
-  turtlesim::TeleportAbsolute teleport_srv;
-	teleport_srv.request.x = x_coordinate;
-	teleport_srv.request.y = y_coordinate;
-	teleport_srv.request.theta = theta;
-
-	ros::service::waitForService("turtle1/teleport_absolute");
-	if (teleport_client.call(teleport_srv))
-		{
-			ROS_INFO("Sum");
-		}
-		else
-		{
-			ROS_ERROR("Failed to call service teleport");
-			return 1;
-		}
-	return 0;
-}
-
-// bool traj_reset(std_srvs::Empty::Request  &req,
-// 								std_srvs::Empty::Response &res)
-// {
-// 	turtlesim::Pose pose;
-// 	pose.x=req.x;
-// 	pose.y=req.y;
-// 	pose.theta=req.theta;
-// 	go_to_goal(pose,0.01);
-// 	return true;
-// }
-
-
 int traj_rest_client(){
 	ros::NodeHandle n;
-	ros::ServiceClient traj_reset_client= n.serviceClient<std_srvs::Empty>("/trajectory_reset");
-  std_srvs::Empty traje_reset_srv;
-	ros::service::waitForService("/trajectory_reset");
-	return 0;
-	// if (traj_rest_client.call(traje_reset_srv))
-	// 	{
-	// 		ROS_INFO("Sum");
-	// 	}
-	// 	else
-	// 	{
-	// 		ROS_ERROR("Failed to call service teleport");
-	// 		return 1;
-	// 	}
-	// return 0;
+  ros::ServiceClient client= n.serviceClient<std_srvs::Empty>("turtle1/trajectory_reset", 1000);
+  std_srvs::Empty srv;
+  ros::service::waitForService("turtle1/trajectory_reset");
+  if (client.call(srv))
+          {
+                  ROS_INFO("CALL RESET");
+          }
+          else
+          {
+                  ROS_ERROR("Failed to call service teleport");
+                  return 1;
+          }
+  return 0;
 }
