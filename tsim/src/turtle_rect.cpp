@@ -6,11 +6,13 @@
 #include "turtlesim/TeleportAbsolute.h"
 #include "std_srvs/Empty.h"
 #include <cstdlib>
+#include <tsim/PoseError.h>
 using namespace std; // use for count
 
 ros::Publisher velocity_publisher;
 ros::Subscriber pose_subscriber;
 turtlesim::Pose turtlesim_pose;
+ros::Publisher PoseError_publisher;
 // ros::NodeHandles n;
 
 void go_stright(double speed, double distance, bool ifForward);
@@ -19,6 +21,7 @@ void set_relative_angle(double desired_angle_degree);
 void poseCallback(const turtlesim::Pose::ConstPtr & pose_message);
 int turtle_setpen_client(int off);
 int traj_rest_client();
+int Error_pose(int x, int y, int theta);
 
 int main(int argc, char **argv)
 {
@@ -26,6 +29,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle n;
 	publich: n;
 	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 1000);
+	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
 
 	// get parameter
@@ -61,12 +65,16 @@ int main(int argc, char **argv)
 		ros::Duration(2).sleep();
 		turtle_setpen_client(0);
 		go_stright(trans_vel,width,true);
+		Error_pose(x_value+width, y_value, 0);
 		rotate(rot_vel,90.0,false);
 		go_stright(trans_vel,height,true);
+		Error_pose(x_value+width, y_value+height, 90);
 		rotate(rot_vel,90.0,false);
 		go_stright(trans_vel,width,true);
+		Error_pose(x_value, y_value+height, 180);
 		rotate(rot_vel,90.0,false);
 		go_stright(trans_vel,height,true);
+		Error_pose(x_value, y_value+height, -90);
 	}
 }
 
@@ -197,4 +205,13 @@ int traj_rest_client(){
                   return 1;
           }
   return 0;
+}
+
+int Error_pose(int x, int y, int theta){
+	tsim::PoseError p_error;
+	p_error.x_error = turtlesim_pose.x - x;
+	p_error.y_error = turtlesim_pose.y - y ;
+	theta = theta * M_PI/180;
+	p_error.theta_error = turtlesim_pose.theta - theta;
+	PoseError_publisher.publish(p_error);
 }

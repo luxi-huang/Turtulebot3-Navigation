@@ -7,6 +7,7 @@
     </node>
 
     <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+    <node name="pos_vel_plot" pkg="rqt_plot" type="rqt_plot" args="/pose_error" />
 
     <param name="x" value="3" />
     <param name="y" value="2" />
@@ -15,6 +16,5 @@
     <param name="trans_vel" value="2" />
     <param name="rot_vel" value="1" />
     <param name="frequency" value="100" />
-
 
 </launch>
