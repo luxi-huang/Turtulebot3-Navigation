@@ -1,3 +1,11 @@
+// """
+// Reset_sever: set the std_srvs service.
+//
+// SERVICE:
+// + turtle1/trajectory_reset (reset turtle to the left coner of trajectory)
+// """
+
+
 #include "ros/ros.h"
 #include <sstream>
 #include "turtlesim/Pose.h"

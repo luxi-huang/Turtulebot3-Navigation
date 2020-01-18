@@ -1,3 +1,14 @@
+// turtle_rect: enable the turtle to follow the trajectory of
+// a rectangle
+//
+// PUBLISHERS:
+//   + turtle1/cmd_vel (Twist) ~ publish turtle velocity.
+// 	+ pose_error (Pose_error) ~ publish the pose error of turtle.
+//
+// SUBSCRIBERS:
+//   + turtle1/pose (Pose) ~ subscribe the current pose of the turtle1 turtle (x, y, theta)
+
+
 #include "ros/ros.h"
 #include <sstream>
 #include "turtlesim/Pose.h"
