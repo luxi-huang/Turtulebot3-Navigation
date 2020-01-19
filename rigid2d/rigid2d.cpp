@@ -1,25 +1,27 @@
 #include "rigid2d.hpp"
 #include <iostream>
-#include "math.h"
+#include "cmath"
+#include <cstdlib> //c standard library
 
-namespace rigid2d{
 
-  double pi = rigid2d::PI ;
+using namespace rigid2d;
 
-  // bool rigid2d::almost_equal(double d1, double d2, double epsilon=1.0e-12){
-  //   if(abs(d1 - d2) < epsilon){
-  //     return true;
-  //   }else{
-  //     return false;
-  //   }
-  // }
+constexpr double PI = 3.14159265358979323846;
 
-  // double rigid2d::deg2rad(double deg){
-  //   return deg / 180 * PI;
-  // }
-  //
-  double rigid2d::rad2deg(double rad){
-    return 180 * rad / pi;
+constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12){
+  if (abs(d1-d2)<epsilon){
+    return true;
+  }else{
+    return false;
   }
+}
 
+constexpr double deg2rad(double deg)
+{
+  return deg * rigid2d::PI /180;
+}
+
+constexpr double rad2deg(double rad)
+{
+  return rad * 180 /rigid2d::PI;
 }
