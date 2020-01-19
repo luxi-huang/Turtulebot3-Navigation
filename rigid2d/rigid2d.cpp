@@ -25,3 +25,14 @@ constexpr double rad2deg(double rad)
 {
   return rad * 180 /rigid2d::PI;
 }
+
+std::ostream & operator<<(std::ostream & os, const Vector2D & v){
+  os << "< " << v.x << " , " << v.y << " >";
+  return os;
+}
+
+std::istream & operator>>(std::istream & is, Vector2D & v){
+  is >> v.x;
+  is >> v.y;
+  return is;
+}
