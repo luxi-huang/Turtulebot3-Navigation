@@ -90,6 +90,13 @@ namespace rigid2d
     /// \brief a rigid body transformation in 2 dimensions
     class Transform2D
     {
+      double xt = 1;
+      double yt = 1;// Vector2D m;
+      double xr1 = 1;
+      double xr2 = 1;
+      double yr1 = 1;
+      double yr2 = 1;
+
     public:
         /// \brief Create an identity transformation
         Transform2D();
