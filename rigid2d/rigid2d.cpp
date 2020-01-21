@@ -37,45 +37,72 @@ std::istream & operator>>(std::istream & is, Vector2D & v){
 }
 
 Vector2D Transform2D::operator()(Vector2D v) const{
-  v.x = v.x + xt;
-  v.y = v.y + yt;
-  v.x = v.x * xr1 + v.y * xr2;
-  v.y = v.x * yr1 + v.y * yr2;
+  v.x = v.x*T11 + v.y*T12 + T13;
+  v.y = v.x*T21 + v.y*T22 + T23;
   return v;
 }
 //
 
 Transform2D::Transform2D(){
-  xt = 0;
-  yt = 0;
+  T11 = 1;
+  T12 = 0;// Vector2D m;
+  T13 = 0;
+  T21 = 0;
+  T22 = 1;
+  T23 = 0;
+  std::cout<<"Hello";
 }
 
 Transform2D::Transform2D(const Vector2D & trans){
-  xt = trans.x;
-  yt = trans.y;
-  xr1 = 1;
-  xr2 = 0;
-  yr1 = 0;
-  yr2 = 1;
+  T11 = 1;
+  T12 = 0;// Vector2D m;
+  T13 = trans.x;
+  T21 = 0;
+  T22 = 1;
+  T23 = trans.y;
 }
 
 Transform2D::Transform2D(double radians){
-  xt = 0;
-  yt = 0;
-  xr1 = cos(radians);
-  xr2 = -sin(radians);
-  yr1 = sin(radians);
-  yr2 = cos(radians);
+  T11 = cos(radians);
+  T12 = -sin(radians);
+  T13 = 0;
+  T21 = sin(radians);
+  T22 = cos(radians);
+  T23 = 0;
 }
 Transform2D::Transform2D(const Vector2D & trans, double radians){
-  xt = trans.x;
-  yt = trans.y;
-  xr1 = cos(radians);
-  xr2 = -sin(radians);
-  yr1 = sin(radians);
-  yr2 = cos(radians);
+  T11 = cos(radians);
+  T12 = -sin(radians);
+  T13 = trans.x;
+  T21 = sin(radians);
+  T22 = cos(radians);
+  T23 = trans.y;
 }
 
-// Transform2D inv() const{
-//   xt = 0;
-// }
+Transform2D Transform2D::inv() const{
+  Transform2D T;
+  T.T11 = T11;
+  T.T12 = T21;
+  T.T21 = T12;
+  T.T22 = T22;
+  T.T13 = -T11*T13 -T21*T23;
+  T.T23 = -T12*T13 -T22*T23;
+  std::cout <<"nice";
+  return T;
+}
+
+Transform2D& Transform2D::operator*=(const Transform2D & rhs){
+  Transform2D Q;
+  Q.T11 = T11*rhs.T11 + T12*rhs.T21;
+  Q.T12 = T11*rhs.T12 + T12*rhs.T22;
+  Q.T21 = T21*rhs.T11 + T22*rhs.T21;
+  Q.T22 = T21*rhs.T12 + T22*rhs.T22;
+  Q.T13 = T11*rhs.T13 + T12*rhs.T23 + T13;
+  Q.T23 = T21*rhs.T13 + T22*rhs.T23 + T23;
+  return *this;
+}
+
+std::ostream & rigid2d::operator<<(std::ostream & os, const Transform2D & tf){
+  os << "< " << tf.T11 << " , " << tf.T12 << " >";
+  return os;
+}
