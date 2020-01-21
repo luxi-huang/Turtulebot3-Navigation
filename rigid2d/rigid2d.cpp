@@ -103,6 +103,23 @@ Transform2D& Transform2D::operator*=(const Transform2D & rhs){
 }
 
 std::ostream & rigid2d::operator<<(std::ostream & os, const Transform2D & tf){
-  os << "< " << tf.T11 << " , " << tf.T12 << " >";
+  os << "degree " << tf.degree<< " dx " << tf.T13 << "dy "<<tf.T23;
   return os;
+}
+
+std::istream & rigid2d::operator>>(std::istream & is, Transform2D & tf){
+  Vector2D v;
+  double degree, radians;
+  std::cout <<"x";
+  is >> v.x;
+  std::cout << "y";
+  is >> v.y;
+  std::cout << "degree";
+  is >> degree;
+  radians = deg2rad(degree);
+
+  Transform2D tf_input(v, radians);
+  tf *= tf_input;
+  return is;
+
 }
