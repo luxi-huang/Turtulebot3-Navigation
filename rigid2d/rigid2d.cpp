@@ -50,7 +50,7 @@ Transform2D::Transform2D(){
   T21 = 0;
   T22 = 1;
   T23 = 0;
-  std::cout<<"Hello";
+  degree = 0;
 }
 
 Transform2D::Transform2D(const Vector2D & trans){
@@ -60,6 +60,7 @@ Transform2D::Transform2D(const Vector2D & trans){
   T21 = 0;
   T22 = 1;
   T23 = trans.y;
+  degree = 0;
 }
 
 Transform2D::Transform2D(double radians){
@@ -69,6 +70,8 @@ Transform2D::Transform2D(double radians){
   T21 = sin(radians);
   T22 = cos(radians);
   T23 = 0;
+  degree = rad2deg(radians);
+
 }
 Transform2D::Transform2D(const Vector2D & trans, double radians){
   T11 = cos(radians);
@@ -77,6 +80,7 @@ Transform2D::Transform2D(const Vector2D & trans, double radians){
   T21 = sin(radians);
   T22 = cos(radians);
   T23 = trans.y;
+  degree = rad2deg(radians);
 }
 
 Transform2D Transform2D::inv() const{
@@ -87,7 +91,7 @@ Transform2D Transform2D::inv() const{
   T.T22 = T22;
   T.T13 = -T11*T13 -T21*T23;
   T.T23 = -T12*T13 -T22*T23;
-  std::cout <<"nice";
+  T.degree = -degree;
   return T;
 }
 
@@ -99,11 +103,20 @@ Transform2D& Transform2D::operator*=(const Transform2D & rhs){
   Q.T22 = T21*rhs.T12 + T22*rhs.T22;
   Q.T13 = T11*rhs.T13 + T12*rhs.T23 + T13;
   Q.T23 = T21*rhs.T13 + T22*rhs.T23 + T23;
+
+  if (Q.T11 < 0){
+  Q.degree = rad2deg(std::acos(Q.T11));
+  }else{
+  Q.degree = rad2deg(std::atan(-Q.T12/Q.T11));
+  }
+  // Q.degree = rad2deg(asin(Q.T21));
+
+  *this = Q;
   return *this;
 }
 
 std::ostream & rigid2d::operator<<(std::ostream & os, const Transform2D & tf){
-  os << "degree " << tf.degree<< " dx " << tf.T13 << "dy "<<tf.T23;
+  os << "degree" << tf.degree << " dx " << tf.T13 << "dy "<< tf.T23;
   return os;
 }
 
@@ -118,8 +131,15 @@ std::istream & rigid2d::operator>>(std::istream & is, Transform2D & tf){
   is >> degree;
   radians = deg2rad(degree);
 
-  Transform2D tf_input(v, radians);
-  tf *= tf_input;
+  Transform2D tf_new(v, radians);
+  tf = tf_new;
   return is;
 
+}
+
+
+Transform2D rigid2d::operator*(Transform2D lhs, const Transform2D & rhs){
+  lhs*=rhs;
+  // A = lhs;
+  return lhs;
 }
