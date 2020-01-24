@@ -134,6 +134,7 @@ namespace rigid2d
         /// \brief \see operator<<(...) (declared outside this class)
         /// for a description
         friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
+
     };
 
 

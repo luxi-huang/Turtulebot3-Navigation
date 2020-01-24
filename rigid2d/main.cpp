@@ -8,9 +8,10 @@
 using namespace rigid2d;
 
 int main(){
-  struct Vector2D v_ab, v_bc v;
+  struct Vector2D v_ab, v_bc, v, va,vb,vc;
   double degree_ab,degree_bc, radians_ab, radians_bc;
-  Transform2D Tba,Tcb,I, Tac;
+  Transform2D Tba,Tcb,I, Tac, Tca;
+  char frame;
   // Transform2D I;
   // Transform2D I;
   // struct Vector2D m;
@@ -55,7 +56,42 @@ int main(){
   std::cout << "Tac : "<<Tac<<"\n";
 
   Tca = Tac.inv();
-  std::cout << "Tba : "<<Tca<<"\n";
+  std::cout << "Tca : "<<Tca<<"\n";
+
+  // enter vector v :
+  std::cout << "please enter vector v.x\n";
+  std::cin >> v.x;
+  std::cout << "please enter vector v.y\n";
+  std::cin >> v.y;
+  // enter frame;
+  std::cout << "please enter the frame: a,b,c\n";
+  std::cin >> frame;
+  // output vector v in frame a,b and c;
+  if (frame == 'a'){
+    va = v;
+    std::cout << "va : "<<va.x<<","<<va.y<<"\n";
+    vb = Tba(v);
+    std::cout << "vb : "<<vb.x<<","<<vb.y<<"\n" ;
+    vc = Tac(v);
+    std::cout << "vc : "<<vc.x<<","<<vc.y<<"\n";
+  }else if (frame == 'b'){
+    va = Tba(v);
+    std::cout << "va : "<<va.x<<","<<va.y<<"\n";
+    vb = v;
+    std::cout << "vb : "<<vb.x<<","<<vb.y<<"\n" ;
+    vc = Tbc(v);
+    std::cout << "vc : "<<vc.x<<","<<vc.y<<"\n";
+  }else if (frame == 'c'){
+    va = Tca(v);
+    std::cout << "va : "<<va.x<<","<<va.y<<"\n";
+    vb = Tcb(v);
+    std::cout << "vb : "<<vb.x<<","<<vb.y<<"\n" ;
+    vc = v;
+    std::cout << "vc : "<<vc.x<<","<<vc.y<<"\n";
+  }
+
+
+
 
 
 

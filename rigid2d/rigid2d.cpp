@@ -120,6 +120,7 @@ std::ostream & rigid2d::operator<<(std::ostream & os, const Transform2D & tf){
   return os;
 }
 
+
 std::istream & rigid2d::operator>>(std::istream & is, Transform2D & tf){
   Vector2D v;
   double degree, radians;
