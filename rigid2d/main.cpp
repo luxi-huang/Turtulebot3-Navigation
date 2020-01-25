@@ -22,9 +22,9 @@ int main(){
   I = Transform2D();
   std::cout << "I : "<<I<<"\n";
 
-  std::cout << "Enter x value of Tab \n";
+  std::cout << "Enter x value of Tab\n";
   std::cin >> v_ab.x;
-  std::cout << "Enter y value of Tab \n";
+  std::cout << "Enter y value of Tab\n";
   std::cin >> v_ab.y;
   std::cout << "Enter degree value of Tab\n";
   std::cin >> degree_ab;
@@ -32,9 +32,9 @@ int main(){
   Transform2D Tab(v_ab, radians_ab);
   std::cout << "Tab : "<<Tab<<"\n";
 
-  std::cout << "Enter x value of Tbc \n";
+  std::cout << "Enter x value of Tbc\n";
   std::cin >> v_bc.x;
-  std::cout << "Enter y value of Tbc \n";
+  std::cout << "Enter y value of Tbc\n";
   std::cin >> v_bc.y;
   std::cout << "Enter degree value of Tbc\n";
   std::cin >> degree_bc;
@@ -70,7 +70,7 @@ int main(){
 
   //enter twist1;
 
-  std::cout << "please enter twist theta_dot\n";
+  std::cout << "please enter twist:theta_dot\n";
   std::cin >> twist1.theta_dot;
   std::cout << "please enter vector vx\n";
   std::cin >> twist1.vx;
