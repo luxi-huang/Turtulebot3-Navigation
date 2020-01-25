@@ -26,7 +26,7 @@ turtlesim::Pose turtlesim_pose;
 ros::Publisher PoseError_publisher;
 // ros::NodeHandles n;
 
-void go_stright(double speed, double distance, bool ifForward);
+void go_stright(double speed, double distance, bool ifForward,double xvalue, double yalue, int dirct);
 void rotate (double angular_vel, double relative_rotate_angle_degree, bool clockwise);
 void set_relative_angle(double desired_angle_degree);
 void poseCallback(const turtlesim::Pose::ConstPtr & pose_message);
@@ -75,21 +75,21 @@ int main(int argc, char **argv)
 		traj_rest_client();
 		ros::Duration(2).sleep();
 		turtle_setpen_client(0);
-		go_stright(trans_vel,width,true);
-		Error_pose(x_value+width, y_value, 0);
+		go_stright(trans_vel,width,true,x_value, y_value, 0);
+		// Error_pose(x_value+width, y_value, 0);
 		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true);
-		Error_pose(x_value+width, y_value+height, 90);
+		go_stright(trans_vel,height,true,x_value+width, y_value, 90);
+		// Error_pose(x_value+width, y_value+height, 90);
 		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,width,true);
-		Error_pose(x_value, y_value+height, 180);
+		go_stright(trans_vel,width,true,x_value+width, y_value+height, 180);
+		// Error_pose(x_value, y_value+height, 180);
 		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true);
-		Error_pose(x_value, y_value+height, -90);
+		go_stright(trans_vel,height,true,x_value, y_value+height,-90);
+		// Error_pose(x_value, y_value+height, -90);
 	}
 }
 
-void go_stright(double speed, double distance, bool ifForward){
+void go_stright(double speed, double distance, bool ifForward,double xvalue, double yvalue, int direct){
 	geometry_msgs::Twist go_stright_msg;
 
 	if (ifForward)
@@ -113,6 +113,20 @@ void go_stright(double speed, double distance, bool ifForward){
 		velocity_publisher.publish(go_stright_msg);
 		double current_time = ros::Time::now().toSec();
 		current_distance = speed * (current_time-start_time);
+
+		if (direct == 0) {
+			Error_pose(current_distance + xvalue, yvalue, direct);
+		}else if (direct == 90){
+			Error_pose(xvalue, current_distance + yvalue, direct);
+		}else if (direct == -180){
+			Error_pose(xvalue - current_distance, yvalue, direct);
+		}else if (direct == -90){
+			Error_pose(xvalue, yvalue-current_distance, direct);
+		}
+
+
+
+
 		ros::spinOnce();
 		loop_rate.sleep();
 	}while(current_distance<distance);
@@ -120,6 +134,7 @@ void go_stright(double speed, double distance, bool ifForward){
 	// after arrived,set the velocity equal to immediently
 	go_stright_msg.linear.x =0;
 	velocity_publisher.publish(go_stright_msg);
+
 
 }
 

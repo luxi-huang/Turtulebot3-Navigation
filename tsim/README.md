@@ -15,3 +15,12 @@ $ roslaunch tsim trect.launch
 * msg/PoseError.msg: msgs for turtle pose_error
 * launch/trect.launch:complie all files to launch, see more intro info inside of .launch file
 * src/turtle_rect.cpp: control turtle move in a rectangle path, and reset when turtle move to the end to the loop of the rectangle.
+
+### turtle pictures:
+![text](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/turtle.png)
+
+### Link of Video:
+https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/turtle_ract_video-2020-01-14_07.34.51.mkv
+
+### rqt_plot:
+![text](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/rqt_plot.png)
