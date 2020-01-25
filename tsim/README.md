@@ -17,10 +17,10 @@ $ roslaunch tsim trect.launch
 * src/turtle_rect.cpp: control turtle move in a rectangle path, and reset when turtle move to the end to the loop of the rectangle.
 
 ### turtle pictures:
-![text](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/turtle.png)
+![Turtle_picture](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/turtle.png)
 
 ### Link of Video:
 https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/turtle_ract_video-2020-01-14_07.34.51.mkv
 
 ### rqt_plot:
-![text](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/rqt_plot.png)
+![rqt_picture](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/rqt_plot.png)
