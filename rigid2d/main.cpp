@@ -12,6 +12,7 @@ int main(){
   double degree_ab,degree_bc, radians_ab, radians_bc;
   Transform2D Tba,Tcb,I, Tac, Tca;
   char frame;
+  struct Twist2D twist1, twist_a,twist_b,twist_c;
   // Transform2D I;
   // Transform2D I;
   // struct Vector2D m;
@@ -66,48 +67,56 @@ int main(){
   // enter frame;
   std::cout << "please enter the frame: a,b,c\n";
   std::cin >> frame;
+
+  //enter twist1;
+
+  std::cout << "please enter twist theta_dot\n";
+  std::cin >> twist1.theta_dot;
+  std::cout << "please enter vector vx\n";
+  std::cin >> twist1.vx;
+  std::cout << "please enter vector vy\n";
+  std::cin >> twist1.vy;
+
   // output vector v in frame a,b and c;
   if (frame == 'a'){
     va = v;
     std::cout << "va : "<<va.x<<","<<va.y<<"\n";
     vb = Tba(v);
     std::cout << "vb : "<<vb.x<<","<<vb.y<<"\n" ;
-    vc = Tac(v);
+    vc = Tca(v);
     std::cout << "vc : "<<vc.x<<","<<vc.y<<"\n";
+
+    twist_a = I(twist1);
+    twist_b = Tba(twist1);
+    twist_c = Tca(twist1);
+
   }else if (frame == 'b'){
-    va = Tba(v);
+    va = Tab(v);
     std::cout << "va : "<<va.x<<","<<va.y<<"\n";
     vb = v;
     std::cout << "vb : "<<vb.x<<","<<vb.y<<"\n" ;
-    vc = Tbc(v);
+    vc = Tcb(v);
     std::cout << "vc : "<<vc.x<<","<<vc.y<<"\n";
+
+    twist_a = Tab(twist1);
+    twist_b = I(twist1);
+    twist_c = Tcb(twist1);
   }else if (frame == 'c'){
-    va = Tca(v);
+    va = Tac(v);
     std::cout << "va : "<<va.x<<","<<va.y<<"\n";
-    vb = Tcb(v);
+    vb = Tbc(v);
     std::cout << "vb : "<<vb.x<<","<<vb.y<<"\n" ;
     vc = v;
     std::cout << "vc : "<<vc.x<<","<<vc.y<<"\n";
+
+    twist_a = Tca(twist1);
+    twist_b = Tcb(twist1);
+    twist_c = I(twist1);
   }
 
+  std::cout << "twist in franme a : theta_dot: "<<twist_a.theta_dot<<", vx: "<<twist_a.vx<<", vy"<< twist_a.vy<<"\n";
+  std::cout << "twist in franme b : theta_dot: "<<twist_b.theta_dot<<", vx: "<<twist_b.vx<<", vy"<< twist_b.vy<<"\n";
+  std::cout << "twist in franme c : theta_dot: "<<twist_c.theta_dot<<", vx: "<<twist_c.vx<<", vy"<< twist_c.vy<<"\n";
 
-
-
-
-
-
-  // std::cout << v.y <<"\n";
-  // Transform2D T(30); //rotate
-  // m = T(v);
-  // Transform2D P(30);
-  // std::cin>>P;
-  // Transform2D P(30); // identity matrix
-  // T = Transform2D();
-  // v = P(v);
-  // P.inv();
-  // std::cout << v.x;
-  // P = P.inv();
-  // m = P(v);
-  // std::cout << m.x;
   return 0;
 }

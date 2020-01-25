@@ -135,12 +135,30 @@ std::istream & rigid2d::operator>>(std::istream & is, Transform2D & tf){
   Transform2D tf_new(v, radians);
   tf = tf_new;
   return is;
-
 }
-
 
 Transform2D rigid2d::operator*(Transform2D lhs, const Transform2D & rhs){
   lhs*=rhs;
   // A = lhs;
   return lhs;
+}
+
+std::ostream & rigid2d::operator<<(std::ostream & os, const Twist2D & twist){
+  os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy;
+  return os;
+}
+
+std::istream & operator>>(std::istream & is, Twist2D & twist){
+  is >> twist.theta_dot;
+  is >> twist.vx;
+  is >> twist.vy;
+  return is;
+}
+
+Twist2D Transform2D::operator()(Twist2D tw) const{
+  Twist2D twist;
+  twist.theta_dot = tw.theta_dot;
+  twist.vx = tw.theta_dot*T23 +T11*tw.vx + T12*tw.vy;
+  twist.vy = -tw.theta_dot*T13+T21*tw.vx + T22*tw.vy;
+  return twist;
 }

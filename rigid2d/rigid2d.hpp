@@ -72,6 +72,12 @@ namespace rigid2d
         double y = 0.0;
     };
 
+    struct Twist2D
+    {
+      double theta_dot = 0.0;
+      double vx = 0.0;
+      double vy = 0.0;
+    };
     /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
     /// os - stream to output to
     /// v - the vector to print
@@ -86,6 +92,9 @@ namespace rigid2d
     /// https://en.cppreference.com/w/cpp/io/basic_istream/peek
     /// https://en.cppreference.com/w/cpp/io/basic_istream/get
     std::istream & operator>>(std::istream & is, Vector2D & v);
+
+
+
 
     /// \brief a rigid body transformation in 2 dimensions
     class Transform2D
@@ -135,9 +144,21 @@ namespace rigid2d
         /// for a description
         friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
 
+        // Twist2D operator()(Twist2D tw) const;
+        Twist2D operator()(Twist2D V) const;
+
+        // Transform2D (vector2D & v);
     };
 
-
+    // class Twist2D{
+    //   double theta_dot;
+    //   double vx;
+    //   double vy;
+    // public:
+    //     friend std::ostream & operator<<(std::ostream & os, const Twist2D & twist);
+    //     explicit Twist2D(double thetadot, double v_x,double v_y);
+    //
+    // };
     /// \brief should print a human readable version of the transform:
     /// An example output:
     /// dtheta (degrees): 90 dx: 3 dy: 5
@@ -156,6 +177,10 @@ namespace rigid2d
     /// \return the composition of the two transforms
     /// HINT: This function can be implemented in terms of *=
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
+
+    // /// twist fucntion
+    std::ostream & operator<<(std::ostream & os, const Twist2D & twist);
+    std::istream & operator>>(std::istream & is, Twist2D & twist);
 }
 
 #endif
