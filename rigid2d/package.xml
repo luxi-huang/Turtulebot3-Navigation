@@ -2,18 +2,18 @@
 <package format="2">
   <name>rigid2d</name>
   <version>0.0.0</version>
-  <description>The rigid2d package</description>
+  <description>ME495 hw1 task C</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="luxi@todo.todo">luxi</maintainer>
+  <maintainer email="lucy0307@qq.com">luxi</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>BSD</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
