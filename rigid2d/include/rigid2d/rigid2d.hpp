@@ -146,7 +146,6 @@ namespace rigid2d
 
         // Twist2D operator()(Twist2D tw) const;
         Twist2D operator()(Twist2D V) const;
-
         // Transform2D (vector2D & v);
     };
 
@@ -178,6 +177,7 @@ namespace rigid2d
     /// HINT: This function can be implemented in terms of *=
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
+    Vector2D intergrateTwist(const Twist2D & tw);
     // /// twist fucntion
     std::ostream & operator<<(std::ostream & os, const Twist2D & twist);
     std::istream & operator>>(std::istream & is, Twist2D & twist);

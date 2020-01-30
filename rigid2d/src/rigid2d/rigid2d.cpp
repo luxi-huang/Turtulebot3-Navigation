@@ -162,3 +162,11 @@ Twist2D Transform2D::operator()(Twist2D tw) const{
   twist.vy = -tw.theta_dot*T13+T21*tw.vx + T22*tw.vy;
   return twist;
 }
+
+
+Vector2D intergrateTwist(const Twist2D & tw){
+  Vector2D v;
+  v.x = tw.vx*1;
+  v.y = tw.vy*1;
+  return v;
+}

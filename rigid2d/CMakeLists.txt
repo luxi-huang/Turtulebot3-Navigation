@@ -106,7 +106,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS roscpp std_msgs
-  #DEPENDS system_lib
+  # DEPENDS system_lib
 )
 
 ###########
@@ -118,7 +118,7 @@ catkin_package(
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-  # ${GSTREAMER_INCLUDE_DIRS}
+  ${GSTREAMER_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -174,16 +174,16 @@ install(TARGETS ${PROJECT_NAME}_node
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
 install(TARGETS ${PROJECT_NAME}
-  # ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  # RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-  # PATTERN ".svn" EXCLUDE
+  PATTERN ".svn" EXCLUDE
 )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
@@ -202,6 +202,17 @@ install(DIRECTORY include/${PROJECT_NAME}/
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
+#
+# if(CATKIN_ENABLE_TESTING)
+#   find_package(rostest REQUIRED)
+#   add_rostest_gtest(testing-test launch/gtest.test test/tests_1.cpp)
+#   # target_link_libraries(testing-test ${catkin_LIBRARIES} testing)
+# endif()
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(${PROJECT_NAME}-test launch/gtest.test test/tests_1.cpp)
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME})
+endif()
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
