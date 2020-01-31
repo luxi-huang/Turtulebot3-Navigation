@@ -134,7 +134,7 @@ add_library( ${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}/${PROJECT_NAME}.cpp src/${PROJECT_NAME}_node.cpp)
+add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}/${PROJECT_NAME}.cpp src/${PROJECT_NAME}_node.cpp include/rigid2d/${PROJECT_NAME}.hpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

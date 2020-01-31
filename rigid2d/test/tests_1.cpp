@@ -212,21 +212,21 @@ TEST(TestSuite, test13)
 
 
 
-TEST(TestSuite, test14)
-{
-  struct Vector2D v;
-
-  // std::cout << "enter 1 for v.x\n";
-  ROS_INFO ("enter 1 for v.x\n");
-  std::cin >> v.x;
-  // std::cout << "enter 1 for v.y\n";
-  ROS_INFO ("enter 1 for v.y\n");
-  std::cin >> v.y;
-
-  std::stringstream buffer;
-  buffer << "v :"<<v.x<<","<<v.y;
-  ASSERT_EQ(buffer.str(),"v :1,1");
-}
+// TEST(TestSuite, test14)
+// {
+//   struct Vector2D v;
+//
+//   // std::cout << "enter 1 for v.x\n";
+//   ROS_INFO ("enter 1 for v.x");
+//   std::cin >> v.x;
+//   // std::cout << "enter 1 for v.y\n";
+//   ROS_INFO ("enter 1 for v.y\n");
+//   std::cin >> v.y;
+//
+//   std::stringstream buffer;
+//   buffer << "v :"<<v.x<<","<<v.y;
+//   ASSERT_EQ(buffer.str(),"v :1,1");
+// }
 
 // integrate twist test;
 TEST(TestSuite, test15)
@@ -239,16 +239,25 @@ TEST(TestSuite, test15)
 
   std::stringstream buffer;
   buffer << "v :"<<v.x<<","<<v.y;
-  ASSERT_EQ(buffer.str(),"v :1,1");
-
+  ASSERT_EQ(buffer.str(),"v :1,2");
 }
 
 
 
 
+
+
+
 int main(int argc, char **argv){
+  ROS_INFO("hello11111");
   testing::InitGoogleTest(&argc, argv);
+  ROS_INFO("hello22222");
+  // if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info) )
+  //  ros::console::notifyLoggerLevelsChanged();
+
   ros::init(argc, argv, "tester");
+  ROS_INFO("hello333333");
   ros::NodeHandle nh;
+  ROS_INFO("hello44444");
   return RUN_ALL_TESTS();
 }

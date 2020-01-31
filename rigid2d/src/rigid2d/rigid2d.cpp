@@ -164,9 +164,9 @@ Twist2D Transform2D::operator()(Twist2D tw) const{
 }
 
 
-Vector2D intergrateTwist(const Twist2D & tw){
+Vector2D rigid2d::intergrateTwist(const Twist2D & twi){
   Vector2D v;
-  v.x = tw.vx*1;
-  v.y = tw.vy*1;
+  v.x = twi.vx*1;
+  v.y = twi.vy*1;
   return v;
 }

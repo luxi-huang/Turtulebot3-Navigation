@@ -3,11 +3,11 @@
 #include "cmath"
 #include <cstdlib> //c standard library
 
-// almost_equal(0.0, 0.0);
 
 using namespace rigid2d;
 
 int main(){
+  // std::cout<<"test!!!!";
   struct Vector2D v_ab, v_bc, v, va,vb,vc;
   double degree_ab,degree_bc, radians_ab, radians_bc;
   Transform2D Tba,Tcb,I, Tac, Tca;
@@ -18,6 +18,7 @@ int main(){
   // struct Vector2D m;
   // v.x = 3.3;
   // v.y = 2.2;
+
 
   I = Transform2D();
   std::cout << "I : "<<I<<"\n";
