@@ -170,3 +170,21 @@ Vector2D rigid2d::intergrateTwist(const Twist2D & twi){
   v.y = twi.vy*1;
   return v;
 }
+
+//Vector multiplication, scaler on left side;
+
+Vector2D rigid2d::operator*(double s, const Vector2D v)
+{
+  Vector2D a;
+  a.x = v.x*s;
+  a.y = v.y*s;
+  return a;
+}
+
+//Vector multiplication, scaler on left side;
+Vector2D rigid2d::operator*=(double a, Vector2D &v)
+{
+  v.x = v.x*a;
+  v.y = v.y*a;
+  return v;
+}

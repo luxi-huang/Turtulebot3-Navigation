@@ -242,6 +242,65 @@ TEST(TestSuite, test15)
   ASSERT_EQ(buffer.str(),"v :1,2");
 }
 
+TEST(TestSuite, test16)
+{
+  Vector2D v1,v2,v3;
+  v1.x = 1;
+  v1.y = 2;
+
+  v2.x = 3;
+  v2.y = 4;
+
+  v3 = v1+v2;
+  std::stringstream buffer;
+  buffer << "v :"<<v3.x<<","<<v3.y;
+  ASSERT_EQ(buffer.str(),"v :4,6");
+}
+
+TEST(TestSuite, test17)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 2;
+
+  v2.x = 3;
+  v2.y = 4;
+
+  v1+=v2;
+  std::stringstream buffer;
+  buffer << "v :"<<v1.x<<","<<v1.y;
+  ASSERT_EQ(buffer.str(),"v :4,6");
+}
+
+TEST(TestSuite, test18)
+{
+  Vector2D v1,v2,v3;
+  v1.x = 1;
+  v1.y = 2;
+
+  v2.x = 3;
+  v2.y = 4;
+
+  v3 = v1-v2;
+  std::stringstream buffer;
+  buffer << "v :"<<v3.x<<","<<v3.y;
+  ASSERT_EQ(buffer.str(),"v :-2,-2");
+}
+
+TEST(TestSuite, test18)
+{
+  Vector2D v1,v2,v3;
+  v1.x = 1;
+  v1.y = 2;
+
+  v2.x = 3;
+  v2.y = 4;
+
+  v3 = v1-v2;
+  std::stringstream buffer;
+  buffer << "v :"<<v3.x<<","<<v3.y;
+  ASSERT_EQ(buffer.str(),"v :-2,-2");
+}
 
 
 

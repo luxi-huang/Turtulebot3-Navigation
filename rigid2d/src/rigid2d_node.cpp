@@ -8,17 +8,29 @@ using namespace rigid2d;
 
 int main(){
   // std::cout<<"test!!!!";
-  struct Vector2D v_ab, v_bc, v, va,vb,vc;
-  double degree_ab,degree_bc, radians_ab, radians_bc;
+  struct Vector2D v_ab, v_bc, v, va,vb,vc,v_test1,v_test2,v_test3;
+  double degree_ab,degree_bc, radians_ab, radians_bc,test;
   Transform2D Tba,Tcb,I, Tac, Tca;
   char frame;
   struct Twist2D twist1, twist_a,twist_b,twist_c;
   // Transform2D I;
   // Transform2D I;
   // struct Vector2D m;
-  // v.x = 3.3;
-  // v.y = 2.2;
-
+  v_test1.x = 3.3;
+  v_test1.y = 2.2;
+  v_test2.x = 1;
+  v_test2.y = 1;
+  // v_test1 -= v_test2;
+  test = v_test1.angle(v_test1,v_test2);
+  // v_test3 = v_test1 - v_test2;
+  // 3*=v_test1;
+  // test = v_test1.length(v_test1);
+  // v_test3 = v_test1*3;
+  // test = v_test1.distance(v_test1,v_test2);
+  std::cout << "v_test1" << v_test1.x << "," << v_test1.y;
+  std::cout << "v_test2" << v_test2.x << "," << v_test2.y;
+  std::cout << "v_test3" << v_test3.x << "," << v_test3.y;
+  std::cout << "v_test1" << test;
 
   I = Transform2D();
   std::cout << "I : "<<I<<"\n";

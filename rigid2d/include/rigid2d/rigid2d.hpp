@@ -68,9 +68,87 @@ namespace rigid2d
     /// \brief A 2-Dimensional Vector
     struct Vector2D
     {
-        double x = 0.0;
-        double y = 0.0;
+      double x = 0.0;
+      double y = 0.0;
+
+      Vector2D operator+(const Vector2D & v){
+        Vector2D a;
+        a.x = v.x + x ;
+        a.y = v.y + y ;
+        return a;
+      }
+
+      Vector2D & operator+=(const Vector2D & v){
+        x = v.x + x ;
+        y = v.y + y ;
+        return *this;
+      }
+
+      Vector2D operator-(const Vector2D & v){
+        Vector2D a;
+        a.x = x-v.x ;
+        a.y = y-v.y ;
+        return a;
+      }
+
+      Vector2D & operator-=(const Vector2D & v){
+        x = x - v.x ;
+        y = y - v.y;
+        return *this;
+      }
+      // Transform2D rigid2d::operator*(Transform2D lhs, const Transform2D & rhs)
+      // Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
+
+      // Vector multiplication  scalar on right side;
+      Vector2D operator*(double s) const
+      {
+        Vector2D a;
+        a.x = x*s ;
+        a.y = y*s ;
+        return a;
+      }
+
+      Vector2D & operator*=(const double s){
+        x = x*s ;
+        y = y*s ;
+        return *this;
+      }
+
+      double length(const Vector2D v){
+        double len;
+        len = sqrt(pow(v.x,2) + pow(v.y,2));
+        return len;
+      }
+
+      double distance(const Vector2D v1, const Vector2D v2){
+        double dis;
+        dis = sqrt((pow(v1.x-v2.x,2)+pow(v1.y-v2.y,2)));
+        return dis;
+      }
+
+      double angle(const Vector2D v1, const Vector2D v2){
+        double dot, det,angl;
+        dot = v1.x*v2.x + v1.y*v2.y;
+        det = v1.x*v2.y - v1.y*v2.x;
+        angl = atan2(det, dot);
+        return angl;
+      }
+
+
+
     };
+
+    //Vector multiplication, scaler on left side;
+    Vector2D operator*(double s, const Vector2D v);
+    Vector2D operator*=(double a, Vector2D & v);
+    // {
+    //   Vector2D a;
+    //   a.x = v.x*s ;
+    //   a.y = v.y*s ;
+    //   return a;
+    // }
+
+
 
     struct Twist2D
     {
@@ -181,6 +259,9 @@ namespace rigid2d
     // /// twist fucntion
     std::ostream & operator<<(std::ostream & os, const Twist2D & twist);
     std::istream & operator>>(std::istream & is, Twist2D & twist);
+
+
+
 }
 
 #endif
