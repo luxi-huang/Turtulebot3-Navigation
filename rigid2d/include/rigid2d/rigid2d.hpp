@@ -51,10 +51,42 @@ namespace rigid2d
       return rad * 180 /rigid2d::PI;
     }
 
+    // constexpr double normalize_angle(double rad);
+
+
+    constexpr double normalize_angle(double rad){
+      // return rad = rigid2d::PI;
+      while (rad<-rigid2d::PI||rad>rigid2d::PI){
+        if (rad < -rigid2d::PI){
+          rad = rad + 2*rigid2d::PI;
+        }
+        else if (rad > rigid2d::PI)
+        {
+          rad = rad - 2*rigid2d::PI;
+        }
+      }
+      return rad;
+    }
+
     /// static_assertions test compile time assumptions.
     /// You should write at least one more test for each function
     /// You should also purposely (and temporarily) make one of these tests fail
     /// just to see what happens
+    //
+    //
+    // constexpr bool check_angle(double radi){
+    //   if (normalize_angle(radi) > 1){
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // }
+
+
+    static_assert(normalize_angle(1.3)-rigid2d::PI<0 && normalize_angle(1.3)+rigid2d::PI>0, "okk");
+    static_assert(normalize_angle(6)-rigid2d::PI<0 && normalize_angle(6)+rigid2d::PI>0, "okk");
+    static_assert(normalize_angle(-6)-rigid2d::PI<0 && normalize_angle(-6)+rigid2d::PI>0, "okk");
+
     static_assert(almost_equal(0, 0), "is_zero failed");
     static_assert(almost_equal(0.001, 0.005, 1.0e-2), "is_zero failed");
 

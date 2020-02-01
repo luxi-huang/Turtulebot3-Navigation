@@ -287,7 +287,9 @@ TEST(TestSuite, test18)
   ASSERT_EQ(buffer.str(),"v :-2,-2");
 }
 
-TEST(TestSuite, test18)
+
+//test twist -= sign
+TEST(TestSuite, test19)
 {
   Vector2D v1,v2,v3;
   v1.x = 1;
@@ -296,10 +298,122 @@ TEST(TestSuite, test18)
   v2.x = 3;
   v2.y = 4;
 
-  v3 = v1-v2;
+  v1-=v2;
   std::stringstream buffer;
-  buffer << "v :"<<v3.x<<","<<v3.y;
+  buffer << "v :"<<v1.x<<","<<v1.y;
   ASSERT_EQ(buffer.str(),"v :-2,-2");
+}
+
+//Test operator vector*s
+TEST(TestSuite, test20)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 2;
+
+  double s=2;
+
+
+  v2 = v1*s;
+  std::stringstream buffer;
+  buffer << "v :"<<v2.x<<","<<v2.y;
+  ASSERT_EQ(buffer.str(),"v :2,4");
+}
+
+// test operator s*vector
+TEST(TestSuite, test21)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 2;
+
+  double s=2;
+
+
+  v2 = s*v1;
+  std::stringstream buffer;
+  buffer << "v :"<<v2.x<<","<<v2.y;
+  ASSERT_EQ(buffer.str(),"v :2,4");
+}
+
+// Test vector operator vector*=scaler
+TEST(TestSuite, test22)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 2;
+
+  double s=2;
+
+
+  v1*=s;
+  std::stringstream buffer;
+  buffer << "v :"<<v1.x<<","<<v1.y;
+  ASSERT_EQ(buffer.str(),"v :2,4");
+}
+
+
+// Test vector operator scaler*=vector
+TEST(TestSuite, test23)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 2;
+
+  double s=2;
+
+
+  s*=v1;
+  std::stringstream buffer;
+  buffer << "v :"<<v1.x<<","<<v1.y;
+  ASSERT_EQ(buffer.str(),"v :2,4");
+}
+
+
+// Test operator length
+TEST(TestSuite, test24)
+{
+  Vector2D v1;
+  v1.x = 1;
+  v1.y = 1;
+
+  double len;
+  len = v1.length(v1);
+
+  EXPECT_FLOAT_EQ(len,1.4142135);
+}
+
+TEST(TestSuite, test25)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 1;
+
+  v2.x = 2;
+  v2.y = 2;
+
+
+  double distance;
+  distance = v1.distance(v1,v2);
+
+  EXPECT_FLOAT_EQ(distance,1.4142135);
+}
+
+
+TEST(TestSuite, test26)
+{
+  Vector2D v1,v2;
+  v1.x = 1;
+  v1.y = 1;
+
+  v2.x = 1;
+  v2.y = 2;
+
+
+  double angle;
+  angle = v1.angle(v1,v2);
+
+  EXPECT_FLOAT_EQ(angle,0.32175055);
 }
 
 
