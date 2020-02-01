@@ -158,11 +158,9 @@ namespace rigid2d
         return dis;
       }
 
-      double angle(const Vector2D v1, const Vector2D v2){
-        double dot, det,angl;
-        dot = v1.x*v2.x + v1.y*v2.y;
-        det = v1.x*v2.y - v1.y*v2.x;
-        angl = atan2(det, dot);
+      double angle(const Vector2D v1){
+        double angl;
+        angl = atan2(v1.y,v1.x);
         return angl;
       }
 

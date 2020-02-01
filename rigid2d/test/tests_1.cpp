@@ -402,23 +402,17 @@ TEST(TestSuite, test25)
 
 TEST(TestSuite, test26)
 {
-  Vector2D v1,v2;
+  Vector2D v1;
   v1.x = 1;
-  v1.y = 1;
+  v1.y = 2;
 
-  v2.x = 1;
-  v2.y = 2;
 
 
   double angle;
-  angle = v1.angle(v1,v2);
+  angle = v1.angle(v1);
 
-  EXPECT_FLOAT_EQ(angle,0.32175055);
+  EXPECT_FLOAT_EQ(angle,1.1071488);
 }
-
-
-
-
 
 
 int main(int argc, char **argv){
