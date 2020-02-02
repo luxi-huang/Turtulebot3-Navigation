@@ -77,7 +77,7 @@ namespace rigid2d
       // /// \brief get the wheel speeds, based on the last encoder update
       // /// \returns the velocity of the wheels, which is equivalent to
       // /// displacement because \Delta T = 1
-      WheelVelocities wheelVelocitie(double delta_radius_L, double delta_radius_R) const;
+      WheelVelocities wheelVelocitie(double delta_radians_L, double delta_radians_R) const;
       //
       // /// \brief reset the robot to the given position/orientation
       // void reset(rigid2d::Twist2D ps);

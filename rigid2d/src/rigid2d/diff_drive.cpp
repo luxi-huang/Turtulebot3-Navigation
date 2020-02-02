@@ -47,16 +47,17 @@ void DiffDrive::updateOdometry(double left_radians, double right_radians){
   L_D = whe_radius*left_radians;
   theta += (R_D -L_D)/whe_base;
   D_T = (R_D + L_D)/2;
-  x += (D_T)*sin(theta);
-  y += (D_T)*cos(theta);
+  x = -(D_T)*sin(theta);
+  y = (D_T)*cos(theta);
 }
 
 void DiffDrive::feedforward(Twist2D cmd){
   double t = 1, new_theta;
   new_theta = cmd.theta_dot*t + theta;
   theta = normalize_angle(new_theta);
-  x += sin(cmd.theta_dot)*t;
-  y += cos(cmd.theta_dot)*t;
+  double linear_velocity = sqrt(pow(cmd.vx,2)+pow(cmd.vy,2));
+  x += linear_velocity*sin(theta)*t;
+  y += linear_velocity*cos(theta)*t;
 }
 //
 Pose DiffDrive::pose(){
@@ -67,13 +68,13 @@ Pose DiffDrive::pose(){
   return p;
 }
 
-
-WheelVelocities DiffDrive::wheelVelocitie(double delta_radius_L, double delta_radius_R) const {
+WheelVelocities DiffDrive::wheelVelocitie(double delta_radians_L, double delta_radians_R) const {
   WheelVelocities u;
-  u.u1 = delta_radius_L;
+  double R_D = delta_radians_L*whe_radius;
+  double L_D = delta_radians_R*whe_radius;
+  u.u1 = R_D;
   u.u2 = u.u1;
-  u.u3 = delta_radius_R;
+  u.u3 = L_D;
   u.u4 = u.u3;
   return u;
-
 }
