@@ -5,49 +5,6 @@
 
 using namespace rigid2d;
 
-// constexpr double PI = 3.14159265358979323846;
-//
-// constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12){
-//   if (abs(d1-d2)<epsilon){
-//     return true;
-//   }else{
-//     return false;
-//   }
-// }
-//
-// constexpr double deg2rad(double deg)
-// {
-//   return deg * rigid2d::PI /180;
-// }
-//
-// constexpr double rad2deg(double rad)
-// {
-//   return rad * 180 /rigid2d::PI;
-// }
-
-// constexpr double normalize_angle(double rad){
-//
-//   while (rad<-rigid2d::PI||rad>rigid2d::PI){
-//     if (rad < -rigid2d::PI){
-//       rad = rad + 2*rigid2d::PI;
-//     }
-//     else if (rad > rigid2d::PI){
-//       rad = rad - 2*rigid2d::PI;
-//     }
-//   return rad;
-//   }
-// }
-//
-// constexpr bool check_angle(double rad){
-//   if (normalize_angle(rad) > rigid2d::PI){
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
-
-
-
 std::ostream & operator<<(std::ostream & os, const Vector2D & v){
   os << "< " << v.x << " , " << v.y << " >";
   return os;
