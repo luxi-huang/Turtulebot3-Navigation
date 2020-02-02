@@ -9,5 +9,8 @@
 
 namespace rigid2d{
 
+  class Waypoints{
+
+  };
 }
 #endif
