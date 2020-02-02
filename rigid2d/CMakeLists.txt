@@ -123,6 +123,7 @@ include_directories(include
 
 ## Declare a C++ library
 add_library( ${PROJECT_NAME}
+  src/${PROJECT_NAME}/diff_drive.cpp
   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
 )
 
@@ -134,7 +135,14 @@ add_library( ${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}/${PROJECT_NAME}.cpp src/${PROJECT_NAME}_node.cpp include/rigid2d/${PROJECT_NAME}.hpp)
+add_executable(
+  ${PROJECT_NAME}_node
+  include/${PROJECT_NAME}/diff_drive.hpp
+  include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
+  src/${PROJECT_NAME}/diff_drive.cpp
+  src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
+  src/${PROJECT_NAME}_node.cpp
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,6 +169,7 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
+  src/${PROJECT_NAME}_node.cpp
   test_compile.bash
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
