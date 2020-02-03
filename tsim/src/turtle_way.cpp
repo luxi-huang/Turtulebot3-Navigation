@@ -30,8 +30,10 @@ void poseCallback(const turtlesim::Pose::ConstPtr & pose_message);
 int turtle_setpen_client(int off);
 int traj_rest_client();
 int Error_pose(int x, int y, int theta);
-void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance);
+void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance, turtlesim::Pose &last_pose);
+double normalize_angle(double rad);
 
+turtlesim::Pose  last_pose;
 
 int main(int argc, char **argv)
 {
@@ -78,8 +80,12 @@ int main(int argc, char **argv)
 		turtle_setpen_client(0);
 
 
+
     while (1){
       ros::spinOnce();
+			last_pose.x = turtlesim_pose.x;
+			last_pose.y = turtlesim_pose.y;
+			last_pose.y = turtlesim_pose.theta;
       if (value == 4){
         value =0;
       } else{
@@ -94,7 +100,14 @@ int main(int argc, char **argv)
       goal_pose.y = waypoints_y[value];
 
       double distance_tolerance = 0.001;
-      go_to_goal(goal_pose, distance_tolerance);
+			ROS_INFO ("%f\n",last_pose.x);
+
+      go_to_goal(goal_pose, distance_tolerance, last_pose);
+
+			last_pose.x = turtlesim_pose.x;
+			last_pose.y = turtlesim_pose.y;
+			last_pose.y = turtlesim_pose.theta;
+
     }
 	}
 }
@@ -149,17 +162,17 @@ int traj_rest_client(){
   return 0;
 }
 
-int Error_pose(int x, int y, int theta){
+int Error_pose(float x, float y,float theta){
 	tsim::PoseError p_error;
 	p_error.x_error = turtlesim_pose.x - x;
 	p_error.y_error = turtlesim_pose.y - y ;
-	theta = theta * M_PI/180;
+	// theta = theta * M_PI/180;
 	p_error.theta_error = turtlesim_pose.theta - theta;
 	PoseError_publisher.publish(p_error);
 }
 
 
-void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
+void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance, turtlesim::Pose & last_pose){
 
 	geometry_msgs::Twist goal_msg;
 	double left_distance;
@@ -176,9 +189,18 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
 		while (current_angle < -M_PI){
 			current_angle = current_angle +2*M_PI;
 		}
-		ROS_INFO ("%f\n",current_angle);
+		// ROS_INFO ("%f\n",current_angle);
 		goal_msg.angular.z = 4*current_angle;
+
 		// goal_msg.angular.z = angle;z
+		ROS_INFO ("%f\n",last_pose.x);
+
+		last_pose.x += goal_msg.linear.x*cos(goal_msg.angular.z)*0.06;
+		last_pose.y += goal_msg.linear.x*sin(goal_msg.angular.z)*0.06;
+		last_pose.theta += goal_msg.angular.z;
+		double rad = normalize_angle(last_pose.theta);
+
+		Error_pose(last_pose.x, last_pose.y, rad);
 
 		velocity_publisher.publish(goal_msg);
 
@@ -189,4 +211,20 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
 	goal_msg.linear.x =0;
 	goal_msg.angular.z = 0;
 	velocity_publisher.publish(goal_msg);
+}
+
+
+
+double normalize_angle(double rad){
+	// return rad = rigid2d::PI;
+	while (rad<-M_PI||rad>M_PI){
+		if (rad < -M_PI){
+			rad = rad + 2*M_PI;
+		}
+		else if (rad > M_PI)
+		{
+			rad = rad - 2*M_PI;
+		}
+	}
+	return rad;
 }
