@@ -38,8 +38,8 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "turtle_rect");
 	ros::NodeHandle n;
 	publich: n;
-	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",);
-	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);60
+	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1000);
+	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
   std::vector<double> waypoints_x =  {0.5,1,1.25,0.75,0.25};
   std::vector<double> waypoints_y =  {0,0,0.5,1,0.5};
@@ -161,7 +161,7 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
 	geometry_msgs::Twist goal_msg;
 	double left_distance;
 	ros::Rate loop_rate(100);
-  double x;
+  double x,y;
   x = goal_pose.x;
   y = goal_pose.y;
 	do{
@@ -173,8 +173,8 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
 		goal_msg.angular.y = 0;
 		goal_msg.angular.z =1*(atan2(goal_pose.y-turtlesim_pose.y, goal_pose.x-turtlesim_pose.x)-turtlesim_pose.theta);
 
-    x += goal.msg.linear.x * cos(goal_msg.angular.z);
-    y += goal.msg.linear.x * sin(goal_msg.angular.z);
+    x += goal_msg.linear.x * cos(goal_msg.angular.z);
+    y += goal_msg.linear.x * sin(goal_msg.angular.z);
     Error_pose(x, y , goal_msg.angular.z);
 
 		velocity_publisher.publish(goal_msg);
