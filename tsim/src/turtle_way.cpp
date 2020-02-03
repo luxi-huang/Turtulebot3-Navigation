@@ -37,11 +37,11 @@ turtlesim::Pose  last_pose;
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "turtle_rect");
+	ros::init(argc, argv, "turtle_way");
 	ros::NodeHandle n;
 	publich: n;
 	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",60);
-	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);
+	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 60);
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
   std::vector<double> waypoints_x =  {3,7,9,5,1};
   std::vector<double> waypoints_y =  {2,3,7,10,6};
@@ -74,9 +74,9 @@ int main(int argc, char **argv)
   int value = 0;
 	while (ros::ok()){
 		// ros::spinOnce();
-		ros::Duration(2).sleep();
+		ros::Duration(1).sleep();
 		traj_rest_client();
-		ros::Duration(2).sleep();
+		ros::Duration(1).sleep();
 		turtle_setpen_client(0);
 
 
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
       goal_pose.y = waypoints_y[value];
 
       double distance_tolerance = 0.001;
-			ROS_INFO ("%f\n",last_pose.x);
+			// ROS_INFO ("%f\n",last_pose.x);
 
       go_to_goal(goal_pose, distance_tolerance, last_pose);
 
@@ -193,10 +193,10 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance, turtlesim
 		goal_msg.angular.z = 4*current_angle;
 
 		// goal_msg.angular.z = angle;z
-		ROS_INFO ("%f\n",last_pose.x);
+		// ROS_INFO ("%f\n",last_pose.x);
 
-		last_pose.x += goal_msg.linear.x*cos(goal_msg.angular.z)*0.06;
-		last_pose.y += goal_msg.linear.x*sin(goal_msg.angular.z)*0.06;
+		last_pose.x += goal_msg.linear.x*cos(goal_msg.angular.z)*0.006;
+		last_pose.y += goal_msg.linear.x*sin(goal_msg.angular.z)*0.006;
 		last_pose.theta += goal_msg.angular.z;
 		double rad = normalize_angle(last_pose.theta);
 

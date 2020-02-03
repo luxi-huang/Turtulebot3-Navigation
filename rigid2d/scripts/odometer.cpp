@@ -35,16 +35,17 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "odometer");
 
-  ros::NodeHandle n("~");
+  ros::NodeHandle nh1;
+
   string odm_frame_id;
   string body_frame_id;
-  n.getParam("odm_frame_id",odm_frame_id);
-  n.getParam("body_frame_id",body_frame_id);
+  nh1.getParam("odm_frame_id",odm_frame_id);
+  nh1.getParam("body_frame_id",body_frame_id);
   // n.getParam();
   double wheel_base;
   double wheel_radius;
-  n.getParam("wheel_base",wheel_base);
-  n.getParam("wheel_radius",wheel_radius);
+  nh1.getParam("wheel_base",wheel_base);
+  nh1.getParam("wheel_radius",wheel_radius);
 
 
   Pose pp;
@@ -55,8 +56,8 @@ int main(int argc, char **argv)
   wheel_radius =2.0;
   DiffDrive diff;
   diff= DiffDrive(pp,wheel_base,wheel_radius);
-  odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry", 1000);
-  joint_state_subscriber = n.subscribe("joint_state", 10,poseCallback);
+  odm_publisher = nh1.advertise<nav_msgs::Odometry>("Odometry", 1000);
+  joint_state_subscriber = nh1.subscribe("joint_state", 10,poseCallback);
 
   ros::Time current_time;
 
