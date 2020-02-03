@@ -1,4 +1,5 @@
 #include "rigid2d/diff_drive.hpp"
+#include "rigid2d/rigid2d.hpp"
 #include <iostream>
 #include "cmath"
 #include <cstdlib> //c standard library

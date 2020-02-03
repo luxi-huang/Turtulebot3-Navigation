@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8.3)
 project(rigid2d)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -11,6 +11,8 @@ add_compile_options(-Wall -std=c++17 -Werror)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  tf2;
+  tf2_ros;
 )
 
 ## System dependencies are found with CMake's conventions
@@ -106,7 +108,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS roscpp std_msgs
-  # DEPENDS system_lib
+  #DEPENDS system_lib
 )
 
 ###########
@@ -115,7 +117,8 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include
+include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${GSTREAMER_INCLUDE_DIRS}
@@ -125,7 +128,7 @@ include_directories(include
 add_library( ${PROJECT_NAME}
   src/${PROJECT_NAME}/diff_drive.cpp
   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
-  src/${PROJECT_NAME}/waypoints.cpp
+  src/rigid2d/waypoints.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -136,16 +139,34 @@ add_library( ${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(
-  ${PROJECT_NAME}_node
+add_executable(${PROJECT_NAME}_node
   include/${PROJECT_NAME}/diff_drive.hpp
   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
   include/${PROJECT_NAME}/waypoints.hpp
   src/${PROJECT_NAME}/diff_drive.cpp
   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
   src/${PROJECT_NAME}_node.cpp
-  src/${PROJECT_NAME}/waypoints.cpp
+  src/rigid2d/waypoints.cpp
+  # scripts/odometer.cpp
 )
+
+add_executable(odometer
+  include/${PROJECT_NAME}/diff_drive.hpp
+  include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
+  include/${PROJECT_NAME}/waypoints.hpp
+  src/${PROJECT_NAME}/diff_drive.cpp
+  src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
+  src/rigid2d/waypoints.cpp
+  scripts/odometer.cpp
+)
+
+
+add_dependencies(odometer ${odometer_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odometer
+  ${catkin_LIBRARIES}
+)
+
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,6 +182,9 @@ add_executable(
 target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
 )
+#target_link_libraries(odometer_node
+   #${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
@@ -172,7 +196,6 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
-  src/${PROJECT_NAME}_node.cpp
   test_compile.bash
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
@@ -210,21 +233,13 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_rigid2d.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-#
-# if(CATKIN_ENABLE_TESTING)
-#   find_package(rostest REQUIRED)
-#   add_rostest_gtest(testing-test launch/gtest.test test/tests_1.cpp)
-#   # target_link_libraries(testing-test ${catkin_LIBRARIES} testing)
-# endif()
-
+#catkin_add_gtest(${PROJECT_NAME}-test test/test.cpp)
+ #if(TARGET ${PROJECT_NAME}-test)
+ #target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+ #endif()
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   add_rostest_gtest(${PROJECT_NAME}-test launch/gtest.test test/tests_1.cpp)
-  # add_rostest_gtest(${PROJECT_NAME}-test launch/gtest.test test/tests_diff_drive.cpp)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
 ## Add folders to be run by python nosetests
