@@ -26,21 +26,20 @@ turtlesim::Pose turtlesim_pose;
 ros::Publisher PoseError_publisher;
 // ros::NodeHandles n;
 
-void go_stright(double speed, double distance, bool ifForward,double xvalue, double yalue, int dirct);
-void rotate (double angular_vel, double relative_rotate_angle_degree, bool clockwise);
-void set_relative_angle(double desired_angle_degree);
 void poseCallback(const turtlesim::Pose::ConstPtr & pose_message);
 int turtle_setpen_client(int off);
 int traj_rest_client();
 int Error_pose(int x, int y, int theta);
+void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance);
+
 
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "turtle_rect");
 	ros::NodeHandle n;
 	publich: n;
-	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 1000);
-	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 60);
+	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",);
+	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);60
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
   std::vector<double> waypoints_x =  {0.5,1,1.25,0.75,0.25};
   std::vector<double> waypoints_y =  {0,0,0.5,1,0.5};
@@ -69,115 +68,36 @@ int main(int argc, char **argv)
 	ROS_INFO ("rot_vel :%d, The rotational velocity of the robot",rot_vel);
 	ROS_INFO ("frequency :%d, The frequency of the control loop",frequency);
 
-	ros::Rate loop_rate(1000);
+	// ros::Rate loop_rate(1000);
+  int value = 0;
 	while (ros::ok()){
 		ros::spinOnce();
 		ros::Duration(2).sleep();
 		traj_rest_client();
 		ros::Duration(2).sleep();
 		turtle_setpen_client(0);
-		go_stright(trans_vel,width,true,x_value, y_value, 0);
-		// Error_pose(x_value+width, y_value, 0);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true,x_value+width, y_value, 90);
-		// Error_pose(x_value+width, y_value+height, 90);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,width,true,x_value+width, y_value+height, 180);
-		// Error_pose(x_value, y_value+height, 180);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true,x_value, y_value+height,-90);
-		// Error_pose(x_value, y_value+height, -90);
+    if (value == 4){
+      value =0;
+    } else{
+      value += 1;
+    }
+
+    int goal_x, goal_y;
+
+    goal_x = waypoints_x[value];
+    goal_y = waypoints_y[value];
+    turtlesim::Pose  goal_pose;
+
+    goal_pose.x = goal_x;
+    goal_pose.y = goal_y;
+    double distance_tolerance = 0.001;
+    go_to_goal(goal_pose, distance_tolerance);
+
 	}
 }
 
-void go_stright(double speed, double distance, bool ifForward,double xvalue, double yvalue, int direct){
-	geometry_msgs::Twist go_stright_msg;
-
-	if (ifForward)
-		go_stright_msg.linear.x =abs(speed);
-	else
-		go_stright_msg.linear.x =-abs(speed);
-
-	go_stright_msg.linear.y =0;
-	go_stright_msg.linear.z =0;
-	go_stright_msg.angular.x = 0;
-	go_stright_msg.angular.y = 0;
-	go_stright_msg.angular.z =0;
-
-	double start_time = ros::Time::now().toSec();
-	double current_distance = 0.0;
-	ros::Rate loop_rate(100);
-
-	//if current_distanace samller than desired distance, keep moving straight
-	do{
-		// double current_time = ros::Time::now().toSec();
-		velocity_publisher.publish(go_stright_msg);
-		double current_time = ros::Time::now().toSec();
-		current_distance = speed * (current_time-start_time);
-
-		if (direct == 0) {
-			Error_pose(current_distance + xvalue, yvalue, direct);
-		}else if (direct == 90){
-			Error_pose(xvalue, current_distance + yvalue, direct);
-		}else if (direct == -180){
-			Error_pose(xvalue - current_distance, yvalue, direct);
-		}else if (direct == -90){
-			Error_pose(xvalue, yvalue-current_distance, direct);
-		}
 
 
-
-
-		ros::spinOnce();
-		loop_rate.sleep();
-	}while(current_distance<distance);
-
-	// after arrived,set the velocity equal to immediently
-	go_stright_msg.linear.x =0;
-	velocity_publisher.publish(go_stright_msg);
-
-
-}
-
-// turtle_rotate function is for rotate the turtle to relative_angle with direction
-void rotate (double angular_vel, double relative_rotate_angle_degree, bool clockwise){
-  double relative_rotate_angle_radius = relative_rotate_angle_degree * M_PI /180.0;
-	// double relative_rotate_angle_radius;
-	// initial linear and angular velocity with all directions for 0
-	geometry_msgs::Twist angular_msg;
-	angular_msg.linear.x =0;
-	angular_msg.linear.y =0;
-	angular_msg.linear.z =0;
-	angular_msg.angular.x = 0;
-	angular_msg.angular.y = 0;
-	angular_msg.angular.z = 0;
-
-	// relative_rotate_angle_radius = relative_rotate_angle * M_PI /180.0;
-	if (clockwise)
-		angular_msg.angular.z =-abs(angular_vel);
-	else
-		angular_msg.angular.z =abs(angular_vel);
-
-	double rotate_angle = 0.0;
-	double start_time = ros::Time::now().toSec();
-
-	// keep rotate until the rotate angle equal to relative_rotate_angle
-	ros::Rate loop_rate(1000);
-	do{
-	  // double current_time = ros::Time::now().toSec();
-		velocity_publisher.publish(angular_msg);
-		double current_time = ros::Time::now().toSec();
-		rotate_angle = angular_vel * (current_time-start_time);
-		ros::spinOnce();
-		loop_rate.sleep();
-		// ROS_INFO("%f", rotate_angle);
-	}while(rotate_angle<relative_rotate_angle_radius);
-
-	// after reach to desired angle, set angle to 0
-	angular_msg.angular.z =0;
-	velocity_publisher.publish(angular_msg);
-
-}
 
 void poseCallback(const turtlesim::Pose::ConstPtr & pose_message){
 	turtlesim_pose.x=pose_message->x;
@@ -185,14 +105,6 @@ void poseCallback(const turtlesim::Pose::ConstPtr & pose_message){
 	turtlesim_pose.theta=pose_message->theta;
 }
 
-void set_relative_angle (double desired_angle_degree){
-	double desired_angle_radians = desired_angle_degree * M_PI /180.0;
-	double relative_angle_radians = desired_angle_radians - turtlesim_pose.theta;
-	double relative_angle_degree =relative_angle_radians *180.0/M_PI;
-	bool clockwise = ((relative_angle_degree<0)?true:false);
-	rotate (0.2, abs(relative_angle_degree), clockwise);
-
-}
 
 int turtle_setpen_client(int off){
 	ros::NodeHandle n;
@@ -241,4 +153,37 @@ int Error_pose(int x, int y, int theta){
 	theta = theta * M_PI/180;
 	p_error.theta_error = turtlesim_pose.theta - theta;
 	PoseError_publisher.publish(p_error);
+}
+
+
+void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
+
+	geometry_msgs::Twist goal_msg;
+	double left_distance;
+	ros::Rate loop_rate(100);
+  double x;
+  x = goal_pose.x;
+  y = goal_pose.y;
+	do{
+		goal_msg.linear.x = 1*sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
+		goal_msg.linear.y =0;
+		goal_msg.linear.z =0;
+
+		goal_msg.angular.x = 0;
+		goal_msg.angular.y = 0;
+		goal_msg.angular.z =1*(atan2(goal_pose.y-turtlesim_pose.y, goal_pose.x-turtlesim_pose.x)-turtlesim_pose.theta);
+
+    x += goal.msg.linear.x * cos(goal_msg.angular.z);
+    y += goal.msg.linear.x * sin(goal_msg.angular.z);
+    Error_pose(x, y , goal_msg.angular.z);
+
+		velocity_publisher.publish(goal_msg);
+
+		// ros::spinOnce();
+		loop_rate.sleep();
+		left_distance = sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
+	}while(left_distance>distance_tolerance);
+	goal_msg.linear.x =0;
+	goal_msg.angular.z = 0;
+	velocity_publisher.publish(goal_msg);
 }
