@@ -49,13 +49,10 @@ void Waypoints::convert_velocity_to_twist(){
   tw.clear();
   int size;
   size = vel.size();
-  for (int i =0; i < 2*size; i++){
+  for (int i =0; i < size; i++){
     tw[2*i].theta_dot = vel[i].angular;
-    tw[2*i].vy = 0;
-    tw[2*i].vx = 0;
-    tw[2*i+1].theta_dot = 0;
-    tw[2*i+1].vx = vel[i].linear * cos(vel[i].angular);
-    tw[2*i+1].vy = vel[i].linear * sin(vel[i].angular);
+    tw[2*i].vx = vel[i].linear * cos(vel[i].angular);
+    tw[2*i].vy = vel[i].linear * sin(vel[i].angular);
   }
 }
 

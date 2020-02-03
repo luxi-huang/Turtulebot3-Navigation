@@ -224,6 +224,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   add_rostest_gtest(${PROJECT_NAME}-test launch/gtest.test test/tests_1.cpp)
+  # add_rostest_gtest(${PROJECT_NAME}-test launch/gtest.test test/tests_diff_drive.cpp)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME})
 endif()
 ## Add folders to be run by python nosetests

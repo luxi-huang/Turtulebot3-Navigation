@@ -1,4 +1,6 @@
 #include "rigid2d/rigid2d.hpp"
+#include "rigid2d/diff_drive.hpp"
+
 #include <ros/ros.h>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -383,6 +385,7 @@ TEST(TestSuite, test24)
   EXPECT_FLOAT_EQ(len,1.4142135);
 }
 
+// test distance
 TEST(TestSuite, test25)
 {
   Vector2D v1,v2;
@@ -399,19 +402,104 @@ TEST(TestSuite, test25)
   EXPECT_FLOAT_EQ(distance,1.4142135);
 }
 
-
+//test angle;
 TEST(TestSuite, test26)
 {
   Vector2D v1;
   v1.x = 1;
   v1.y = 2;
 
-
-
   double angle;
   angle = v1.angle(v1);
 
   EXPECT_FLOAT_EQ(angle,1.1071488);
+}
+
+//the following tests are from diff_drive.cpp
+// test twistTowheels works;
+TEST(TestSuite, test27){
+  Twist2D t;
+  WheelVelocities u;
+  double whe_base = 2.0;
+  double D = whe_base/2;
+  double whe_radius =2.0;
+  t.theta_dot =1.0;
+  t.vx = 1.0;
+  t.vy = 1.0;
+  u.u1 = (1/whe_radius)*((-D)*t.theta_dot + t.vx);
+  u.u2 = (1/whe_radius)*((D)*t.theta_dot + t.vx);
+  u.u3 = u.u2;
+  u.u4 = u.u1;
+  std::stringstream buffer;
+  buffer <<"u1: " << u.u1 << " u2: " << u.u2 << " u3: "<< u.u3 << " u4: "<< u.u4;
+  ASSERT_EQ(buffer.str(),"u1: 0 u2: 1 u3: 1 u4: 0");
+}
+
+// test wheeltotwist function;
+TEST(TestSuite, test28){
+  WheelVelocities vel;
+  Twist2D t;
+  double whe_base = 2.0;
+  double D = whe_base/2;
+  double whe_radius =2.0;
+
+  vel.u1 = 0;
+  vel.u2 = 1;
+  // t.theta_dot = ((-1/(D+L))*vel.u1 + (1/(D+L))*vel.u2 + (1/(D+L))*vel.u3 - (1/(D+L))*vel.u4)*(whe_radius/4);
+  // t.vx = vel.u1 + vel.u2 + vel.u3 + vel.u4;
+  // t.vy = -vel.u1 + vel.u2 - vel.u3 + vel.u4;
+  t.theta_dot = (vel.u1+vel.u2)*whe_radius/2;
+  t.vx = whe_radius*(vel.u2-vel.u1)/(2*D);
+  t.vy = 0;
+  std::stringstream buffer;
+  buffer <<"theta_dot: " << t.theta_dot << " vx: " << t.vx << " vy: "<< t.vy;
+  ASSERT_EQ(buffer.str(),"theta_dot: 1 vx: 1 vy: 0");
+}
+
+//test feedforward withonly angle;
+TEST(TestSuite, test29){
+
+  Twist2D cmd;
+  cmd.theta_dot = 2.0;
+  cmd.vx = 0;
+  cmd.vy = 0;
+  DiffDrive D;
+  D.feedforward(cmd);
+  Pose p;
+  p = D.pose();
+  std::stringstream buffer;
+  buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
+  ASSERT_EQ(buffer.str(),"Pose_theta 2 x 0y 0");
+}
+
+// test feedforward with only linear velocity;
+TEST(TestSuite, test30){
+  Twist2D cmd;
+  cmd.theta_dot = 0;
+  cmd.vx = 1;
+  cmd.vy = 0;
+  DiffDrive D;
+  D.feedforward(cmd);
+  Pose p;
+  p = D.pose();
+  std::stringstream buffer;
+  buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
+  ASSERT_EQ(buffer.str(),"Pose_theta 0 x 1y 0");
+}
+
+//test feedforward with only angular velocity;
+TEST(TestSuite, test31){
+  Twist2D cmd;
+  cmd.theta_dot = 1;
+  cmd.vx = 1;
+  cmd.vy = 0;
+  DiffDrive D;
+  D.feedforward(cmd);
+  Pose p;
+  p = D.pose();
+  std::stringstream buffer;
+  buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
+  ASSERT_EQ(buffer.str(),"Pose_theta 1 x 0.540302y 0.841471");
 }
 
 

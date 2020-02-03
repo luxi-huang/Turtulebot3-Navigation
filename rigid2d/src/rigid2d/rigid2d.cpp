@@ -123,7 +123,7 @@ Transform2D rigid2d::operator*(Transform2D lhs, const Transform2D & rhs){
   return lhs;
 }
 
-std::ostream & rigid2d::operator<<(std::ostream & os, const Twist2D & twist){
+std::ostream & operator<<(std::ostream & os, const Twist2D & twist){
   os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy;
   return os;
 }

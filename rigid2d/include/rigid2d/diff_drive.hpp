@@ -16,6 +16,9 @@ namespace rigid2d
     double y = 0.0;
   };
 
+  std::ostream & operator<<(std::ostream & os, const Pose & pose);
+  std::istream & operator>>(std::istream & is, Pose & pose);
+
   struct WheelVelocities
   {
     double u1 = 0.0;
@@ -24,6 +27,8 @@ namespace rigid2d
     double u4 = 0.0;
   };
 
+  std::ostream & operator<<(std::ostream & os, const  WheelVelocities & wheel_v);
+  std::istream & operator>>(std::istream & is, WheelVelocities & wheel_v);
 
   class DiffDrive
   {
@@ -80,7 +85,7 @@ namespace rigid2d
       WheelVelocities wheelVelocitie(double delta_radians_L, double delta_radians_R) const;
       //
       // /// \brief reset the robot to the given position/orientation
-      // void reset(rigid2d::Twist2D ps);
+      void reset(rigid2d::Twist2D ps);
 
   };
 
