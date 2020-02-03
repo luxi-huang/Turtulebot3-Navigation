@@ -54,7 +54,7 @@ int main(int argc, char **argv)
   wheel_base = 4.0;
   wheel_radius =2.0;
   DiffDrive diff;
-  diff = DiffDrive(pp,wheel_base,wheel_radius);
+  diff= DiffDrive(pp,wheel_base,wheel_radius);
   odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry", 1000);
   joint_state_subscriber = n.subscribe("joint_state", 10,poseCallback);
 
