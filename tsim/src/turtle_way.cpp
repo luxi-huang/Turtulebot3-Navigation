@@ -38,11 +38,11 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "turtle_rect");
 	ros::NodeHandle n;
 	publich: n;
-	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1000);
+	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",60);
 	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
-  std::vector<double> waypoints_x =  {0.5,1,1.25,0.75,0.25};
-  std::vector<double> waypoints_y =  {0,0,0.5,1,0.5};
+  std::vector<double> waypoints_x =  {3,7,9,5,1};
+  std::vector<double> waypoints_y =  {2,3,7,10,6};
 	// get parameter
 	int x_value;
 	int y_value;
@@ -71,28 +71,31 @@ int main(int argc, char **argv)
 	// ros::Rate loop_rate(1000);
   int value = 0;
 	while (ros::ok()){
-		ros::spinOnce();
+		// ros::spinOnce();
 		ros::Duration(2).sleep();
 		traj_rest_client();
 		ros::Duration(2).sleep();
 		turtle_setpen_client(0);
-    if (value == 4){
-      value =0;
-    } else{
-      value += 1;
+
+
+    while (1){
+      ros::spinOnce();
+      if (value == 4){
+        value =0;
+      } else{
+        value += 1;
+      }
+
+
+
+      turtlesim::Pose  goal_pose;
+
+      goal_pose.x = waypoints_x[value];
+      goal_pose.y = waypoints_y[value];
+
+      double distance_tolerance = 0.001;
+      go_to_goal(goal_pose, distance_tolerance);
     }
-
-    int goal_x, goal_y;
-
-    goal_x = waypoints_x[value];
-    goal_y = waypoints_y[value];
-    turtlesim::Pose  goal_pose;
-
-    goal_pose.x = goal_x;
-    goal_pose.y = goal_y;
-    double distance_tolerance = 0.001;
-    go_to_goal(goal_pose, distance_tolerance);
-
 	}
 }
 
@@ -161,9 +164,6 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
 	geometry_msgs::Twist goal_msg;
 	double left_distance;
 	ros::Rate loop_rate(100);
-  double x,y;
-  x = goal_pose.x;
-  y = goal_pose.y;
 	do{
 		goal_msg.linear.x = 1*sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
 		goal_msg.linear.y =0;
@@ -171,15 +171,18 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance){
 
 		goal_msg.angular.x = 0;
 		goal_msg.angular.y = 0;
-		goal_msg.angular.z =1*(atan2(goal_pose.y-turtlesim_pose.y, goal_pose.x-turtlesim_pose.x)-turtlesim_pose.theta);
-
-    x += goal_msg.linear.x * cos(goal_msg.angular.z);
-    y += goal_msg.linear.x * sin(goal_msg.angular.z);
-    Error_pose(x, y , goal_msg.angular.z);
+		// goal_msg.angular.z =4*(atan2(goal_pose.y-turtlesim_pose.y, goal_pose.x-turtlesim_pose.x)-turtlesim_pose.theta);
+		double current_angle = atan2(goal_pose.y-turtlesim_pose.y, goal_pose.x-turtlesim_pose.x)-turtlesim_pose.theta;
+		while (current_angle < -M_PI){
+			current_angle = current_angle +2*M_PI;
+		}
+		ROS_INFO ("%f\n",current_angle);
+		goal_msg.angular.z = 4*current_angle;
+		// goal_msg.angular.z = angle;z
 
 		velocity_publisher.publish(goal_msg);
 
-		// ros::spinOnce();
+		ros::spinOnce();
 		loop_rate.sleep();
 		left_distance = sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
 	}while(left_distance>distance_tolerance);
