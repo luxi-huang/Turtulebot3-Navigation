@@ -1,6 +1,6 @@
-// fake_diff_encoders;
+// fake_diff_encoders:create_fake_diff_encoders;
 //
-// PUBLISHERS:nav_msgs/Odometry.h(odometry) publish the odometry message
+// PUBLISHERS:sensor_msgs/JointState (joint_state): publish wheels's joint_state
 //
 // SUBSCRIBERS:geometry_msgs/Twist (cmd_vel);
 #include "rigid2d/rigid2d.hpp"

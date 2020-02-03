@@ -136,6 +136,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(turtle_rect src/turtle_rect.cpp)
 add_executable(reset_sever src/reset_sever.cpp)
+add_executable(turtle_way src/turtle_way.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -147,11 +148,16 @@ add_executable(reset_sever src/reset_sever.cpp)
 ## same as for the library above
 add_dependencies(turtle_rect ${tutle_rect_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(reset_sever ${reset_sever_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(turtle_way ${turtle_way_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(turtle_rect
   ${catkin_LIBRARIES}
 )
 target_link_libraries(reset_sever
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(turtle_way
   ${catkin_LIBRARIES}
 )
 #############
@@ -169,9 +175,27 @@ install(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
 )
 
+
+install(PROGRAMS
+  src/reset_sever.cpp
+  # scripts/my_python_script
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
+)
+
+
+
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
 install(TARGETS turtle_rect
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS reset_sever
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+install(TARGETS turtle_way
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
