@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "turtle_way");
 	ros::NodeHandle n;
-	publich: n;
+	// publich: n;
 	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",60);
 	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 60);
 	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
@@ -169,6 +169,7 @@ int Error_pose(float x, float y,float theta){
 	// theta = theta * M_PI/180;
 	p_error.theta_error = turtlesim_pose.theta - theta;
 	PoseError_publisher.publish(p_error);
+	return 0;
 }
 
 

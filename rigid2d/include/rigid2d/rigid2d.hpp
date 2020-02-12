@@ -5,6 +5,8 @@
 
 #include<iosfwd> // contains forward definitions for iostream objects
 #include "cmath"
+#include <stdlib.h>
+
 namespace rigid2d
 {
     /// \brief PI.  Not in C++ standard until C++20.
