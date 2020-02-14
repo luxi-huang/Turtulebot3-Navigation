@@ -6,81 +6,88 @@
 #include <cstdlib> //c standard library
 #include <vector>
 
-using namespace rigid2d;
-Waypoints::Waypoints(Vector2D G1,Vector2D G2,Vector2D G3,Vector2D G4){
-  //not sure if it is correct;
-  point1[0]=G1;
-  point2[0]=G2;
-  point3[0]=G3;
-  point4[0]=G4;
-  // G4 = goal;
+namespace rigid2d{
+Waypoints::Waypoints(std::vector<Vector2D> p,Velocity v){
+  points = p;
+  static_vel[0] = v;
+  vel[0] =v;
 }
+
+
 
 double Waypoints::left_distance(Pose pose){
   double left_d;
-  left_d = sqrt(pow((pose.x - goal.x),2)+pow((pose.y-goal.y),2));
+  left_d = sqrt(pow((pose.x - points[goal].x),2)+pow((pose.y-points[goal].y),2));
   return left_d;
 }
-
+//
 double Waypoints::left_angle(Pose pose){
   Vector2D v1;
   double diff_angle;
-  v1.x = goal.x - pose.x;
-  v1.y = goal.y -pose.y;
+  v1.x = points[goal].x - points[goal].x;
+  v1.y = points[goal].y - points[goal].y;
   diff_angle = v1.angle(v1);
   diff_angle -= pose.theta;
   return diff_angle;
 }
-
-void Waypoints::velocity_array(double rest_distance,double rest_angle,double steps){
-  // int steps =1 +1 ;
-  vel.clear();
-  double linear_v, angular_v;
-  linear_v = rest_distance/steps;
-  angular_v = rest_angle/steps;
-
-  for (int i =0;i<steps;i++){
-    vel[i].linear = linear_v;
-    vel[i].linear = angular_v;
-  }
-}
-
+//
+// void velocity_array(double rest_distance,double rest_angle,double steps){
+//   // int steps =1 +1 ;
+//   vel.clear();
+//   double linear_v, angular_v;
+//   linear_v = rest_distance/steps;
+//   angular_v = rest_angle/steps;
+//
+//   for (int i =0;i<steps;i++){
+//     vel[i].linear = linear_v;
+//     vel[i].linear = angular_v;
+//   }
+// }
+//
 void Waypoints::convert_velocity_to_twist(){
   tw.clear();
-  int size;
-  size = vel.size();
-  for (int i =0; i < size; i++){
-    tw[i].theta_dot = vel[i].angular;
-    tw[i].vx = vel[i].linear * cos(vel[i].angular);
-    tw[i].vy = vel[i].linear * sin(vel[i].angular);
-  }
+  tw[0].theta_dot = vel[0].angular;
+  tw[0].vx = vel[0].linear * cos(vel[0].angular);
+  tw[0].vy = vel[0].linear * sin(vel[0].angular);
 }
-
-void Waypoints::update_current_pose(DiffDrive &a){
+//
+void Waypoints::update_current_pose(DiffDrive &a, double ttime){
  int size;
  size = tw.size();
  for (int i =0; i< size; i++){
    Twist2D t;
-   a.feedforward(tw[i]);
+   a.feedforward(tw[i],ttime);
  }
 }
-
+//
+//
+void Waypoints::reset_velocity(){
+  vel[0] = static_vel[0];
+}
 
 void Waypoints::change_goal(){
-  if (goal.x == point1[0].x && goal.y == point1[0].y){
-    goal = point2[1];
-  } else if (goal.x == point2[0].x && goal.y == point2[0].y) {
-    goal = point3[1];
-  }else if (goal.x == point3[0].x && goal.y == point3[0].y) {
-    goal = point4[1];
-  }else if (goal.x == point4[0].x && goal.y == point4[0].y) {
-    goal = point1[1];
+  if (goal < points.size()-1){
+    goal = goal+1;
+  } else{
+    goal =0;
+  }
+  reset_velocity();
+}
+
+// // get another array of velocity and chagne goal to next goal;
+void Waypoints::nextWaypoint(double rest_distance,double rest_angle,double threshold_linear){
+  reset_velocity();
+  if (rest_distance < threshold_linear){
+    //change goal
+    change_goal();
+  }else if (rest_distance < vel[0].linear){
+    //change linear speed;
+    vel[0].linear = rest_distance;
+    if(rest_angle < vel[0].angular){
+    //change angular speed;
+      vel[0].angular = rest_angle;
+    }
   }
 }
 
-// get another array of velocity and chagne goal to next goal;
-void Waypoints::nextWaypoint(double rest_distance,double rest_angle,double threshold_linear){
-  if (rest_distance < threshold_linear){
-    change_goal();
-  }
 }

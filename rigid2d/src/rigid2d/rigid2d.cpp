@@ -3,7 +3,7 @@
 #include "cmath"
 #include <cstdlib> //c standard library
 
-using namespace rigid2d;
+namespace rigid2d{
 
 std::ostream & operator<<(std::ostream & os, const Vector2D & v){
   os << "< " << v.x << " , " << v.y << " >";
@@ -95,13 +95,13 @@ Transform2D& Transform2D::operator*=(const Transform2D & rhs){
   return *this;
 }
 
-std::ostream & rigid2d::operator<<(std::ostream & os, const Transform2D & tf){
+std::ostream & operator<<(std::ostream & os, const Transform2D & tf){
   os << "degree" << tf.degree << " dx " << tf.T13 << "dy "<< tf.T23;
   return os;
 }
 
 
-std::istream & rigid2d::operator>>(std::istream & is, Transform2D & tf){
+std::istream & operator>>(std::istream & is, Transform2D & tf){
   Vector2D v;
   double degree, radians;
   std::cout <<"x";
@@ -117,7 +117,7 @@ std::istream & rigid2d::operator>>(std::istream & is, Transform2D & tf){
   return is;
 }
 
-Transform2D rigid2d::operator*(Transform2D lhs, const Transform2D & rhs){
+Transform2D operator*(Transform2D lhs, const Transform2D & rhs){
   lhs*=rhs;
   // A = lhs;
   return lhs;
@@ -144,16 +144,9 @@ Twist2D Transform2D::operator()(Twist2D tw) const{
 }
 
 
-Vector2D rigid2d::intergrateTwist(const Twist2D & twi){
-  Vector2D v;
-  v.x = twi.vx*1;
-  v.y = twi.vy*1;
-  return v;
-}
-
 //Vector multiplication, scaler on left side;
 
-Vector2D rigid2d::operator*(double s, const Vector2D v)
+Vector2D operator*(double s, const Vector2D v)
 {
   Vector2D a;
   a.x = v.x*s;
@@ -162,9 +155,26 @@ Vector2D rigid2d::operator*(double s, const Vector2D v)
 }
 
 //Vector multiplication, scaler on left side;
-Vector2D rigid2d::operator*=(double a, Vector2D &v)
+Vector2D operator*=(double a, Vector2D &v)
 {
   v.x = v.x*a;
   v.y = v.y*a;
   return v;
+}
+
+// std::ostream & operator<<(std::ostream & os, const Twist2D & twist){
+//   os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy;
+//   return os;
+// }
+
+Transform2D displacement(const Transform2D & T){
+  Transform2D t;
+  t = T;
+  return t;
+}
+
+
+// Transform2D rigid2d::integrateTwist(const Twist2D & V, const Transform2D & T){
+//
+// }
 }

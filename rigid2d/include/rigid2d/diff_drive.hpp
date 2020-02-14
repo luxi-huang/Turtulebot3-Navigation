@@ -74,7 +74,7 @@ namespace rigid2d
       // /// \brief update the odometry of the diff drive robot, assuming that
       // /// it follows the given body twist for one time  unit
       // /// \param cmd - the twist command to send to the robot
-      void feedforward(Twist2D cmd);
+      void feedforward(Twist2D cmd,double ttime);
       //
       // /// \brief get the current pose of the robot
       Pose pose();

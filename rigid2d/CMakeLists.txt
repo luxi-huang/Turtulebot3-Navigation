@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rigid2d)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-Wall -std=c++17 -Werror)
+add_compile_options(-Wall -std=c++17 -Werror -Wall)
 
 # set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
 

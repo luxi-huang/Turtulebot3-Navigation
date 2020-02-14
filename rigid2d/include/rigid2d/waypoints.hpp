@@ -18,38 +18,40 @@ namespace rigid2d{
 
   class Waypoints{
     // std::vector<int> v1 = {1,2};
-    std::vector<Vector2D> point1={{0.5,0.0}};
-    std::vector<Vector2D> point2={{1.0,0.5}};
-    std::vector<Vector2D> point3={{0.5,1.0}};
-    std::vector<Vector2D> point4={{0.0,0.5}};
+    // std::vector<Vector2D> point1={{0.5,0.0}};
+    // std::vector<Vector2D> point2={{1.0,0.5}};
+    // std::vector<Vector2D> point3={{0.5,1.0}};
+    // std::vector<Vector2D> point4={{0.0,0.5}};
+    std::vector<Vector2D> points={{0.5,0.0},{1.0,0.5},{0.5,1.0}};
     std::vector<Velocity> vel = {{0,0}};
     std::vector<Twist2D> tw = {{0,0,0}};
-    Vector2D goal;
+    std::vector<Velocity> static_vel = {{0,0}};
+    double goal;
 
   public:
     //set the goal
-    Waypoints(Vector2D G1,Vector2D G2,Vector2D G3,Vector2D G4);
+    Waypoints(std::vector<Vector2D> p, Velocity v);
 
     // calcualte the rest_distance to goal point;
     double left_distance(Pose pose);
-
+    //
     // calculate left_angle;
     double left_angle(Pose pose);
-
+    //
     // calculate next twist velocities;
-    void velocity_array(double rest_distance,double rest_angle, double steps);
-
-    // change_goal;
-    void change_goal();
-
-    // set condition to move to nextWaypoint;
+    // void velocity_array(double rest_distance,double rest_angle, double steps);
+    //
+    // // set condition to move to nextWaypoint;
     void nextWaypoint(double rest_distance,double rest_angle,double threshold_linear);
-
-
+    //
+    //
     void convert_velocity_to_twist();
+    //
+    // // use twist array to update pose;
+    void update_current_pose(DiffDrive & a,double ttime);
 
-    // use twist array to update pose;
-    void update_current_pose(DiffDrive & a);
+    void change_goal();
+    void reset_velocity();
 
 
   };

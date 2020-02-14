@@ -231,18 +231,18 @@ TEST(TestSuite, test13)
 // }
 
 // integrate twist test;
-TEST(TestSuite, test15)
-{
-  Twist2D tw1;
-  Vector2D v;
-  tw1.vx = 1;
-  tw1.vy = 2;
-  v = intergrateTwist(tw1);
-
-  std::stringstream buffer;
-  buffer << "v :"<<v.x<<","<<v.y;
-  ASSERT_EQ(buffer.str(),"v :1,2");
-}
+// TEST(TestSuite, test15)
+// {
+//   Twist2D tw1;
+//   Vector2D v;
+//   tw1.vx = 1;
+//   tw1.vy = 2;
+//   v = intergrateTwist(tw1);
+//
+//   std::stringstream buffer;
+//   buffer << "v :"<<v.x<<","<<v.y;
+//   ASSERT_EQ(buffer.str(),"v :1,2");
+// }
 
 TEST(TestSuite, test16)
 {
@@ -421,18 +421,21 @@ TEST(TestSuite, test27){
   Twist2D t;
   WheelVelocities u;
   double whe_base = 2.0;
-  double D = whe_base/2;
   double whe_radius =2.0;
-  t.theta_dot =1.0;
+  t.theta_dot =2.0;
   t.vx = 1.0;
-  t.vy = 1.0;
-  u.u1 = (1/whe_radius)*((-D)*t.theta_dot + t.vx);
-  u.u2 = (1/whe_radius)*((D)*t.theta_dot + t.vx);
+  t.vy = 0.0;
+
+  u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+  u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+
+  // u.u1 = (1.0/whe_radius)*((-D)*t.theta_dot + t.vx);
+  // u.u2 = (1.0/whe_radius)*((D)*t.theta_dot + t.vx);
   u.u3 = u.u2;
   u.u4 = u.u1;
   std::stringstream buffer;
   buffer <<"u1: " << u.u1 << " u2: " << u.u2 << " u3: "<< u.u3 << " u4: "<< u.u4;
-  ASSERT_EQ(buffer.str(),"u1: 0 u2: 1 u3: 1 u4: 0");
+  ASSERT_EQ(buffer.str(),"u1: -0.5 u2: 1.5 u3: 1.5 u4: -0.5");
 }
 
 // test wheeltotwist function;
@@ -440,20 +443,25 @@ TEST(TestSuite, test28){
   WheelVelocities vel;
   Twist2D t;
   double whe_base = 2.0;
-  double D = whe_base/2;
+  double D = whe_base/2.0;
   double whe_radius =2.0;
+  double r = whe_radius/2.0;
 
-  vel.u1 = 0;
-  vel.u2 = 1;
-  // t.theta_dot = ((-1/(D+L))*vel.u1 + (1/(D+L))*vel.u2 + (1/(D+L))*vel.u3 - (1/(D+L))*vel.u4)*(whe_radius/4);
-  // t.vx = vel.u1 + vel.u2 + vel.u3 + vel.u4;
-  // t.vy = -vel.u1 + vel.u2 - vel.u3 + vel.u4;
-  t.theta_dot = (vel.u1+vel.u2)*whe_radius/2;
-  t.vx = whe_radius*(vel.u2-vel.u1)/(2*D);
-  t.vy = 0;
+  vel.u1 = -0.5;
+  vel.u2 = 1.5;
+  vel.u3 = 1.5;
+  vel.u3 = -0.5;
+
+  t.vx = (vel.u1+vel.u2)*r;
+  t.theta_dot = (vel.u2/D-vel.u1/D)*r;
+  t.vy= 0;
+
+  // t.theta_dot = (vel.u1+vel.u2)*whe_radius/2.0;
+  // t.vx = whe_radius*(vel.u2-vel.u1)/(2.0*D);
+  // t.vy = 0;
   std::stringstream buffer;
   buffer <<"theta_dot: " << t.theta_dot << " vx: " << t.vx << " vy: "<< t.vy;
-  ASSERT_EQ(buffer.str(),"theta_dot: 1 vx: 1 vy: 0");
+  ASSERT_EQ(buffer.str(),"theta_dot: 2 vx: 1 vy: 0");
 }
 
 //test feedforward withonly angle;

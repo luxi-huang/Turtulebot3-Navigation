@@ -1,5 +1,4 @@
 <launch>
-    <!-- My Package launch file -->
     <node pkg="tsim" type="turtle_way" name="turtle_way"  output="screen">
     </node>
 

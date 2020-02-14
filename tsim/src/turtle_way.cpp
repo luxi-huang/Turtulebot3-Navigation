@@ -40,9 +40,9 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "turtle_way");
 	ros::NodeHandle n;
 	// publich: n;
-	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",60);
+	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1000);
 	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 60);
-	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
+	pose_subscriber = n.subscribe("/turtle1/pose", 1000, poseCallback);
   std::vector<double> waypoints_x =  {3,7,9,5,1};
   std::vector<double> waypoints_y =  {2,3,7,10,6};
 	// get parameter
@@ -208,6 +208,7 @@ void go_to_goal(turtlesim::Pose  goal_pose, double distance_tolerance, turtlesim
 		ros::spinOnce();
 		loop_rate.sleep();
 		left_distance = sqrt(pow((turtlesim_pose.x-goal_pose.x),2)+pow((turtlesim_pose.y-goal_pose.y),2));
+		// ROS_INFO("xxxxxxxxx:%f",turtlesim_pose.x);
 	}while(left_distance>distance_tolerance);
 	goal_msg.linear.x =0;
 	goal_msg.angular.z = 0;

@@ -1,0 +1,2 @@
+wheel_radius: 0.1 # The radius of the wheels, change yaml in nuturtle_description
+wheel_base: 0.26 # The distance between the centers wheels, change yaml in nuturtle_description

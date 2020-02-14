@@ -36,7 +36,7 @@
     </visual>
   </link>
 
-  <joint name="right_wheel_axle" type="continuous">
+  <joint name="odometer/right_wheel_joint" type="continuous">
     <origin rpy="0 0 0" xyz="0 ${(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
     <child link="link_right_wheel"/>
     <parent link="base_link"/>
@@ -57,7 +57,7 @@
     </visual>
   </link>
 
-  <joint name="left_wheel_axle" type="continuous">
+  <joint name="odometer/left_wheel_joint" type="continuous">
     <origin rpy="0 0 0" xyz="0 ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
     <child link="link_left_wheel"/>
     <parent link="base_link"/>

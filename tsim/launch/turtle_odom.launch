@@ -5,18 +5,16 @@
 
 
   <node pkg="rigid2d" type="odometer" name="odometer" output="screen">
+    <rosparam command="load" file="$(find rigid2d)/config/car.yaml" />
   </node>
 
   <param name="robot_description"
        command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
-  <!-- <param name="robot_description" command="cat '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'"/> -->
-  <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+  <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
 
   <node pkg="rigid2d" type="fake_diff_encoders" name="fake_diff_encoders"  output="screen">
   </node>
-<!-- 
-  <node pkg="rigid2d" type="odometer" name="odometer" output="screen">
-  </node> -->
+
 
 
 
