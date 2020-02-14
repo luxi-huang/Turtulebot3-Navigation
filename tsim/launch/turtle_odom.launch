@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <include file="$(find tsim)/launch/turtle_pent.launch" />
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tsim)/rviz/config.rviz" />
-
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tsim)/rviz/config.rviz" /> -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/config.rviz" />
 
   <node pkg="rigid2d" type="odometer" name="odometer" output="screen">
     <rosparam command="load" file="$(find rigid2d)/config/car.yaml" />
@@ -15,7 +15,8 @@
   <node pkg="rigid2d" type="fake_diff_encoders" name="fake_diff_encoders"  output="screen">
   </node>
 
-
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <!-- Show in Rviz   -->
 
 
 

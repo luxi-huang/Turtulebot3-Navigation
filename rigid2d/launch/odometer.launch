@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-
-<node pkg="rigid2d" type="odometer" name="odometer" output="screen">
-</node>
-
-
-</launch>

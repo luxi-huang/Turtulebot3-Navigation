@@ -99,7 +99,7 @@ void publish_joint_state(WheelVelocities v){
 
   j_s.name[0] = joint_name_vector[0];
   j_s.name[1] = joint_name_vector[1];
-
+  j_s.header.stamp = ros::Time::now();
   j_s.velocity[0] = v.u1;
   j_s.velocity[1] = v.u2;
   joint_state_publisher.publish(j_s);

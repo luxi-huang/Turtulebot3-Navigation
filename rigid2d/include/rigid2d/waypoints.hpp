@@ -48,7 +48,7 @@ namespace rigid2d{
     void convert_velocity_to_twist();
     //
     // // use twist array to update pose;
-    void update_current_pose(DiffDrive & a,double ttime);
+    void update_current_pose(DiffDrive & a, double ttime);
 
     void change_goal();
     void reset_velocity();

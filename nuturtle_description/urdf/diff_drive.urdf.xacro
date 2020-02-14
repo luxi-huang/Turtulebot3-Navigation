@@ -10,8 +10,6 @@
 <xacro:property name="chassis_thinkness" value="${props['chassis_thinkness']}" />
 
 
-
-
   <link name="base_link" >
     <visual>
       <origin rpy="0 0 0" xyz="0 0 ${wheel_radius}"/>

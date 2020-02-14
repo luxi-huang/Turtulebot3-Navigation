@@ -9,8 +9,8 @@
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
   <!-- send fake joint values -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="use_gui" value="True"/>
+ <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="true"/>
   </node>
 
   <!-- Combine joint values -->

@@ -69,6 +69,7 @@ int main(int argc, char **argv)
 
   nh1.getParam("odm_frame_id",odm_frame_id);
   nh1.getParam("body_frame_id",body_frame_id);
+  // nh1.getParam("body_frame_id",body_frame_id);
   nh1.getParam("left_wheel_joint",left_wheel_joint);
   nh1.getParam("right_wheel_joint",right_wheel_joint);
 
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
     // ROS_INFO("odm_x %f", tw.theta_dot);
     diffa.feedforward(tw,duration);
     P = diffa.pose();
-    ROS_INFO("pose.x %f", P.x);
+    // ROS_INFO("pose.x %f", P.x);
     // current_time = ros::Time::now();
     send_TF(P, current_time);
     pub_odm (P,tw, current_time);
@@ -150,7 +151,7 @@ void send_TF(Pose P,ros::Time current_time){
   geometry_msgs::TransformStamped odom_trans;
   odom_trans.header.stamp = current_time;
   odom_trans.header.frame_id = "odom_frame_id";
-  odom_trans.child_frame_id = "body_frame_id";
+  odom_trans.child_frame_id = "base_link";
   odom_trans.transform.translation.x = P.x;
   odom_trans.transform.translation.y = P.y;
   odom_trans.transform.translation.z = 0.0;
@@ -177,7 +178,7 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
   odom.pose.pose.orientation = odom_quat;
 
     //set the velocity
-  odom.child_frame_id = "body_frame_id";
+  odom.child_frame_id = "base_link";
   odom.twist.twist.linear.x = tw.vx;
   odom.twist.twist.linear.y = tw.vy;
   odom.twist.twist.angular.z = tw.theta_dot;
