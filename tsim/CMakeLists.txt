@@ -3,7 +3,11 @@ project(tsim)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
-add_compile_options(-Wall -std=c++17 -Werror -Wall)
+add_compile_options(-Wall -Wno-psabi -Wextra)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -147,9 +151,9 @@ add_executable(turtle_way src/turtle_way.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(turtle_rect ${tutle_rect_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(reset_sever ${reset_sever_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(turtle_way ${turtle_way_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(turtle_rect ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(reset_sever ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(turtle_way ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(turtle_rect
   ${catkin_LIBRARIES}
@@ -199,6 +203,9 @@ install(TARGETS reset_sever
 install(TARGETS turtle_way
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
