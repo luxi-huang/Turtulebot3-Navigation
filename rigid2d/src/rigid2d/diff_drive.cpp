@@ -50,15 +50,15 @@ Twist2D DiffDrive::wheelsToTwist(WheelVelocities vel){
   return t;
 }
 
-// void DiffDrive::updateOdometry(double left_radians, double right_radians){
-//   double R_D,L_D,D_T = 0;
-//   R_D = whe_radius*right_radians;
-//   L_D = whe_radius*left_radians;
-//   theta += (R_D -L_D)/1.0/whe_base;
-//   D_T = (R_D + L_D)/2.0;
-//   x = -(D_T)*sin(theta);
-//   y = (D_T)*cos(theta);
-// }
+void DiffDrive::updateOdometry(double left_radians, double right_radians){
+  double R_D,L_D,D_T = 0;
+  R_D = whe_radius*right_radians;
+  L_D = whe_radius*left_radians;
+  theta += (R_D -L_D)/1.0/whe_base;
+  D_T = (R_D + L_D)/2.0;
+  x = -(D_T)*sin(theta);
+  y = (D_T)*cos(theta);
+}
 
 void DiffDrive::feedforward(Twist2D cmd,double ttime){
   double new_theta;
