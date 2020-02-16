@@ -94,14 +94,14 @@ int main(int argc, char **argv)
   last_time = current_time;
 
   //
-  Pose new_pose;
-  new_pose.x = 4;
-  new_pose.y = 4;
-  new_pose.theta = 0;
-  ROS_INFO("BEFORE SERVICE");
-
-  set_pose_client(new_pose);
-  ROS_INFO("AFTER SEVICE");
+  // Pose new_pose;
+  // new_pose.x = 4;
+  // new_pose.y = 4;
+  // new_pose.theta = 0;
+  // ROS_INFO("BEFORE SERVICE");
+  //
+  // set_pose_client(new_pose);
+  // ROS_INFO("AFTER SEVICE");
 
   while(ros::ok()){
     ros::spinOnce();

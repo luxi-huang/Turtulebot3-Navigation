@@ -189,15 +189,15 @@ add_executable(set_pose_service
 )
 
 
-add_executable(rotation
-  include/${PROJECT_NAME}/diff_drive.hpp
-  include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
-  include/${PROJECT_NAME}/waypoints.hpp
-  src/${PROJECT_NAME}/diff_drive.cpp
-  src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
-  src/rigid2d/waypoints.cpp
-  scripts/rotation.cpp
-)
+# add_executable(rotation
+#   include/${PROJECT_NAME}/diff_drive.hpp
+#   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
+#   include/${PROJECT_NAME}/waypoints.hpp
+#   src/${PROJECT_NAME}/diff_drive.cpp
+#   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
+#   src/rigid2d/waypoints.cpp
+#   scripts/rotation.cpp
+# )
 
 
 add_dependencies(odometer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -215,10 +215,10 @@ target_link_libraries(set_pose_service
   ${catkin_LIBRARIES}
 )
 
-add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(rotation
-  ${catkin_LIBRARIES}
-)
+# add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(rotation
+#   ${catkin_LIBRARIES}
+# )
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
