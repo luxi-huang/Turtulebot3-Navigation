@@ -17,9 +17,6 @@
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
   <!-- Show in Rviz   -->
-
-
-
-
+  <node name="set_pose_service" pkg="rigid2d" type="set_pose_service"/>
 
 </launch>

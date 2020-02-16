@@ -178,7 +178,7 @@ add_executable(fake_diff_encoders
   scripts/fake_diff_encoders.cpp
 )
 
-add_executable(fake_diff_encoders_2
+add_executable(set_pose_service
   include/${PROJECT_NAME}/diff_drive.hpp
   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
   include/${PROJECT_NAME}/waypoints.hpp
@@ -186,6 +186,17 @@ add_executable(fake_diff_encoders_2
   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
   src/rigid2d/waypoints.cpp
   src/set_pose_service.cpp
+)
+
+
+add_executable(rotation
+  include/${PROJECT_NAME}/diff_drive.hpp
+  include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
+  include/${PROJECT_NAME}/waypoints.hpp
+  src/${PROJECT_NAME}/diff_drive.cpp
+  src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
+  src/rigid2d/waypoints.cpp
+  scripts/rotation.cpp
 )
 
 
@@ -199,8 +210,15 @@ target_link_libraries(fake_diff_encoders
   ${catkin_LIBRARIES}
 )
 
-add_dependencies(fake_diff_encoders_2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(set_pose_service ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(set_pose_service
+  ${catkin_LIBRARIES}
+)
 
+add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rotation
+  ${catkin_LIBRARIES}
+)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -218,7 +236,7 @@ target_link_libraries(${PROJECT_NAME}_node
 #target_link_libraries(odometer_node
    #${catkin_LIBRARIES}
 #)
-target_link_libraries(fake_diff_encoders_2
+target_link_libraries(set_pose_service
    ${catkin_LIBRARIES}
 )
 #############

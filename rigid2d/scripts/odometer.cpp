@@ -102,16 +102,23 @@ int main(int argc, char **argv)
   current_time = ros::Time::now();
   last_time = current_time;
 
-
+  //
   Pose new_pose;
-  new_pose.x = 8;
-  new_pose.y = 8;
+  new_pose.x = 4;
+  new_pose.y = 4;
   new_pose.theta = 0;
+  ROS_INFO("BEFORE SERVICE");
+
   set_pose_client(new_pose);
-  ros::Duration(10).sleep();
+  ROS_INFO("AFTER SEVICE");
+
+  //ros::service::waitForService("set_pose_service");
+
+  //ros::Duration(10).sleep();
 
   while(ros::ok()){
     ros::spinOnce();
+    ROS_INFO("INSIDE LOOP");
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();
     last_time = current_time;
@@ -128,7 +135,7 @@ int main(int argc, char **argv)
     // current_time = ros::Time::now();
     send_TF(P, current_time);
     pub_odm (P,tw, current_time);
-    ros::spinOnce();
+    // ros::spinOnce();
 
   }
 

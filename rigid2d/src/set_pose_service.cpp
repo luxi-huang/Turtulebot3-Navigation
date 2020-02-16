@@ -24,79 +24,105 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time);
 
 ros::Publisher odm_publisher;
 
-bool callback(rigid2d::set_pen::Request  &req,
-								rigid2d::set_pen::Response &resp)
-{
-  ros::NodeHandle n;
-  odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry/Odometry", 1000);
+class Set_Pose{
+	// Pose p;
+	// Twist2D tw;
+	// tw.vx = 0;
+	// tw.vy = 0;
+	// tw.theta_dot = 0;
 
-  Pose p;
-  ros::Time current_time;
-  Twist2D tw;
-  tw.vx = 0;
-  tw.vy = 0;
-  tw.theta_dot = 0;
+public:
+	Set_Pose(){
+		ros::NodeHandle n;
+		odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry/Odometry", 1000);
+		// ros::Time current_time;
+		// send_TF(p, current_time);
+		// pub_odm (p,tw, current_time);
+	}
 
-  current_time = ros::Time::now();
-  p.x = req.robot_pose.x;
-  p.y = req.robot_pose.y;
-  p.theta = req.robot_pose.theta;
 
-  send_TF(p, current_time);
-  pub_odm (p,tw, current_time);
 
-	ros::spinOnce();
-	// ROS_INFO("11111111");
-	return 1;
-}
+	bool callback(rigid2d::set_pen::Request  &req,
+									rigid2d::set_pen::Response &resp)
+	{
+	  // ros::NodeHandle n;
+	  // odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry/Odometry", 1000);
+
+	  Pose p;
+	  ros::Time current_time;
+	  Twist2D tw;
+	  tw.vx = 0;
+	  tw.vy = 0;
+	  tw.theta_dot = 0;
+
+	  current_time = ros::Time::now();
+	  p.x = req.robot_pose.x;
+	  p.y = req.robot_pose.y;
+	  p.theta = req.robot_pose.theta;
+
+	  send_TF(p, current_time);
+	  pub_odm (p,tw, current_time);
+
+		return 1;
+	}
+
+	void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
+	  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(P.theta);
+	  nav_msgs::Odometry odom;
+	  odom.header.stamp = current_time;
+	  odom.header.frame_id = "odom_frame_id";
+	  //set the position
+	  odom.pose.pose.position.x = P.x;
+	  odom.pose.pose.position.y = P.y;
+	  odom.pose.pose.position.z = 0.0;
+	  odom.pose.pose.orientation = odom_quat;
+
+	    //set the velocity
+	  odom.child_frame_id = "base_link";
+	  odom.twist.twist.linear.x = tw.vx;
+	  odom.twist.twist.linear.y = tw.vy;
+	  odom.twist.twist.angular.z = tw.theta_dot;
+	  odm_publisher.publish(odom);
+	}
+
+	void send_TF(Pose P,ros::Time current_time){
+	  static tf2_ros::TransformBroadcaster odom_broadcaster;
+	  geometry_msgs::TransformStamped odom_trans;
+	  odom_trans.header.stamp = current_time;
+	  odom_trans.header.frame_id = "odom_frame_id";
+	  odom_trans.child_frame_id = "base_link";
+	  odom_trans.transform.translation.x = P.x;
+	  odom_trans.transform.translation.y = P.y;
+	  odom_trans.transform.translation.z = 0.0;
+
+	  tf2::Quaternion q;
+	  q.setRPY(0, 0, P.theta);
+	  odom_trans.transform.rotation.x = q.x();
+	  odom_trans.transform.rotation.y = q.y();
+	  odom_trans.transform.rotation.z = q.z();
+	  odom_trans.transform.rotation.w = q.w();
+
+	  odom_broadcaster.sendTransform(odom_trans);
+	}
+
+
+
+
+
+};
+
+
+
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "set_pen_sever");
+	ros::init(argc, argv, "set_pose_service");
 	ros::NodeHandle n;
-	ros::ServiceServer service = n.advertiseService("/set_pose",callback);
+	Set_Pose sett;
+	// odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry/Odometry", 1000);
+	ros::ServiceServer service = n.advertiseService("/set_pose",& Set_Pose::callback, &sett);
 	ROS_INFO ("ready to call service");
 	ros::spin();
 
 	return 0;
-}
-
-
-void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
-  geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(P.theta);
-  nav_msgs::Odometry odom;
-  odom.header.stamp = current_time;
-  odom.header.frame_id = "odom_frame_id";
-  //set the position
-  odom.pose.pose.position.x = P.x;
-  odom.pose.pose.position.y = P.y;
-  odom.pose.pose.position.z = 0.0;
-  odom.pose.pose.orientation = odom_quat;
-
-    //set the velocity
-  odom.child_frame_id = "base_link";
-  odom.twist.twist.linear.x = tw.vx;
-  odom.twist.twist.linear.y = tw.vy;
-  odom.twist.twist.angular.z = tw.theta_dot;
-  odm_publisher.publish(odom);
-}
-
-void send_TF(Pose P,ros::Time current_time){
-  static tf2_ros::TransformBroadcaster odom_broadcaster;
-  geometry_msgs::TransformStamped odom_trans;
-  odom_trans.header.stamp = current_time;
-  odom_trans.header.frame_id = "odom_frame_id";
-  odom_trans.child_frame_id = "base_link";
-  odom_trans.transform.translation.x = P.x;
-  odom_trans.transform.translation.y = P.y;
-  odom_trans.transform.translation.z = 0.0;
-
-  tf2::Quaternion q;
-  q.setRPY(0, 0, P.theta);
-  odom_trans.transform.rotation.x = q.x();
-  odom_trans.transform.rotation.y = q.y();
-  odom_trans.transform.rotation.z = q.z();
-  odom_trans.transform.rotation.w = q.w();
-
-  odom_broadcaster.sendTransform(odom_trans);
 }
