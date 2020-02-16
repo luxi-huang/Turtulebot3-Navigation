@@ -65,6 +65,7 @@
   <build_export_depend>std_srvs</build_export_depend>
   <build_export_depend>nuturtlebot</build_export_depend>
   <build_export_depend>rigid2d</build_export_depend>
+  <test_depend>rostest</test_depend>
 
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>

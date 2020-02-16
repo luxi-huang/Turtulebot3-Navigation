@@ -36,11 +36,12 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "turtle_interface");
   ros::NodeHandle n;
+
   cmd_vel_subscriber =  n.subscribe("cmd_vel",1000,velCallback);
-  wheel_cmd_publisher = n.advertise<nuturtlebot::WheelCommands>("wheel_cmd", 1000);
+  wheel_cmd_publisher = n.advertise<nuturtlebot::WheelCommands>("wheel_cmd", true);
 
   sensor_data_subscriber = n.subscribe("sensor_data",1000,sensor_Callback);
-  joint_state_publisher = n.advertise<sensor_msgs::JointState>("joint_states", 1000);
+  joint_state_publisher = n.advertise<sensor_msgs::JointState>("joint_states",true);
 
 
   double wheel_base;
@@ -75,7 +76,13 @@ int main(int argc, char **argv)
   while(ros::ok()){
     // get robot_cmd and publish to wheel_velocity;
     WheelVelocities wheel_v;
+    // ROS_INFO("wheel_base: %f", wheel_base);
+    // ROS_INFO("twist value: %f",ttwist_value.vx);
     wheel_v = diff1.twistToWheels(ttwist_value);
+    // ROS_INFO("wheel_v_u1: %f ", wheel_v.u1);
+    // ROS_INFO("wheel_encoder left: %f ", new_left);
+    // ROS_INFO("wheel_encoder left: %f ", new_right);
+     // wheel_sensor
     pub_wheel_velocity(wheel_v);
 
     // get time intervel
@@ -99,6 +106,7 @@ int main(int argc, char **argv)
     // P = diff1.pose();
     publish_joint_state(wheel_v_encoder);
 
+    // ROS_INFO("%f",ttwist_value.vx);
     ros::spinOnce();
   }
 }
@@ -116,12 +124,15 @@ void pub_wheel_velocity(WheelVelocities v){
   nuturtlebot::WheelCommands v_cmd;
   v_cmd.left_velocity = v.u1;
   v_cmd.right_velocity = v.u2;
+  // ROS_INFO ("%f", v.u1);
   wheel_cmd_publisher.publish(v_cmd);
 }
 
 void sensor_Callback(const nuturtlebot::SensorData::ConstPtr & sensor){
   new_left = sensor->left_encoder;
   new_right = sensor->right_encoder;
+  ROS_INFO("wheel_encoder left:!!!!!!! %d ", new_left);
+  ROS_INFO("wheel_encoder right:!!!!!!!!! %d ", new_right);
 }
 
 void publish_joint_state(WheelVelocities v){
@@ -139,5 +150,7 @@ void publish_joint_state(WheelVelocities v){
   j_s.header.stamp = ros::Time::now();
   j_s.velocity[0] = v.u1;
   j_s.velocity[1] = v.u2;
+  // ROS_INFO("j_s.velocity_v1 %f", j_s.velocity[0]);
+  // ROS_INFO("j_s.velocity_v2 %f", j_s.velocity[1]);
   joint_state_publisher.publish(j_s);
 }

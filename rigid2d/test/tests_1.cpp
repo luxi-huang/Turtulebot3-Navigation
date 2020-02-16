@@ -422,9 +422,9 @@ TEST(TestSuite, test27){
   WheelVelocities u;
   double whe_base = 2.0;
   double whe_radius =2.0;
-  t.theta_dot =2.0;
-  t.vx = 1.0;
-  t.vy = 0.0;
+  t.theta_dot =2.0; //2.0
+  t.vx = 1.0;  //1.0
+  t.vy = 0.0;  //0.0
 
   u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
   u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
@@ -472,7 +472,7 @@ TEST(TestSuite, test29){
   cmd.vx = 0;
   cmd.vy = 0;
   DiffDrive D;
-  D.feedforward(cmd);
+  D.feedforward(cmd,1);
   Pose p;
   p = D.pose();
   std::stringstream buffer;
@@ -487,7 +487,7 @@ TEST(TestSuite, test30){
   cmd.vx = 1;
   cmd.vy = 0;
   DiffDrive D;
-  D.feedforward(cmd);
+  D.feedforward(cmd,1);
   Pose p;
   p = D.pose();
   std::stringstream buffer;
@@ -502,7 +502,7 @@ TEST(TestSuite, test31){
   cmd.vx = 1;
   cmd.vy = 0;
   DiffDrive D;
-  D.feedforward(cmd);
+  D.feedforward(cmd,1);
   Pose p;
   p = D.pose();
   std::stringstream buffer;

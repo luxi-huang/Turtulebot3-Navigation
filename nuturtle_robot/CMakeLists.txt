@@ -76,7 +76,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
-  # std_msgs
+  std_msgs
 )
 
 ################################################
@@ -175,6 +175,8 @@ target_link_libraries(turtle_interface
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
+
+
 install(PROGRAMS
   # scripts/my_python_script
   scripts/turtle_interface.cpp
@@ -214,12 +216,19 @@ install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 #############
 ## Testing ##
 #############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_nuturtle_robot.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(${PROJECT_NAME}-test launch/turtle_interface.test test/turtle_interface_test.cpp)
+  # add_rostest(launch/turtle_interface.test)
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+endif()
+#
+# if (CATKIN_ENABLE_TESTING)
+#    add_rostest(launch/turtle_interface.test)
 # endif()
+
+
+# Add gtest based cpp test target and link libraries
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
