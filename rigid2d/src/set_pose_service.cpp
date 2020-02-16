@@ -25,12 +25,6 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time);
 ros::Publisher odm_publisher;
 
 class Set_Pose{
-	// Pose p;
-	// Twist2D tw;
-	// tw.vx = 0;
-	// tw.vy = 0;
-	// tw.theta_dot = 0;
-
 public:
 	Set_Pose(){
 		ros::NodeHandle n;
@@ -104,9 +98,6 @@ public:
 
 	  odom_broadcaster.sendTransform(odom_trans);
 	}
-
-
-
 
 
 };

@@ -64,11 +64,6 @@ int main(int argc, char **argv)
   string body_frame_id;
   string left_wheel_joint;
   string right_wheel_joint;
-  //
-  // nh1.setParam("odm_frame_id",odm_frame_id);
-  // nh1.setParam("body_frame_id",body_frame_id);
-  // nh1.setParam("left_wheel_joint",left_wheel_joint);
-  // nh1.setParam("right_wheel_joint",right_wheel_joint);
 
   nh1.getParam("odm_frame_id",odm_frame_id);
   nh1.getParam("body_frame_id",body_frame_id);
@@ -80,8 +75,6 @@ int main(int argc, char **argv)
   double wheel_radius;
   nh1.getParam("wheel_base",wheel_base);
   nh1.getParam("wheel_radius",wheel_radius);
-  // ROS_INFO ("wheel_radius,%f",wheel_radius);
-  // ROS_INFO ("wheel_radius,%f",wheel_radius);
 
   //
   Pose pp1;
@@ -94,8 +87,6 @@ int main(int argc, char **argv)
   //
   WheelVelocities wheel_v;
   Pose P;
-  // double current_time;
-  // double last_time;
   double duration;
   ros::Time current_time;
   ros::Time last_time;
@@ -112,10 +103,6 @@ int main(int argc, char **argv)
   set_pose_client(new_pose);
   ROS_INFO("AFTER SEVICE");
 
-  //ros::service::waitForService("set_pose_service");
-
-  //ros::Duration(10).sleep();
-
   while(ros::ok()){
     ros::spinOnce();
     ROS_INFO("INSIDE LOOP");
@@ -124,18 +111,12 @@ int main(int argc, char **argv)
     last_time = current_time;
     Twist2D tw;
     wheel_v = wheel_vel();
-    // ROS_INFO ("wheel_radius,%f",wheel_radius);
-    // ROS_INFO("u1 and u2 %f, %f/n", wheel_v.u1,wheel_v.u2);
 
     tw = diffa.wheelsToTwist(wheel_v);
-    // ROS_INFO("odm_x %f", tw.theta_dot);
     diffa.feedforward(tw,duration);
     P = diffa.pose();
-    // ROS_INFO("pose.x %f", P.x);
-    // current_time = ros::Time::now();
     send_TF(P, current_time);
     pub_odm (P,tw, current_time);
-    // ros::spinOnce();
 
   }
 
