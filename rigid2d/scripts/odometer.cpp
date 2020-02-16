@@ -15,6 +15,8 @@
 #include <nav_msgs/Odometry.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
+// #include "geometry_msgs/Pose.h"
+#include "rigid2d/set_pen.h"
 
 using std::string;
  // use for count
@@ -39,13 +41,14 @@ struct MyJointState {
     double p = 0.0): name(n), velocity(v), position(p)
     {}
 };
+
 MyJointState wheel1,wheel2;
 
 void poseCallback(const sensor_msgs::JointState::ConstPtr & mesg);
 WheelVelocities wheel_vel();
 void send_TF(Pose P,ros::Time current_time);
 void pub_odm (Pose P,Twist2D tw,ros::Time current_time);
-
+int set_pose_client(Pose pp);
 
 int main(int argc, char **argv)
 {
@@ -99,6 +102,14 @@ int main(int argc, char **argv)
   current_time = ros::Time::now();
   last_time = current_time;
 
+
+  Pose new_pose;
+  new_pose.x = 8;
+  new_pose.y = 8;
+  new_pose.theta = 0;
+  set_pose_client(new_pose);
+  ros::Duration(10).sleep();
+
   while(ros::ok()){
     ros::spinOnce();
     current_time = ros::Time::now();
@@ -118,6 +129,7 @@ int main(int argc, char **argv)
     send_TF(P, current_time);
     pub_odm (P,tw, current_time);
     ros::spinOnce();
+
   }
 
 //
@@ -183,4 +195,26 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
   odom.twist.twist.linear.y = tw.vy;
   odom.twist.twist.angular.z = tw.theta_dot;
   odm_publisher.publish(odom);
+}
+
+
+int set_pose_client(Pose pp){
+  ros::NodeHandle nh1;
+  ros::ServiceClient client= nh1.serviceClient<rigid2d::set_pen>("/set_pose", 1000);
+  rigid2d::set_pen srv;
+  srv.request.robot_pose.x = pp.x;
+  srv.request.robot_pose.y = pp.y;
+  srv.request.robot_pose.theta = pp.theta;
+
+  ros::service::waitForService("set_pose_service");
+  if (client.call(srv))
+          {
+                  ROS_INFO("CALL set_pose");
+          }
+          else
+          {
+                  ROS_ERROR("Failed to call service teleport");
+                  return 1;
+          }
+  return 0;
 }

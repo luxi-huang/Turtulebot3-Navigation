@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rigid2d)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-Wall -std=c++17 -Werror -Wall)
+add_compile_options(-Wall -Wno-psabi -Wextra)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
 
@@ -12,8 +16,11 @@ add_compile_options(-Wall -std=c++17 -Werror -Wall)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
-  tf2;
-  tf2_ros;
+  tf2
+  tf2_ros
+  geometry_msgs
+  message_generation
+  std_srvs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -57,11 +64,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  set_pen.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -71,10 +77,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  # std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -108,7 +115,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp std_msgs tf2 tf2_ros geometry_msgs message_generation std_srvs message_runtime
   #DEPENDS system_lib
 )
 
@@ -171,16 +178,28 @@ add_executable(fake_diff_encoders
   scripts/fake_diff_encoders.cpp
 )
 
+add_executable(fake_diff_encoders_2
+  include/${PROJECT_NAME}/diff_drive.hpp
+  include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
+  include/${PROJECT_NAME}/waypoints.hpp
+  src/${PROJECT_NAME}/diff_drive.cpp
+  src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
+  src/rigid2d/waypoints.cpp
+  src/set_pose_service.cpp
+)
 
-add_dependencies(odometer ${odometer_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_dependencies(odometer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometer
   ${catkin_LIBRARIES}
 )
 
-add_dependencies(fake_diff_encoders ${fake_diff_encoders_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(fake_diff_encoders ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(fake_diff_encoders
   ${catkin_LIBRARIES}
 )
+
+add_dependencies(fake_diff_encoders_2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -199,7 +218,9 @@ target_link_libraries(${PROJECT_NAME}_node
 #target_link_libraries(odometer_node
    #${catkin_LIBRARIES}
 #)
-
+target_link_libraries(fake_diff_encoders_2
+   ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############
@@ -212,6 +233,12 @@ target_link_libraries(${PROJECT_NAME}_node
 install(PROGRAMS
   test_compile.bash
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(PROGRAMS
+  src/set_pose_service.cpp
+  # scripts/my_python_script
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
 )
 
 ## Mark executables for installation
@@ -242,6 +269,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
    #DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
  #)
 
+install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 #############
 ## Testing ##
 #############
