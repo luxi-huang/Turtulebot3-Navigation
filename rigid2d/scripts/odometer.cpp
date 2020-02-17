@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
   ros::NodeHandle nh1("~");
   ros::NodeHandle nh;
-  odm_publisher = nh1.advertise<nav_msgs::Odometry>("Odometry", 1000);
+  odm_publisher = nh.advertise<nav_msgs::Odometry>("odom", 1000);
   joint_state_subscriber = nh.subscribe("joint_states", 1000, poseCallback);
 
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 
   while(ros::ok()){
     ros::spinOnce();
-    ROS_INFO("INSIDE LOOP");
+    // ROS_INFO("INSIDE LOOP");
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();
     last_time = current_time;

@@ -1,0 +1,16 @@
+<launch>
+  <!-- <node name="turtle_interface" pkg="nuturtle_robot" type="turtle_interface" output="screen">
+  </node> -->
+
+  <!-- <node name="rotation" pkg="nuturtle_robot" type="rotation" output="screen">
+  </node> -->
+
+  <!-- <node name="odometer" pkg="rigid2d" type="odometer" output="screen"> -->
+      <!-- <param name="odom_frame_id" value="odom_frame_id"/> -->
+      <!-- <param name="base_link" value="base_link"/> -->
+  <!-- </node> -->
+
+  <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
+  </node>
+
+</launch>

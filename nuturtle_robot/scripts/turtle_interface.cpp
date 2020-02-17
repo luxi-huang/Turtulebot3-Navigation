@@ -37,7 +37,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "turtle_interface");
   ros::NodeHandle n;
 
-  cmd_vel_subscriber =  n.subscribe("cmd_vel",1000,velCallback);
+  cmd_vel_subscriber =  n.subscribe("turtle1/cmd_vel",1000,velCallback);
   wheel_cmd_publisher = n.advertise<nuturtlebot::WheelCommands>("wheel_cmd", true);
 
   sensor_data_subscriber = n.subscribe("sensor_data",1000,sensor_Callback);
