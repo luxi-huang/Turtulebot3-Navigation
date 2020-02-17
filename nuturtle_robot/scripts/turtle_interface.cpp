@@ -74,12 +74,13 @@ int main(int argc, char **argv)
   last_time = current_time;
 
   double left_wheel_velocity,right_wheel_velocity = 0;
+  ros::Rate loop_rate(10);
 
   while(ros::ok()){
     // get robot_cmd and publish to wheel_velocity;
     WheelVelocities wheel_v;
     // ROS_INFO("wheel_base: %f", wheel_base);
-    // ROS_INFO("twist value: %f",ttwist_value.vx);
+    // ROS_INFO("twist value: %f",ttwist_value.theta_dot);
     wheel_v = diff1.twistToWheels(ttwist_value);
     // ROS_INFO("wheel_v_u1: %f ", wheel_v.u1);
     // ROS_INFO("wheel_encoder left: %f ", new_left);
@@ -87,6 +88,7 @@ int main(int argc, char **argv)
      // wheel_sensor
     pub_wheel_velocity(wheel_v);
 
+    ROS_INFO("count");
     // get time intervel
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();
@@ -110,6 +112,7 @@ int main(int argc, char **argv)
 
     // ROS_INFO("%f",ttwist_value.vx);
     ros::spinOnce();
+    loop_rate.sleep();
   }
 }
 
@@ -124,13 +127,15 @@ void velCallback(const geometry_msgs::Twist::ConstPtr & Twist){
 
 void pub_wheel_velocity(WheelVelocities v){
   nuturtlebot::WheelCommands v_cmd;
+  // ROS_INFO("v1 %f", v.u1);
+
   if (v.u1 > maximum_rotational_velocity_motor){
     v.u1 = maximum_rotational_velocity_motor;
   }
   if (v.u2 > maximum_rotational_velocity_motor){
     v.u2 = maximum_rotational_velocity_motor;
   }
-  ROS_INFO("v1 %f", v.u1);
+  // ROS_INFO("v1 %f", v.u1);
   v_cmd.left_velocity = (v.u1/maximum_rotational_velocity_motor)*265;
   // ROS_INFO("v/max_v %f", v.u1/maximum_rotational_velocity_motor);
   v_cmd.right_velocity = (v.u2/maximum_rotational_velocity_motor)*265;

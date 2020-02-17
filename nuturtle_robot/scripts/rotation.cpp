@@ -53,35 +53,44 @@ int main(int argc, char **argv)
   ROS_INFO("loop_number_int%d",loop_number_int);
 
   ros::Time start_time,end_time;
-  double duration;
+  // double duration;
 
   ros::Rate rate(1/pub_intervel);
   // ROS_INFO("debug 111");
   while(ros::ok())
-    {
+  {
     // ROS_INFO("debug 222");
     // ros::spin();
     for (int j =0; j<20; j++)
-      {
-        // ROS_INFO("debug 333");
-        start_time = ros::Time::now();
+    {
+      // ROS_INFO("start loop");
+      // ROS_INFO("rotate");
+      // start_time = ros::Time::now();
       for(int i = 0; i<loop_number_int;i++)
-        {
-          // ROS_INFO("best!!");
+      {
+        // ROS_INFO("rotate");
           // cmd_vel_publisher.publish("rotation_velocity);
-          publish_velocity(rotation_velocity);
+        publish_velocity(rotation_velocity);
           // ROS_INFO("after_publish");
-         rate.sleep();
-        }
+        rate.sleep();
 
-      end_time = ros::Time::now();
-      duration = (start_time - end_time).toSec();
-      //pub zero velocity, stop 1/20 rotation time;
-      publish_velocity(0);
-      // ros::Duration(duration/20.0);
-      // ROS_INFO("stop2");
-      ros::Duration(10);
-      // ROS_INFO("stop1");
+      }
+
+      // end_time = ros::Time::now();
+      // duration = (end_time - start_time).toSec();
+      // ROS_INFO("test");
+
+      // int stop_loop_number = round(loop_number_int/20.0);
+      // ROS_INFO("loop_number %d", loop_number_int);
+      // ROS_INFO("stop");
+      for(int i = 0; i<loop_number_int/20;i++)
+      {
+          publish_velocity(0);
+          // ROS_INFO("stop");
+          rate.sleep();
+      }
+
+      // ROS_INFO("finish a circle");
 
     }
     ros::spinOnce();

@@ -2,32 +2,33 @@
   <node name="turtle_interface" pkg="nuturtle_robot" type="turtle_interface" output="screen">
   </node>
 
-  <!-- <node name="rotation" pkg="nuturtle_robot" type="rotation" output="screen">
+  <node name="rotation" pkg="nuturtle_robot" type="rotation" output="screen">
   </node>
-
+<!--
   <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
     <param name="joint_state_topic" value="/fake/joint_states"/>
     <param name="odom_frame_id" value="/fake_odom_frame_id"/>
     <param name="base_link" value="/fake_base_link"/>
-  </node>
+  </node> -->
 
-  <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
+  <!-- <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
     <param name="joint_state_topic" value="/fake/joint_states"/>
-  </node>
+  </node> -->
 
-  <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
+  <!-- <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
     <param name="joint_state_topic" value="/joint_states"/>
     <param name="odom_frame_id" value="/odom_frame_id"/>
     <param name="base_link" value="/base_link"/>
-  </node>
+  </node> -->
 
-  <param name="robot_description"
-       command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
+  <!-- <param name="robot_description"
+       command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/> -->
+
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
-  <remap from="odom" to="fake_odm"/>
+  <!-- <remap from="odom" to="fake_odm"/>
 
-  <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom fake_odm" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom fake_odm" /> -->
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/> -->
+  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/> -->
 </launch>

@@ -8,7 +8,7 @@
 
 
   <group if="$(eval arg('robot') != 0)">
-    <machine name="turtlebot" address="turtlebot2" env-loader="/home/student/install/env.sh" user="student"  />
+    <machine name="turtlebot" address="turtlebot3" env-loader="/home/student/luxi_install/env.sh" user="student"  />
   </group>
 
   <node name="serial_node" pkg="rosserial_python" type="serial_node.py" machine="turtlebot">
@@ -28,7 +28,7 @@
     <param name="joint_state_topic" value="/fake/joint_states"/>
     <param name="odom_frame_id" value="/fake_odom_frame_id"/>
     <param name="base_link" value="/fake_base_link"/>
-    <remap from="odom" to="fake_odm"/>
+    <remap from="odom" to="fake_odom"/>
   </node>
 
   <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
@@ -47,7 +47,7 @@
 
   <!-- <remap from="odom" to="fake_odm"/> -->
 
-  <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom fake_odm" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom_frame_id fake_odom_frame_id" />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 </launch>
