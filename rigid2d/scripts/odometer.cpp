@@ -28,7 +28,8 @@ using rigid2d::Twist2D;
 
 ros::Publisher odm_publisher;
 ros::Subscriber joint_state_subscriber;
-
+string odom_frame_id;
+string base_link;
 //sensor_msgs::JointState wheel1, wheel2;
 
 struct MyJointState {
@@ -68,11 +69,12 @@ int main(int argc, char **argv)
   string left_wheel_joint;
   string right_wheel_joint;
 
-  nh1.getParam("odm_frame_id",odm_frame_id);
+  nh1.getParam("odom_frame_id",odom_frame_id);
   nh1.getParam("body_frame_id",body_frame_id);
   // nh1.getParam("body_frame_id",body_frame_id);
   nh1.getParam("left_wheel_joint",left_wheel_joint);
   nh1.getParam("right_wheel_joint",right_wheel_joint);
+  nh1.getParam("base_link",base_link);
 
   double wheel_base;
   double wheel_radius;
@@ -108,7 +110,7 @@ int main(int argc, char **argv)
 
   while(ros::ok()){
     ros::spinOnce();
-    ROS_INFO("wheel_bas%f ",wheel_base);
+    // ROS_INFO("wheel_bas%f ",wheel_base);
     // ROS_INFO("INSIDE LOOP");
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();
@@ -174,7 +176,7 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
   geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(P.theta);
   nav_msgs::Odometry odom;
   odom.header.stamp = current_time;
-  odom.header.frame_id = "odom_frame_id";
+  odom.header.frame_id = odom_frame_id;
   //set the position
   odom.pose.pose.position.x = P.x;
   odom.pose.pose.position.y = P.y;
@@ -182,7 +184,7 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
   odom.pose.pose.orientation = odom_quat;
 
     //set the velocity
-  odom.child_frame_id = "base_link";
+  odom.child_frame_id = base_link;
   odom.twist.twist.linear.x = tw.vx;
   odom.twist.twist.linear.y = tw.vy;
   odom.twist.twist.angular.z = tw.theta_dot;

@@ -31,6 +31,7 @@ WheelVelocities wheel_sensor;
 Twist2D ttwist_value;
 int new_left, new_right;
 int last_left, last_right;
+int maximum_rotational_velocity_motor;
 
 int main(int argc, char **argv)
 {
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
   n.getParam("wheel_base",wheel_base);
   n.getParam("wheel_radius",wheel_radius);
   n.getParam("encoder_ticks",encoder_ticks);
+  n.getParam("maximum_rotational_velocity_motor", maximum_rotational_velocity_motor);
 
   DiffDrive diff1;
   Pose pp;
@@ -122,8 +124,15 @@ void velCallback(const geometry_msgs::Twist::ConstPtr & Twist){
 
 void pub_wheel_velocity(WheelVelocities v){
   nuturtlebot::WheelCommands v_cmd;
-  v_cmd.left_velocity = v.u1;
-  v_cmd.right_velocity = v.u2;
+  if (v.u1 > maximum_rotational_velocity_motor){
+    v.u1 = maximum_rotational_velocity_motor;
+  }
+  if (v.u2 > maximum_rotational_velocity_motor){
+    v.u2 = maximum_rotational_velocity_motor;
+  }
+
+  v_cmd.left_velocity = (v.u1/maximum_rotational_velocity_motor)*265;
+  v_cmd.right_velocity = (v.u2/maximum_rotational_velocity_motor)*265;
   // ROS_INFO ("%f", v.u1);
   wheel_cmd_publisher.publish(v_cmd);
 }
@@ -131,8 +140,8 @@ void pub_wheel_velocity(WheelVelocities v){
 void sensor_Callback(const nuturtlebot::SensorData::ConstPtr & sensor){
   new_left = sensor->left_encoder;
   new_right = sensor->right_encoder;
-  ROS_INFO("wheel_encoder left:!!!!!!! %d ", new_left);
-  ROS_INFO("wheel_encoder right:!!!!!!!!! %d ", new_right);
+  // ROS_INFO("wheel_encoder left:!!!!!!! %d ", new_left);
+  // ROS_INFO("wheel_encoder right:!!!!!!!!! %d ", new_right);
 }
 
 void publish_joint_state(WheelVelocities v){

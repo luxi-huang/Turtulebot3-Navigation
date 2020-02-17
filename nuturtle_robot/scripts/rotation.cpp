@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   for (int j =0; j<20; j++){
     start_time = ros::Time::now();
     for(int i = 0; i<loop_number_int;i++){
-      ros::spinOnce();
+      ros::spin();
       // cmd_vel_publisher.publish(rotation_velocity);
       publish_velocity(rotation_velocity);
       rate.sleep();

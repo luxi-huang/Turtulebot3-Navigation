@@ -7,6 +7,8 @@
   <node pkg="rigid2d" type="odometer" name="odometer" output="screen">
     <!-- <rosparam command="load" file="$(find rigid2d)/config/car.yaml" /> -->
     <param name="joint_state_topic" value="/joint_states"/>
+    <param name="odom_frame_id" value="/odom_frame_id"/>
+    <param name="base_link" value="/base_link"/>
   </node>
 
   <param name="robot_description"
