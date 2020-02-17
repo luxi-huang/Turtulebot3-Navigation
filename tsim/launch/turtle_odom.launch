@@ -13,6 +13,7 @@
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
 
   <node pkg="rigid2d" type="fake_diff_encoders" name="fake_diff_encoders"  output="screen">
+    <param name="joint_state_topic" value="/joint_states"/>
   </node>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>

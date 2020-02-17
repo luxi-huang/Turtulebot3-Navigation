@@ -32,17 +32,22 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "fake_diff_encoders");
 
   ros::NodeHandle nh;
+  ros::NodeHandle nhh("~");
 
-
+  string joint_state_topic;
   // string left_wheel_joint;
   // string right_wheel_joint;
   nh.getParam("odometer/left_wheel_joint", left_wheel_joint);
+  nh.getParam("odometer/right_wheel_joint",right_wheel_joint);
+
+  // nh.setParam("joint_state_topic", "joint_states");
   nh.getParam("odometer/right_wheel_joint",right_wheel_joint);
 
   double wheel_base;
   double wheel_radius;
   nh.getParam("wheel_base",wheel_base);
   nh.getParam("wheel_radius",wheel_radius);
+  nhh.getParam("joint_state_topic", joint_state_topic);
   // ROS_INFO ("wheel_radius,%f",wheel_radius);
   // wheel_base = 4.0;
   // wheel_radius =2.0;
@@ -55,9 +60,13 @@ int main(int argc, char **argv)
   pp.theta = 0;
 
   diff1 = DiffDrive(pp,wheel_base,wheel_radius);
+  // ros::NodeHandle nhh("~");
 
   vel_subscriber = nh.subscribe("turtle1/cmd_vel",10,velCallback);
-  joint_state_publisher = nh.advertise<sensor_msgs::JointState>("joint_states", 1000);
+  joint_state_publisher = nhh.advertise<sensor_msgs::JointState>(joint_state_topic, 1000);
+
+
+
 
   while(ros::ok()){
     // ROS_INFO("%f",Twist_value.vx);

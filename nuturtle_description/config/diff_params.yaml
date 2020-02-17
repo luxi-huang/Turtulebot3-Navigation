@@ -8,4 +8,5 @@ maximum_translational_velocity: 0.22 # m/s
 maximum_rotational_velocity_robot: 2.84 # rad/s
 maximum_rotational_velocity_motor: 6.35492 # rad/s
 maximum_motor_power: 265 # -265 to 265z
-frac_vel: 0.8 # fraction of max velocity 
+frac_vel: 0.8 # fraction of max velocity
+# joint_state_topic: joint_states
