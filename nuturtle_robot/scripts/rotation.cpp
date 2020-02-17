@@ -43,32 +43,95 @@ int main(int argc, char **argv)
   n.getParam("maximum_rotational_velocity_robot", maximum_rotational_velocity_robot);
 
   double rotation_velocity = frac_vel*maximum_rotational_velocity_robot;
+  ROS_INFO("rotation_velocity:%f", rotation_velocity);
   double rotation_time = 2.0*PI/rotation_velocity;
+  ROS_INFO("rotation_time:%f", rotation_time);
   double pub_intervel = 0.02;
   double loop_number_double = rotation_time / pub_intervel;
+  ROS_INFO("loop_number_double%f",loop_number_double);
   int loop_number_int = round(loop_number_double);
+  ROS_INFO("loop_number_int%d",loop_number_int);
 
   ros::Time start_time,end_time;
   double duration;
 
   ros::Rate rate(1/pub_intervel);
-  for (int j =0; j<20; j++){
-    start_time = ros::Time::now();
-    for(int i = 0; i<loop_number_int;i++){
-      ros::spin();
-      // cmd_vel_publisher.publish(rotation_velocity);
-      publish_velocity(rotation_velocity);
-      rate.sleep();
-    }
+  // ROS_INFO("debug 111");
+  while(ros::ok())
+    {
+    // ROS_INFO("debug 222");
+    // ros::spin();
+    for (int j =0; j<20; j++)
+      {
+        // ROS_INFO("debug 333");
+        start_time = ros::Time::now();
+      for(int i = 0; i<loop_number_int;i++)
+        {
+          // ROS_INFO("best!!");
+          // cmd_vel_publisher.publish("rotation_velocity);
+          publish_velocity(rotation_velocity);
+          // ROS_INFO("after_publish");
+         rate.sleep();
+        }
 
-    end_time = ros::Time::now();
-    duration = (start_time - end_time).toSec();
-    //pub zero velocity, stop 1/20 rotation time;
-    publish_velocity(0);
-    ros::Duration(duration/20.0);
+      end_time = ros::Time::now();
+      duration = (start_time - end_time).toSec();
+      //pub zero velocity, stop 1/20 rotation time;
+      publish_velocity(0);
+      // ros::Duration(duration/20.0);
+      // ROS_INFO("stop2");
+      ros::Duration(10);
+      // ROS_INFO("stop1");
+
+    }
+    ros::spinOnce();
+    // return 0;
+
   }
   return 0;
 }
+
+// void publish_velocity(double rotation_velocity){
+//
+//   for (int j =0; j<20; j++){
+//
+//     ROS_INFO("debug 333");
+//     start_time = ros::Time::now();
+//
+//     for(int i = 0; i<loop_number_int;i++){
+//       ROS_INFO("best!!");
+//       geometry_msgs::Twist rotation_angle1;
+//       rotation_angle1.linear.x = 0;
+//       rotation_angle1.linear.x = 0;
+//       rotation_angle1.linear.x = 0;
+//
+//       rotation_angle1.angular.x = 0;
+//       rotation_angle1.angular.y = 0;
+//       rotation_angle1.angular.z = rotation_velocity;
+//
+//       cmd_vel_publisher.publish(rotation_angle1);
+//       // rate.sleep();
+//     }
+//
+//     end_time = ros::Time::now();
+//     duration = (start_time - end_time).toSec();
+//
+//     //pub zero velocity, stop 1/20 rotation time;
+//     geometry_msgs::Twist rotation_angle2;
+//     rotation_angle2.linear.x = 0;
+//     rotation_angle2.linear.x = 0;
+//     rotation_angle2.linear.x = 0;
+//
+//     rotation_angle2.angular.x = 0;
+//     rotation_angle2.angular.y = 0;
+//     rotation_angle2.angular.z = 0;
+//
+//     cmd_vel_publisher.publish(rotation_angle2);
+//
+//     ros::Duration(duration/20.0);
+//   }
+//
+// }
 
 void publish_velocity(double rotation_velocity){
   geometry_msgs::Twist rotation_angle;
@@ -79,6 +142,7 @@ void publish_velocity(double rotation_velocity){
   rotation_angle.angular.x = 0;
   rotation_angle.angular.y = 0;
   rotation_angle.angular.z = rotation_velocity;
+  // ROS_INFO ("%f",rotation_angle.angular.z);
 
   cmd_vel_publisher.publish(rotation_angle);
 }

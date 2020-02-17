@@ -130,8 +130,9 @@ void pub_wheel_velocity(WheelVelocities v){
   if (v.u2 > maximum_rotational_velocity_motor){
     v.u2 = maximum_rotational_velocity_motor;
   }
-
+  ROS_INFO("v1 %f", v.u1);
   v_cmd.left_velocity = (v.u1/maximum_rotational_velocity_motor)*265;
+  // ROS_INFO("v/max_v %f", v.u1/maximum_rotational_velocity_motor);
   v_cmd.right_velocity = (v.u2/maximum_rotational_velocity_motor)*265;
   // ROS_INFO ("%f", v.u1);
   wheel_cmd_publisher.publish(v_cmd);

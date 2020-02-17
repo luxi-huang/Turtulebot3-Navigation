@@ -2,7 +2,7 @@
   <node name="turtle_interface" pkg="nuturtle_robot" type="turtle_interface" output="screen">
   </node>
 
-  <node name="rotation" pkg="nuturtle_robot" type="rotation" output="screen">
+  <!-- <node name="rotation" pkg="nuturtle_robot" type="rotation" output="screen">
   </node>
 
   <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
@@ -23,11 +23,11 @@
 
   <param name="robot_description"
        command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
-  <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
+  <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
   <remap from="odom" to="fake_odm"/>
 
   <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom fake_odm" />
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/> -->
 </launch>
