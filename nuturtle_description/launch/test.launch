@@ -5,15 +5,21 @@
   <!-- <node name="rotation" pkg="nuturtle_robot" type="rotation" output="screen">
   </node> -->
 
-  <!-- <node name="odometer" pkg="rigid2d" type="odometer" output="screen"> -->
-      <!-- <param name="odom_frame_id" value="odom_frame_id"/> -->
-      <!-- <param name="base_link" value="base_link"/> -->
-  <!-- </node> -->
-
-  <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
+  <!-- <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
     <param name="joint_state_topic" value="/fake/joint_states"/>
+  </node> -->
+
+  <!-- <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
+    <param name="joint_state_topic" value="/fake/joint_states"/>
+  </node> -->
+
+  <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
+    <param name="joint_state_topic" value="/joint_states"/>
   </node>
 
-  <!-- <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
+  <param name="robot_description"
+       command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
+  <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
+
 
 </launch>

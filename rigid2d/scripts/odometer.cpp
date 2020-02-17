@@ -54,10 +54,13 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "odometer");
 
+  string joint_state_topic;
   ros::NodeHandle nh1("~");
   ros::NodeHandle nh;
+  nh1.getParam("joint_state_topic", joint_state_topic);
+
   odm_publisher = nh.advertise<nav_msgs::Odometry>("odom", 1000);
-  joint_state_subscriber = nh.subscribe("joint_states", 1000, poseCallback);
+  joint_state_subscriber = nh.subscribe(joint_state_topic, 1000, poseCallback);
 
 
   string odm_frame_id;
@@ -73,8 +76,8 @@ int main(int argc, char **argv)
 
   double wheel_base;
   double wheel_radius;
-  nh1.getParam("wheel_base",wheel_base);
-  nh1.getParam("wheel_radius",wheel_radius);
+  nh.getParam("wheel_base",wheel_base);
+  nh.getParam("wheel_radius",wheel_radius);
 
   //
   Pose pp1;
@@ -105,6 +108,7 @@ int main(int argc, char **argv)
 
   while(ros::ok()){
     ros::spinOnce();
+    ROS_INFO("wheel_bas%f ",wheel_base);
     // ROS_INFO("INSIDE LOOP");
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();
