@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 
   ros::Rate rate(1/pub_intervel);
   // ROS_INFO("debug 111");
-  while(ros::ok())
-  {
+  // while(ros::ok())
+  // {
     // ROS_INFO("debug 222");
     // ros::spin();
     for (int j =0; j<20; j++)
@@ -76,28 +76,18 @@ int main(int argc, char **argv)
 
       }
 
-      // end_time = ros::Time::now();
-      // duration = (end_time - start_time).toSec();
-      // ROS_INFO("test");
-
-      // int stop_loop_number = round(loop_number_int/20.0);
-      // ROS_INFO("loop_number %d", loop_number_int);
-      // ROS_INFO("stop");
       for(int i = 0; i<loop_number_int/20;i++)
       {
           publish_velocity(0);
           // ROS_INFO("stop");
           rate.sleep();
       }
-
-      // ROS_INFO("finish a circle");
-
     }
     ros::spinOnce();
     // return 0;
 
-  }
-  return 0;
+  // }
+  // return 0;
 }
 
 // void publish_velocity(double rotation_velocity){

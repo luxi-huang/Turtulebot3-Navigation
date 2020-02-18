@@ -88,7 +88,7 @@ int main(int argc, char **argv)
      // wheel_sensor
     pub_wheel_velocity(wheel_v);
 
-    ROS_INFO("count");
+    // ROS_INFO("count");
     // get time intervel
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();

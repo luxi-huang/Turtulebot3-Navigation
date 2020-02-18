@@ -156,8 +156,8 @@ void send_TF(Pose P,ros::Time current_time){
   static tf2_ros::TransformBroadcaster odom_broadcaster;
   geometry_msgs::TransformStamped odom_trans;
   odom_trans.header.stamp = current_time;
-  odom_trans.header.frame_id = "odom_frame_id";
-  odom_trans.child_frame_id = "base_link";
+  odom_trans.header.frame_id = odom_frame_id;
+  odom_trans.child_frame_id = base_link;
   odom_trans.transform.translation.x = P.x;
   odom_trans.transform.translation.y = P.y;
   odom_trans.transform.translation.z = 0.0;

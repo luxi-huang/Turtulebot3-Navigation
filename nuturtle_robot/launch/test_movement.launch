@@ -8,7 +8,7 @@
 
 
   <group if="$(eval arg('robot') != 0)">
-    <machine name="turtlebot" address="turtlebot3" env-loader="/home/student/luxi_install/env.sh" user="student"  />
+    <machine name="turtlebot" address="turtlebot5" env-loader="/home/student/luxi_install/env.sh" user="student"  />
   </group>
 
   <node name="serial_node" pkg="rosserial_python" type="serial_node.py" machine="turtlebot">
@@ -29,6 +29,7 @@
     <param name="odom_frame_id" value="/fake_odom_frame_id"/>
     <param name="base_link" value="/fake_base_link"/>
     <remap from="odom" to="fake_odom"/>
+    <remap from="joint_state" to="/fake/joint_states"/>
   </node>
 
   <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
@@ -45,9 +46,11 @@
        command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
 
-  <!-- <remap from="odom" to="fake_odm"/> -->
 
   <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom_frame_id fake_odom_frame_id" />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_robot)/config/config.rviz" />
+
 </launch>
