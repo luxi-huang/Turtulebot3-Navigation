@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     for (int j =0; j<20; j++)
     {
       // ROS_INFO("start loop");
-      // ROS_INFO("rotate");
+      ROS_INFO("rotate!!!ya");
       // start_time = ros::Time::now();
       for(int i = 0; i<loop_number_int;i++)
       {
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
       }
 
-      for(int i = 0; i<loop_number_int/20;i++)
+      for(int i = 0; i<loop_number_int;i++)
       {
           publish_velocity(0);
           // ROS_INFO("stop");

@@ -1,5 +1,5 @@
 wheel_width: 0.004 # The width of the wheels
-wheel_radius: 0.066 # The radius of the wheels, change values in rigid2d package car.yaml
+wheel_radius: 0.033 # The radius of the wheels, change values in rigid2d package car.yaml
 wheel_base: 0.16 # The distance between the centers wheels,change values in rigid2d package car.yaml
 chassis_length: 0.178 # The length of the main chassis link
 chassis_thinkness: 0.01 # The thickness of the plate that forms the chassis

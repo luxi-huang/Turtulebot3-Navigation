@@ -26,10 +26,15 @@ DiffDrive::DiffDrive(const Pose & p,double wheel_base, double wheel_radius){
 WheelVelocities DiffDrive::twistToWheels(Twist2D t){
   WheelVelocities u;
   // double D = whe_base/2.0;
+  // mine orgianl
   // u.u1 = (1.0/whe_radius)*((-D)*t.theta_dot + t.vx);
   // u.u2 = (1.0/whe_radius)*((D)*t.theta_dot + t.vx);
-  u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
-  u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+  //new
+  // u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+  // u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+  //lastest
+  u.u1 = (2.0*t.vx+t.theta_dot*whe_base)/(2*whe_radius);
+  u.u2 = (2.0*t.vx-t.theta_dot*whe_base)/(2*whe_radius);
 
   u.u3 = u.u2;
   u.u4 = u.u1;
@@ -38,14 +43,24 @@ WheelVelocities DiffDrive::twistToWheels(Twist2D t){
 
 Twist2D DiffDrive::wheelsToTwist(WheelVelocities vel){
   Twist2D t;
-  double D = whe_base/2.0;
-  double r = whe_radius/2.0;
+  // double D = whe_base/2.0;
+  // mine original
+  // double r = whe_radius/2.0;
   // t.theta_dot = ((-1/(D+L))*vel.u1 + (1/(D+L))*vel.u2 + (1/(D+L))*vel.u3 - (1/(D+L))*vel.u4)*(whe_radius/4);
   // t.vx = vel.u1 + vel.u2 + vel.u3 + vel.u4;
-  // t.vy = -vel.u1 + vel.u2 - vel.u3 + vel.u4;
-  t.vx = (vel.u1+vel.u2)*r;
-  t.theta_dot = (vel.u2/D-vel.u1/D)*r;
+  // t.vy =-vel.u1 + vel.u2 - vel.u3 + vel.u4;
+
+  // fiexed
+  // t.vx = (vel.u1+vel.u2)*r;
+  // t.theta_dot = (vel.u2/D-vel.u1/D)*r;
+  // t.vy = 0;
+
+  // latest
+  t.theta_dot = (vel.u2-vel.u1)*whe_radius/whe_base;
+  t.vx = (vel.u1+vel.u2)*whe_radius/2;
   t.vy = 0;
+
+
 
   return t;
 }

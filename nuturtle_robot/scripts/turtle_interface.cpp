@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 
 
   Pose P;
+
   diff1 = DiffDrive(pp,wheel_base,wheel_radius);
 
   last_right = new_right;
@@ -75,12 +76,13 @@ int main(int argc, char **argv)
 
   double left_wheel_velocity,right_wheel_velocity = 0;
   ros::Rate loop_rate(10);
-
+  ROS_INFO("wheelBase: %f ", wheel_base);
+  ROS_INFO("wheel_radius: %f", wheel_radius);
   while(ros::ok()){
     // get robot_cmd and publish to wheel_velocity;
     WheelVelocities wheel_v;
     // ROS_INFO("wheel_base: %f", wheel_base);
-    // ROS_INFO("twist value: %f",ttwist_value.theta_dot);
+    ROS_INFO("twist value: %f",ttwist_value.theta_dot);
     wheel_v = diff1.twistToWheels(ttwist_value);
     // ROS_INFO("wheel_v_u1: %f ", wheel_v.u1);
     // ROS_INFO("wheel_encoder left: %f ", new_left);
