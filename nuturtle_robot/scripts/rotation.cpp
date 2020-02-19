@@ -56,11 +56,14 @@ int main(int argc, char **argv)
   // double duration;
 
   ros::Rate rate(1/pub_intervel);
+  ros::Rate rate2(0.1);
+  rate2.sleep();
   // ROS_INFO("debug 111");
   // while(ros::ok())
   // {
     // ROS_INFO("debug 222");
     // ros::spin();
+
     for (int j =0; j<20; j++)
     {
       // ROS_INFO("start loop");
@@ -70,13 +73,13 @@ int main(int argc, char **argv)
       {
         // ROS_INFO("rotate");
           // cmd_vel_publisher.publish("rotation_velocity);
-        publish_velocity(rotation_velocity);
+        publish_velocity(-rotation_velocity);
           // ROS_INFO("after_publish");
         rate.sleep();
 
       }
 
-      for(int i = 0; i<loop_number_int;i++)
+      for(int i = 0; i<loop_number_int/20;i++)
       {
           publish_velocity(0);
           // ROS_INFO("stop");

@@ -47,7 +47,7 @@
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
 
 
-  <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom_frame_id fake_odom_frame_id" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 odom_frame_id fake_odom_frame_id" />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 

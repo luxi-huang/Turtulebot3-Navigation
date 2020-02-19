@@ -41,7 +41,7 @@ int main(int argc, char **argv)
   cmd_vel_subscriber =  n.subscribe("turtle1/cmd_vel",1000,velCallback);
   wheel_cmd_publisher = n.advertise<nuturtlebot::WheelCommands>("wheel_cmd", true);
 
-  sensor_data_subscriber = n.subscribe("sensor_data",1000,sensor_Callback);
+  sensor_data_subscriber = n.subscribe("sensor_data",1,sensor_Callback);
   joint_state_publisher = n.advertise<sensor_msgs::JointState>("joint_states",true);
 
 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     // get robot_cmd and publish to wheel_velocity;
     WheelVelocities wheel_v;
     // ROS_INFO("wheel_base: %f", wheel_base);
-    ROS_INFO("twist value: %f",ttwist_value.theta_dot);
+    // ROS_INFO("twist value: %f",ttwist_value.theta_dot);
     wheel_v = diff1.twistToWheels(ttwist_value);
     // ROS_INFO("wheel_v_u1: %f ", wheel_v.u1);
     // ROS_INFO("wheel_encoder left: %f ", new_left);
@@ -137,6 +137,13 @@ void pub_wheel_velocity(WheelVelocities v){
   if (v.u2 > maximum_rotational_velocity_motor){
     v.u2 = maximum_rotational_velocity_motor;
   }
+  if (v.u1 < -maximum_rotational_velocity_motor){
+    v.u1 = -maximum_rotational_velocity_motor;
+  }
+  if (v.u2 < -maximum_rotational_velocity_motor){
+    v.u2 = -maximum_rotational_velocity_motor;
+  }
+
   // ROS_INFO("v1 %f", v.u1);
   v_cmd.left_velocity = (v.u1/maximum_rotational_velocity_motor)*265;
   // ROS_INFO("v/max_v %f", v.u1/maximum_rotational_velocity_motor);

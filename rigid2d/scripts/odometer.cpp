@@ -108,7 +108,7 @@ int main(int argc, char **argv)
   // set_pose_client(new_pose);
   // ROS_INFO("AFTER SEVICE");
 
-  ros::Rate loop_rate(10);
+  // ros::Rate loop_rate(10);
   while(ros::ok()){
     ros::spinOnce();
     // ROS_INFO("wheel_bas%f ",wheel_base);
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
     P = diffa.pose();
     send_TF(P, current_time);
     pub_odm (P,tw, current_time);
-    loop_rate.sleep();
+    // loop_rate.sleep();
 
   }
 
