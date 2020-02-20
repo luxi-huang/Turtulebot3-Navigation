@@ -177,16 +177,16 @@ add_executable(fake_diff_encoders
   src/rigid2d/waypoints.cpp
   scripts/fake_diff_encoders.cpp
 )
-
-add_executable(set_pose_service
-  include/${PROJECT_NAME}/diff_drive.hpp
-  include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
-  include/${PROJECT_NAME}/waypoints.hpp
-  src/${PROJECT_NAME}/diff_drive.cpp
-  src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
-  src/rigid2d/waypoints.cpp
-  src/set_pose_service.cpp
-)
+#
+# add_executable(set_pose_service
+#   include/${PROJECT_NAME}/diff_drive.hpp
+#   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
+#   include/${PROJECT_NAME}/waypoints.hpp
+#   src/${PROJECT_NAME}/diff_drive.cpp
+#   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
+#   src/rigid2d/waypoints.cpp
+#   src/set_pose_service.cpp
+# )
 
 
 # add_executable(rotation
@@ -210,10 +210,10 @@ target_link_libraries(fake_diff_encoders
   ${catkin_LIBRARIES}
 )
 
-add_dependencies(set_pose_service ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(set_pose_service
-  ${catkin_LIBRARIES}
-)
+# add_dependencies(set_pose_service ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(set_pose_service
+#   ${catkin_LIBRARIES}
+# )
 
 # add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # target_link_libraries(rotation
@@ -236,9 +236,9 @@ target_link_libraries(${PROJECT_NAME}_node
 #target_link_libraries(odometer_node
    #${catkin_LIBRARIES}
 #)
-target_link_libraries(set_pose_service
-   ${catkin_LIBRARIES}
-)
+# target_link_libraries(set_pose_service
+#    ${catkin_LIBRARIES}
+# )
 #############
 ## Install ##
 #############
@@ -252,12 +252,12 @@ install(PROGRAMS
   test_compile.bash
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-install(PROGRAMS
-  src/set_pose_service.cpp
-  # scripts/my_python_script
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
-)
+#
+# install(PROGRAMS
+#   src/set_pose_service.cpp
+#   # scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
+# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html

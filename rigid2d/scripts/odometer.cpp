@@ -28,9 +28,9 @@ using rigid2d::Twist2D;
 
 ros::Publisher odm_publisher;
 ros::Subscriber joint_state_subscriber;
+ros::ServiceServer service;
 string odom_frame_id;
 string base_link;
-//sensor_msgs::JointState wheel1, wheel2;
 
 struct MyJointState {
   string name;
@@ -50,6 +50,40 @@ WheelVelocities wheel_vel();
 void send_TF(Pose P,ros::Time current_time);
 void pub_odm (Pose P,Twist2D tw,ros::Time current_time);
 int set_pose_client(Pose pp);
+DiffDrive diffa;
+
+bool set_pose_callback(rigid2d::set_pen::Request  &req,
+                rigid2d::set_pen::Response &resp)
+{
+  // ros::NodeHandle n;
+  // odm_publisher = n.advertise<nav_msgs::Odometry>("Odometry/Odometry", 1000);
+  Pose p;
+  ros::Time current_time;
+  Twist2D tw;
+  tw.vx = 0;
+  tw.vy = 0;
+  tw.theta_dot = 0;
+  ROS_INFO("service 111111");
+
+  current_time = ros::Time::now();
+  p.x = req.robot_pose.x;
+  p.y = req.robot_pose.y;
+  p.theta = req.robot_pose.theta;
+
+
+  ros::NodeHandle nh;
+  double wheel_base;
+  double wheel_radius;
+  nh.getParam("wheel_base",wheel_base);
+  nh.getParam("wheel_radius",wheel_radius);
+
+  diffa= DiffDrive(p,wheel_base,wheel_radius);
+  send_TF(p, current_time);
+  pub_odm (p,tw, current_time);
+  ROS_INFO("service works!");
+
+  return 1;
+}
 
 int main(int argc, char **argv)
 {
@@ -62,6 +96,7 @@ int main(int argc, char **argv)
 
   odm_publisher = nh.advertise<nav_msgs::Odometry>("odom", 1000);
   joint_state_subscriber = nh.subscribe(joint_state_topic, 1000, poseCallback);
+  ros::ServiceServer service = nh.advertiseService("/set_pose", set_pose_callback);
 
 
   string odm_frame_id;
@@ -86,7 +121,7 @@ int main(int argc, char **argv)
   pp1.x = 0;
   pp1.y = 0;
   pp1.theta = 0;
-  DiffDrive diffa;
+  // DiffDrive diffa;
   diffa= DiffDrive(pp1,wheel_base,wheel_radius);
   //
   //
@@ -194,23 +229,23 @@ void pub_odm (Pose P,Twist2D tw,ros::Time current_time){
 }
 
 
-int set_pose_client(Pose pp){
-  ros::NodeHandle nh1;
-  ros::ServiceClient client= nh1.serviceClient<rigid2d::set_pen>("/set_pose", 1000);
-  rigid2d::set_pen srv;
-  srv.request.robot_pose.x = pp.x;
-  srv.request.robot_pose.y = pp.y;
-  srv.request.robot_pose.theta = pp.theta;
-
-  ros::service::waitForService("set_pose_service");
-  if (client.call(srv))
-          {
-                  ROS_INFO("CALL set_pose");
-          }
-          else
-          {
-                  ROS_ERROR("Failed to call service teleport");
-                  return 1;
-          }
-  return 0;
-}
+// int set_pose_client(Pose pp){
+//   ros::NodeHandle nh1;
+//   ros::ServiceClient client= nh1.serviceClient<rigid2d::set_pen>("/set_pose", 1000);
+//   rigid2d::set_pen srv;
+//   srv.request.robot_pose.x = pp.x;
+//   srv.request.robot_pose.y = pp.y;
+//   srv.request.robot_pose.theta = pp.theta;
+//
+//   ros::service::waitForService("set_pose_service");
+//   if (client.call(srv))
+//           {
+//                   ROS_INFO("CALL set_pose");
+//           }
+//           else
+//           {
+//                   ROS_ERROR("Failed to call service teleport");
+//                   return 1;
+//           }
+//   return 0;
+// }
