@@ -21,6 +21,8 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   message_generation
   std_srvs
+  nav_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -115,7 +117,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp std_msgs tf2 tf2_ros geometry_msgs message_generation std_srvs message_runtime
+  CATKIN_DEPENDS roscpp std_msgs tf2 tf2_ros geometry_msgs message_generation std_srvs message_runtime nav_msgs tf
   #DEPENDS system_lib
 )
 
