@@ -26,11 +26,12 @@ namespace rigid2d{
     std::vector<Velocity> vel = {{0,0}};
     std::vector<Twist2D> tw = {{0,0,0}};
     std::vector<Velocity> static_vel = {{0,0}};
-    double goal;
+    int goal;
 
   public:
+    Waypoints();
     //set the goal
-    Waypoints(std::vector<Vector2D> p, Velocity v);
+    explicit Waypoints(std::vector<Vector2D> p, Velocity v);
 
     // calcualte the rest_distance to goal point;
     double left_distance(Pose pose);
@@ -42,7 +43,7 @@ namespace rigid2d{
     // void velocity_array(double rest_distance,double rest_angle, double steps);
     //
     // // set condition to move to nextWaypoint;
-    void nextWaypoint(double rest_distance,double rest_angle,double threshold_linear);
+    Twist2D nextWaypoint(double rest_distance,double rest_angle,double threshold_linear, double threshold_angular);
     //
     //
     void convert_velocity_to_twist();
@@ -52,6 +53,7 @@ namespace rigid2d{
 
     void change_goal();
     void reset_velocity();
+    int print_goal();
 
 
   };

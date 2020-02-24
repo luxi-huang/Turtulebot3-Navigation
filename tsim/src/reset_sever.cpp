@@ -28,6 +28,7 @@ bool callback(std_srvs::Empty::Request  &req,
 	n.getParam("y",y_value);
 	turtle_setpen_client(1);
 	turtle_teleport_client(x_value, y_value, 0);
+	// turtle_teleport_client(0, 0, 0);
 	ros::spinOnce();
 	// ROS_INFO("11111111");
 	return 1;
