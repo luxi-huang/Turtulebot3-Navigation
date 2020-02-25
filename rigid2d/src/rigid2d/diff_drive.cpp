@@ -33,8 +33,8 @@ WheelVelocities DiffDrive::twistToWheels(Twist2D t){
   // u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
   // u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
   //lastest
-  u.u1 = (2.0*t.vx+t.theta_dot*whe_base)/(2*whe_radius);
-  u.u2 = (2.0*t.vx-t.theta_dot*whe_base)/(2*whe_radius);
+  u.u1 = (2.0*t.vx-t.theta_dot*whe_base)/(2*whe_radius);
+  u.u2 = (2.0*t.vx+t.theta_dot*whe_base)/(2*whe_radius);
 
   u.u3 = u.u2;
   u.u4 = u.u1;

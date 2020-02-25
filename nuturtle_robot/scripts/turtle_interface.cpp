@@ -79,26 +79,21 @@ int main(int argc, char **argv)
   ROS_INFO("wheelBase: %f ", wheel_base);
   ROS_INFO("wheel_radius: %f", wheel_radius);
   while(ros::ok()){
-    // get robot_cmd and publish to wheel_velocity;
+
     WheelVelocities wheel_v;
-    // ROS_INFO("wheel_base: %f", wheel_base);
-    // ROS_INFO("twist value: %f",ttwist_value.theta_dot);
     wheel_v = diff1.twistToWheels(ttwist_value);
-    // ROS_INFO("wheel_v_u1: %f ", wheel_v.u1);
-    // ROS_INFO("wheel_encoder left: %f ", new_left);
-    // ROS_INFO("wheel_encoder left: %f ", new_right);
-     // wheel_sensor
+
     pub_wheel_velocity(wheel_v);
 
-    // ROS_INFO("count");
-    // get time intervel
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();
     last_time = current_time;
 
-    // calculate the left and right velocity from the subscribe value of encoder; new_left and new_right is subscribe value from encoder;
-    left_wheel_velocity = ((last_left - new_left)/duration/encoder_ticks)*2*PI;
-    right_wheel_velocity = ((last_right - new_right)/duration/encoder_ticks)*2*PI;
+    // left_wheel_velocity = ((last_left - new_left)/duration/encoder_ticks)*2*PI;
+    // right_wheel_velocity = ((last_right - new_right)/duration/encoder_ticks)*2*PI;
+
+    left_wheel_velocity = ((new_left-last_left)/duration/encoder_ticks)*2*PI;
+    right_wheel_velocity = ((new_right - last_right)/duration/encoder_ticks)*2*PI;
 
     last_right = new_right;
     last_left = new_left;
@@ -108,14 +103,8 @@ int main(int argc, char **argv)
     wheel_v_encoder.u1 = left_wheel_velocity;
     wheel_v_encoder.u2 = right_wheel_velocity;
 
-    // wheel_v_encoder.u2 = left_wheel_velocity;
-    // wheel_v_encoder.u1 = right_wheel_velocity;
-
-    // diff1.updateOdometry(left_radius, right_radius);
-    // P = diff1.pose();
     publish_joint_state(wheel_v_encoder);
 
-    // ROS_INFO("%f",ttwist_value.vx);
     ros::spinOnce();
     loop_rate.sleep();
   }
@@ -175,8 +164,8 @@ void publish_joint_state(WheelVelocities v){
   j_s.name[0] = joint_name_vector[0];
   j_s.name[1] = joint_name_vector[1];
   j_s.header.stamp = ros::Time::now();
-  j_s.velocity[0] = v.u2;
-  j_s.velocity[1] = v.u1;
+  j_s.velocity[0] = v.u1;
+  j_s.velocity[1] = v.u2;
   // ROS_INFO("j_s.velocity_v1 %f", j_s.velocity[0]);
   // ROS_INFO("j_s.velocity_v2 %f", j_s.velocity[1]);
   joint_state_publisher.publish(j_s);
