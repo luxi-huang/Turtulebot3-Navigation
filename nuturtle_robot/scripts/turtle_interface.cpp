@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "turtle_interface");
   ros::NodeHandle n;
 
-  cmd_vel_subscriber =  n.subscribe("turtle1/cmd_vel",1000,velCallback);
+  cmd_vel_subscriber =  n.subscribe("turtle1/cmd_vel",1,velCallback);
   wheel_cmd_publisher = n.advertise<nuturtlebot::WheelCommands>("wheel_cmd", true);
 
   sensor_data_subscriber = n.subscribe("sensor_data",1,sensor_Callback);
@@ -108,6 +108,9 @@ int main(int argc, char **argv)
     wheel_v_encoder.u1 = left_wheel_velocity;
     wheel_v_encoder.u2 = right_wheel_velocity;
 
+    // wheel_v_encoder.u2 = left_wheel_velocity;
+    // wheel_v_encoder.u1 = right_wheel_velocity;
+
     // diff1.updateOdometry(left_radius, right_radius);
     // P = diff1.pose();
     publish_joint_state(wheel_v_encoder);
@@ -172,8 +175,8 @@ void publish_joint_state(WheelVelocities v){
   j_s.name[0] = joint_name_vector[0];
   j_s.name[1] = joint_name_vector[1];
   j_s.header.stamp = ros::Time::now();
-  j_s.velocity[0] = v.u1;
-  j_s.velocity[1] = v.u2;
+  j_s.velocity[0] = v.u2;
+  j_s.velocity[1] = v.u1;
   // ROS_INFO("j_s.velocity_v1 %f", j_s.velocity[0]);
   // ROS_INFO("j_s.velocity_v2 %f", j_s.velocity[1]);
   joint_state_publisher.publish(j_s);

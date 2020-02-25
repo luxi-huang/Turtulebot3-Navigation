@@ -8,7 +8,7 @@
 
 
   <group if="$(eval arg('robot') != 0)">
-    <machine name="turtlebot" address="turtlebot2" env-loader="/home/student/luxi_install/env.sh" user="student"  />
+    <machine name="turtlebot" address="turtlebot1" env-loader="/home/student/luxi_install/env.sh" user="student"  />
   </group>
 
   <node name="serial_node" pkg="rosserial_python" type="serial_node.py" machine="turtlebot">

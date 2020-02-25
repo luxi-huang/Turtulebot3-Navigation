@@ -45,8 +45,8 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "turtle_way");
 	ros::NodeHandle n;
-	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1000);
-	marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 100);
+	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1);
+	marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
 
 
 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 	Velocity vel;
 	vel.linear = translation_velocity;
 	vel.angular = rotation_velocity;
-	ROS_INFO("vel_linear~~~ %f", vel.linear);
+	// ROS_INFO("vel_linear~~~ %f", vel.linear);
 
 	Waypoints way;
 	way = Waypoints(p,vel);
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 					ros::spinOnce();
 				}
 			}
-			ROS_INFO("twist_ x  %f ", twist.vx);
+			// ROS_INFO("twist_ x  %f ", twist.vx);
 
 			publish_cmd(twist);
 
@@ -169,9 +169,9 @@ int main(int argc, char **argv)
 			visualization_msgs::Marker marker4;
 			visualization_msgs::Marker marker5;
 
-			publish_marker(p_pose1, marker1);
-			publish_marker(p_pose2, marker2);
-			// publish_marker(p_pose3, marker3);
+			// publish_marker(p_pose1, marker1);
+			// publish_marker(p_pose2, marker2);
+			publish_marker(p_pose3, marker3);
 			// publish_marker(p_pose4, marker4);
 			// publish_marker(p_pose5, marker5);
 
