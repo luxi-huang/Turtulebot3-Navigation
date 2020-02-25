@@ -22,6 +22,8 @@
 #include "rigid2d/waypoints.hpp"
 #include <cmath>
 #include <visualization_msgs/Marker.h>
+#include <tf/tf.h>
+#include <nav_msgs/Odometry.h>
 // using namespace std; // use for count
 
 using rigid2d::Vector2D;
@@ -34,6 +36,7 @@ using rigid2d::DiffDrive;
 
 ros::Publisher velocity_publisher;
 ros::Publisher marker_pub;
+ros::Subscriber odomSub;
 
 void publish_cmd(Twist2D ttwist);
 void publish_marker(Pose p_pose, visualization_msgs::Marker marker);
@@ -41,12 +44,35 @@ void publish_zero_vel();
 
 uint32_t shape = visualization_msgs::Marker::CUBE;
 
+
+Pose pose_odom;
+
+
+void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
+{
+	pose_odom.x = msg->pose.pose.position.x;
+	pose_odom.y = msg->pose.pose.position.y;
+
+	tf::Quaternion q(
+		 msg->pose.pose.orientation.x,
+		 msg->pose.pose.orientation.y,
+		 msg->pose.pose.orientation.z,
+		 msg->pose.pose.orientation.w );
+
+	tf::Matrix3x3 m(q);
+	double roll, pitch, yaw;
+	m.getRPY(roll, pitch, yaw);
+	pose_odom.theta = yaw;
+	// pub_pose_.publish(pose2d);
+}
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "turtle_way");
 	ros::NodeHandle n;
 	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1);
 	marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+	odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 10, odomCallback);
 
 
 
@@ -111,6 +137,7 @@ int main(int argc, char **argv)
     while (1){
       ros::spinOnce();
 			Pose estimate_pose;
+			// check_error_diff=DiffDrive(pose_odom,0.0,0.0);
 			estimate_pose = check_error_diff.pose();
 
 			double distance_to_goal = way.left_distance(estimate_pose);
@@ -120,6 +147,9 @@ int main(int argc, char **argv)
 			int last_goal = way.print_goal();
 			twist = way.nextWaypoint(distance_to_goal, angle_to_goal,linear_threshold, angular_threshold);
 			int current_goal = way.print_goal();
+			if (last_goal != current_goal){
+				check_error_diff=DiffDrive(pose_odom,0.0,0.0);
+			}
 
 			if(last_goal == 0 && current_goal == 1){
 				while(1)
