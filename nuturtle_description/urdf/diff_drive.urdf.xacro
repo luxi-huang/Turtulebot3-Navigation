@@ -8,11 +8,20 @@
 <xacro:property name="wheel_base" value="${props['wheel_base']}" />
 <xacro:property name="chassis_length" value="${props['chassis_length']}" />
 <xacro:property name="chassis_thinkness" value="${props['chassis_thinkness']}" />
+<xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" />
 
 
   <link name="base_link" >
+    <pose>0 0 ${chassis_thinkness/2 + wheel_radius-0.02} 0 0 0</pose>
+<!-- 
+    <inertial>
+      <mass value="0.94"/>
+      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-0.02}"/>
+      <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.106208333333"/>
+    </inertial> -->
+
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 ${wheel_radius}"/>
+      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-0.02}"/>
       <geometry>
           <box size="${chassis_length} ${wheel_base+Wheel_width} ${chassis_thinkness}"/>
        </geometry>
@@ -20,11 +29,12 @@
            <color rgba="0 1 0 1" />
        </material>
      </visual>
+
   </link>
 
   <link name="link_right_wheel">
     <visual name="link_right_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+      <origin rpy="0 1.5707 1.5707" xyz="${wheel_radius} 0 0"/>
       <geometry>
         <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
       </geometry>
@@ -45,7 +55,7 @@
 
   <link name="link_left_wheel">
     <visual name="link_left_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+      <origin rpy="0 1.5707 1.5707" xyz="${wheel_radius} 0 0"/>
       <geometry>
         <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
       </geometry>
@@ -66,12 +76,12 @@
 
   <link name="link_caster">
     <visual name="caster_visual">
-      <origin rpy="0 0 0" xyz="${chassis_length/2-wheel_radius/2+chassis_thinkness/4} 0 ${wheel_radius/2-chassis_thinkness/4}"/>
+      <origin rpy="0 0 0" xyz="${-chassis_length/2 + (wheel_radius/2-wheel_axel_offset/2)} 0 ${wheel_radius/2-wheel_axel_offset/2}"/>
       <geometry>
-        <sphere radius="${wheel_radius/2-chassis_thinkness/4}"/>
+        <sphere radius="${wheel_radius/2-wheel_axel_offset/2}"/>
       </geometry>
-      <material name="blue_mat">
-        <color rgba="0.203125 0.23828125 0.28515625 1.0"/>
+      <material name="red_mat">
+        <color rgba="1 0 0 0.5"/>
       </material>
     </visual>
   </link>
