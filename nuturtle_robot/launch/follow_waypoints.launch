@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="robot" default="0"/>
+  <!-- <arg name="robot" default="0"/>
 
   <group if="$(eval arg('robot') == 0)">
     <machine name="turtlebot" address="localhost"/>
@@ -14,7 +14,7 @@
   <node name="serial_node" pkg="rosserial_python" type="serial_node.py" machine="turtlebot">
     <param name="port" value="/dev/ttyACM0"/>
     <param name="baud" value="115200"/>
-  </node>
+  </node> -->
 
 
 

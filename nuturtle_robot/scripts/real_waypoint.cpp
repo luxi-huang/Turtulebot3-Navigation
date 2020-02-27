@@ -39,7 +39,7 @@ ros::Publisher marker_pub;
 ros::Subscriber odomSub;
 
 void publish_cmd(Twist2D ttwist);
-void publish_marker(Pose p_pose, visualization_msgs::Marker marker);
+void publish_marker(Pose p_pose, visualization_msgs::Marker marker, int number);
 void publish_zero_vel();
 
 uint32_t shape = visualization_msgs::Marker::CUBE;
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 	// initial waypoints;
 	std::vector<Vector2D> p;
 	// p = {{3.0,2.0},{7.0,3.0},{9.0,7.0},{5.0,10.0},{1.0,6.0}};
-	p = {{0.0,0.0},{2.0,0.0},{3,2},{1.0,3.0},{-1.0,2.0}};
+	p = {{0.0,0.0},{1.0,0.0},{1.5,0.5},{0.5,1.0},{-0.5,0.5}};
 	trans_vel =2;
 	rot_vel =1;
 
@@ -147,9 +147,9 @@ int main(int argc, char **argv)
 			int last_goal = way.print_goal();
 			twist = way.nextWaypoint(distance_to_goal, angle_to_goal,linear_threshold, angular_threshold);
 			int current_goal = way.print_goal();
-			if (last_goal != current_goal){
-				check_error_diff=DiffDrive(pose_odom,0.0,0.0);
-			}
+			// if (last_goal != current_goal){
+			// 	check_error_diff=DiffDrive(pose_odom,0.0,0.0);
+			// }
 
 			if(last_goal == 0 && current_goal == 1){
 				while(1)
@@ -199,11 +199,11 @@ int main(int argc, char **argv)
 			visualization_msgs::Marker marker4;
 			visualization_msgs::Marker marker5;
 
-			// publish_marker(p_pose1, marker1);
-			// publish_marker(p_pose2, marker2);
-			publish_marker(p_pose3, marker3);
-			// publish_marker(p_pose4, marker4);
-			// publish_marker(p_pose5, marker5);
+			publish_marker(p_pose1, marker1, 1);
+			publish_marker(p_pose2, marker2, 2);
+			publish_marker(p_pose3, marker3, 3);
+			publish_marker(p_pose4, marker4, 4);
+			publish_marker(p_pose5, marker5, 5);
 
 
 
@@ -236,7 +236,7 @@ void publish_zero_vel(){
 }
 
 
-void publish_marker(Pose p_pose,visualization_msgs::Marker marker){
+void publish_marker(Pose p_pose,visualization_msgs::Marker marker, int number){
   // visualization_msgs::Marker marker;
   // Set the frame ID and timestamp.  See the TF tutorials for information on these.
   marker.header.frame_id = "/odom_frame_id";
@@ -245,7 +245,7 @@ void publish_marker(Pose p_pose,visualization_msgs::Marker marker){
   // Set the namespace and id for this marker.  This serves to create a unique ID
   // Any marker sent with the same namespace and id will overwrite the old one
   marker.ns = "basic_shapes";
-  marker.id = 0;
+  marker.id = number;
 
   // Set the marker type.  Initially this is CUBE, and cycles between that and SPHERE, ARROW, and CYLINDER
   marker.type = shape;
@@ -263,13 +263,13 @@ void publish_marker(Pose p_pose,visualization_msgs::Marker marker){
   marker.pose.orientation.w = 1.0;
 
   // Set the scale of the marker -- 1x1x1 here means 1m on a side
-  marker.scale.x = 1.0;
-  marker.scale.y = 1.0;
-  marker.scale.z = 1.0;
+  marker.scale.x = 0.1;
+  marker.scale.y = 0.1;
+  marker.scale.z = 0.1;
 
   // Set the color -- be sure to set alpha to something non-zero!
-  marker.color.r = 0.0f;
-  marker.color.g = 1.0f;
+  marker.color.r = 1.0f;
+  marker.color.g = 0.0f;
   marker.color.b = 0.0f;
   marker.color.a = 1.0;
 
