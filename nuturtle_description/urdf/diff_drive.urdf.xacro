@@ -12,16 +12,16 @@
 
 
   <link name="base_link" >
-    <pose>0 0 ${chassis_thinkness/2 + wheel_radius-0.02} 0 0 0</pose>
-<!-- 
+    <pose>0 0 ${chassis_thinkness/2 + wheel_radius-wheel_axel_offset} 0 0 0</pose>
+
     <inertial>
       <mass value="0.94"/>
-      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-0.02}"/>
+      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-wheel_axel_offset}"/>
       <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.106208333333"/>
-    </inertial> -->
+    </inertial>
 
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-0.02}"/>
+      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-wheel_axel_offset}"/>
       <geometry>
           <box size="${chassis_length} ${wheel_base+Wheel_width} ${chassis_thinkness}"/>
        </geometry>
@@ -34,7 +34,7 @@
 
   <link name="link_right_wheel">
     <visual name="link_right_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="${wheel_radius} 0 0"/>
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
       <geometry>
         <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
       </geometry>
@@ -45,7 +45,7 @@
   </link>
 
   <joint name="odometer/right_wheel_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="0 ${(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
+    <origin rpy="0 0 0" xyz="${wheel_radius} ${(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
     <child link="link_right_wheel"/>
     <parent link="base_link"/>
     <axis rpy="0 0 0" xyz="0 1 0"/>
@@ -55,7 +55,7 @@
 
   <link name="link_left_wheel">
     <visual name="link_left_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="${wheel_radius} 0 0"/>
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
       <geometry>
         <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
       </geometry>
@@ -66,7 +66,7 @@
   </link>
 
   <joint name="odometer/left_wheel_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="0 ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
+    <origin rpy="0 0 0" xyz="${wheel_radius} ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
     <child link="link_left_wheel"/>
     <parent link="base_link"/>
     <axis rpy="0 0 0" xyz="0 1 0"/>
