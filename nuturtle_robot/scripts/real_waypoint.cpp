@@ -1,12 +1,11 @@
-// turtle_rect: enable the turtle to follow the trajectory of
-// a rectangle
+// real_waypoints: enable the turtlebot to follow the trajectory of a rectangle
 //
 // PUBLISHERS:
 //   + turtle1/cmd_vel (Twist) ~ publish turtle velocity.
-// 	+ pose_error (Pose_error) ~ publish the pose error of turtle.
-//
+//   + visualization_msgs/Marker (visualization_marker) - pubslish marker
+
 // SUBSCRIBERS:
-//   + turtle1/pose (Pose) ~ subscribe the current pose of the turtle1 turtle (x, y, theta)
+//   + nav_msgs::Odometry (odom) ~ subscribe the current pose of the turtlebot
 
 #include "ros/ros.h"
 #include <sstream>
@@ -24,6 +23,8 @@
 #include <visualization_msgs/Marker.h>
 #include <tf/tf.h>
 #include <nav_msgs/Odometry.h>
+#include "rigid2d/set_pen.h"
+#include "nuturtle_robot/start.h"
 // using namespace std; // use for count
 
 using rigid2d::Vector2D;
@@ -37,33 +38,32 @@ using rigid2d::DiffDrive;
 ros::Publisher velocity_publisher;
 ros::Publisher marker_pub;
 ros::Subscriber odomSub;
+ros::ServiceServer service;
 
 void publish_cmd(Twist2D ttwist);
 void publish_marker(Pose p_pose, visualization_msgs::Marker marker, int number);
 void publish_zero_vel();
+int set_pose_client();
+void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
 
 uint32_t shape = visualization_msgs::Marker::CUBE;
-
-
 Pose pose_odom;
+int server_value = 0;
 
-
-void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
+bool start_callback(nuturtle_robot::start::Request  &req,
+                  nuturtle_robot::start::Response &resp)
 {
-	pose_odom.x = msg->pose.pose.position.x;
-	pose_odom.y = msg->pose.pose.position.y;
+	// set_pose_client();
 
-	tf::Quaternion q(
-		 msg->pose.pose.orientation.x,
-		 msg->pose.pose.orientation.y,
-		 msg->pose.pose.orientation.z,
-		 msg->pose.pose.orientation.w );
-
-	tf::Matrix3x3 m(q);
-	double roll, pitch, yaw;
-	m.getRPY(roll, pitch, yaw);
-	pose_odom.theta = yaw;
-	// pub_pose_.publish(pose2d);
+	if (req.clockwise_forward == 1){
+		server_value = 1;
+		ROS_INFO("start_service111");
+  	return 1;
+	} else {
+		server_value = 1;
+		ROS_INFO("start_service000");
+		return 1;
+	}
 }
 
 int main(int argc, char **argv)
@@ -73,8 +73,7 @@ int main(int argc, char **argv)
 	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1);
 	marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
 	odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 10, odomCallback);
-
-
+	service = n.advertiseService("/start", start_callback);
 
 	int trans_vel;
 	int rot_vel;
@@ -116,6 +115,7 @@ int main(int argc, char **argv)
 
 	double linear_threshold = 0.1;
 	double angular_threshold = 0.1;
+	int count =0;
 
 	Pose init_pose;
 	init_pose.x = p[0].x;
@@ -125,90 +125,99 @@ int main(int argc, char **argv)
 	check_error_diff=DiffDrive(init_pose,0.0,0.0);
 
 	while (ros::ok()){
-
-		double duration;
-		ros::Time current_time;
-		ros::Time last_time;
-		current_time = ros::Time::now();
-		last_time = current_time;
-
-		int frequency = 20;
-		ros::Rate r(frequency);
-    while (1){
-      ros::spinOnce();
-			Pose estimate_pose;
-			// check_error_diff=DiffDrive(pose_odom,0.0,0.0);
-			estimate_pose = check_error_diff.pose();
-
-			double distance_to_goal = way.left_distance(estimate_pose);
-			double angle_to_goal = way.left_angle(estimate_pose);
-
-			Twist2D twist;
-			int last_goal = way.print_goal();
-			twist = way.nextWaypoint(distance_to_goal, angle_to_goal,linear_threshold, angular_threshold);
-			int current_goal = way.print_goal();
-			// if (last_goal != current_goal){
-			// 	check_error_diff=DiffDrive(pose_odom,0.0,0.0);
-			// }
-
-			if(last_goal == 0 && current_goal == 1){
-				while(1)
-				{
-					publish_zero_vel();
-					ros::spinOnce();
-				}
-			}
-			// ROS_INFO("twist_ x  %f ", twist.vx);
-
-			publish_cmd(twist);
-
+		ros::spinOnce();
+		if (server_value == 1)
+		{
+			set_pose_client();
+			double duration;
+			ros::Time current_time;
+			ros::Time last_time;
 			current_time = ros::Time::now();
-			duration = (current_time - last_time).toSec();
 			last_time = current_time;
-			check_error_diff.feedforward(twist,duration);
+
+			int frequency = 20;
+			ros::Rate r(frequency);
+	    while (1){
+	      ros::spinOnce();
+				Pose estimate_pose;
+				// check_error_diff=DiffDrive(pose_odom,0.0,0.0);
+				estimate_pose = check_error_diff.pose();
+
+				double distance_to_goal = way.left_distance(estimate_pose);
+				double angle_to_goal = way.left_angle(estimate_pose);
+
+				Twist2D twist;
+				int last_goal = way.print_goal();
+				twist = way.nextWaypoint(distance_to_goal, angle_to_goal,linear_threshold, angular_threshold);
+				int current_goal = way.print_goal();
+				// if (last_goal != current_goal){
+				// 	check_error_diff=DiffDrive(pose_odom,0.0,0.0);
+				// }
+				count++;
+				if (count > 100){
+					count = 0;
+					check_error_diff=DiffDrive(pose_odom,0.0,0.0);
+				}
+				if(last_goal == 0 && current_goal == 1){
+					while(1)
+					{
+						publish_zero_vel();
+						ros::spinOnce();
+					}
+				}
+
+				// ROS_INFO("twist_ x  %f ", twist.vx);
+
+				publish_cmd(twist);
+
+				current_time = ros::Time::now();
+				duration = (current_time - last_time).toSec();
+				last_time = current_time;
+				check_error_diff.feedforward(twist,duration);
+
+				// set_marker;
+				Pose p_pose1;
+				p_pose1.x = p[0].x;
+				p_pose1.y = p[0].y;
+				p_pose1.theta = 0.0;
+
+				Pose p_pose2;
+				p_pose2.x = p[1].x;
+				p_pose2.y = p[1].y;
+				p_pose2.theta = 0.0;
+
+				Pose p_pose3;
+				p_pose3.x = p[2].x;
+				p_pose3.y = p[2].y;
+				p_pose3.theta = 0.0;
+
+				Pose p_pose4;
+				p_pose4.x = p[3].x;
+				p_pose4.y = p[3].y;
+				p_pose4.theta = 0.0;
+
+				Pose p_pose5;
+				p_pose5.x = p[4].x;
+				p_pose5.y = p[4].y;
+				p_pose5.theta = 0.0;
+
+				visualization_msgs::Marker marker1;
+				visualization_msgs::Marker marker2;
+				visualization_msgs::Marker marker3;
+				visualization_msgs::Marker marker4;
+				visualization_msgs::Marker marker5;
+
+				publish_marker(p_pose1, marker1, 1);
+				publish_marker(p_pose2, marker2, 2);
+				publish_marker(p_pose3, marker3, 3);
+				publish_marker(p_pose4, marker4, 4);
+				publish_marker(p_pose5, marker5, 5);
 
 
-			Pose p_pose1;
-			p_pose1.x = p[0].x;
-			p_pose1.y = p[0].y;
-			p_pose1.theta = 0.0;
 
-			Pose p_pose2;
-			p_pose2.x = p[1].x;
-			p_pose2.y = p[1].y;
-			p_pose2.theta = 0.0;
-
-			Pose p_pose3;
-			p_pose3.x = p[2].x;
-			p_pose3.y = p[2].y;
-			p_pose3.theta = 0.0;
-
-			Pose p_pose4;
-			p_pose4.x = p[3].x;
-			p_pose4.y = p[3].y;
-			p_pose4.theta = 0.0;
-
-			Pose p_pose5;
-			p_pose5.x = p[4].x;
-			p_pose5.y = p[4].y;
-			p_pose5.theta = 0.0;
-
-			visualization_msgs::Marker marker1;
-			visualization_msgs::Marker marker2;
-			visualization_msgs::Marker marker3;
-			visualization_msgs::Marker marker4;
-			visualization_msgs::Marker marker5;
-
-			publish_marker(p_pose1, marker1, 1);
-			publish_marker(p_pose2, marker2, 2);
-			publish_marker(p_pose3, marker3, 3);
-			publish_marker(p_pose4, marker4, 4);
-			publish_marker(p_pose5, marker5, 5);
-
-
-
-			r.sleep();
-    }
+				r.sleep();
+	    }
+		} // if loop close
 	}
 }
 
@@ -276,4 +285,44 @@ void publish_marker(Pose p_pose,visualization_msgs::Marker marker, int number){
   marker.lifetime = ros::Duration();
   marker_pub.publish(marker);
 
+}
+
+
+void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
+{
+	pose_odom.x = msg->pose.pose.position.x;
+	pose_odom.y = msg->pose.pose.position.y;
+
+	tf::Quaternion q(
+		 msg->pose.pose.orientation.x,
+		 msg->pose.pose.orientation.y,
+		 msg->pose.pose.orientation.z,
+		 msg->pose.pose.orientation.w );
+
+	tf::Matrix3x3 m(q);
+	double roll, pitch, yaw;
+	m.getRPY(roll, pitch, yaw);
+	pose_odom.theta = yaw;
+	// pub_pose_.publish(pose2d);
+}
+
+int set_pose_client(){
+	ros::NodeHandle n;
+	ros::ServiceClient client= n.serviceClient<rigid2d::set_pen>("/set_pose");
+  rigid2d::set_pen Set_pose_srv;
+  Set_pose_srv.request.robot_pose.x = 0;
+	Set_pose_srv.request.robot_pose.y = 0;
+	Set_pose_srv.request.robot_pose.theta = 0;
+
+	ros::service::waitForService("/set_pose");
+	if (client.call(Set_pose_srv))
+		{
+			ROS_INFO("set_pose_called");
+		}
+		else
+		{
+			ROS_ERROR("Failed to call service set_pose");
+			return 1;
+		}
+	return 0;
 }

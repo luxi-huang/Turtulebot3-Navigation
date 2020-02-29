@@ -29,10 +29,10 @@ void publish_joint_state(WheelVelocities v);
 
 WheelVelocities wheel_sensor;
 Twist2D ttwist_value;
-int new_left, new_right;
+int new_left =0, new_right =0;
 int last_left, last_right;
 int maximum_rotational_velocity_motor;
-
+int first_value = 0;
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "turtle_interface");
@@ -147,6 +147,12 @@ void pub_wheel_velocity(WheelVelocities v){
 void sensor_Callback(const nuturtlebot::SensorData::ConstPtr & sensor){
   new_left = sensor->left_encoder;
   new_right = sensor->right_encoder;
+
+  if (first_value == 0){
+    last_left = new_left;
+    last_right = new_right;
+    first_value = 1;
+  }
   // ROS_INFO("wheel_encoder left:!!!!!!! %d ", new_left);
   // ROS_INFO("wheel_encoder right:!!!!!!!!! %d ", new_right);
 }
