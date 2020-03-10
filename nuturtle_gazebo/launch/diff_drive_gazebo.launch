@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- <param name="robot_description" command="xacro '$(find nuturtle_gazebo)/urdf/diff_drive.gazebo.xacro'"/> -->
+    <!-- <param name="robot_description" command="$(find xacro)/xacro $(find nuturtle_gazebo)/urdf/diff_drive.gazebo.xacro"/> -->
+    <!-- <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" /> -->
+
+    <param name="robot_description"
+         command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
+
+    <arg name="x" default="0"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="0"/>
+
+    <node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+          args="-urdf -param robot_description -model diff_ddrive -x $(arg x) -y $(arg y) -z $(arg z)" />
+
+    <!-- <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 0.0 -y 0.0 -z 0 -model diff_drive" respawn="false" output="screen"/> -->
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <!-- <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/> -->
+      <arg name="paused" value="false"/>
+      <arg name="use_sim_time" value="true"/>
+      <arg name="gui" value="true"/>
+      <arg name="headless" value="false"/>
+      <arg name="debug" value="false"/>
+    </include>
+
+</launch>

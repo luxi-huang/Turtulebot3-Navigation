@@ -3,15 +3,28 @@
     <xacro:macro name="link_wheel" params="name">
         <link name="${name}">
             <inertial>
-              <mass value="0.1"/>
+              <mass value="0.03"/>
               <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
-              <inertia ixx="0.000526666666667" ixy="0" ixz="0" iyy="0.000526666666667" iyz="0" izz="0.001"/>
+              <inertia ixx="${0.03*(3*wheel_radius*wheel_radius+Wheel_width*Wheel_width)/12.0}" ixy="0" ixz="0" iyy="${0.03*(3*wheel_radius*wheel_radius+Wheel_width*Wheel_width)/12.0}" iyz="0" izz="${0.03*wheel_radius*wheel_radius/2.0}"/>
             </inertial>
             <collision name="${name}_collision">
               <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
               <geometry>
                 <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
               </geometry>
+              <surface>
+                <friction>
+                  <ode>
+                    <mu1>0.3</mu1>
+                    <mu2>0.3</mu2>
+                    <minDepth>0.001</minDepth>
+                    <fdir1>1 0 0 </fdir1>
+                    <maxVel>0.1</maxVel>
+                    <kp>500000</kp>
+                    <kd>10</kd>
+                  </ode>
+                </friction>
+              </surface>
             </collision>
             <visual name="${name}_visual">
               <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
@@ -26,7 +39,7 @@
       <joint name="${name}" type="continuous">
         <origin rpy="0 0 0" xyz="${origin_xyz}"/>
         <child link="${child}"/>
-        <parent link="base_link"/>
+        <parent link="base_body"/>
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <limit effort="10000" velocity="1000"/>
         <joint_properties damping="1.0" friction="1.0"/>

@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<robot name="diff_drive" xmlns:xacro="https://www.ros.org/wiki/xacro">
+
+<xacro:property name="props" value= "${load_yaml('$(find nuturtle_description)/config/diff_params.yaml')}"/>
+<xacro:property name="Wheel_width" value="${props['wheel_width']}" />
+<xacro:property name="wheel_radius" value="${props['wheel_radius']}" />
+<xacro:property name="wheel_base" value="${props['wheel_base']}" />
+<xacro:property name="chassis_length" value="${props['chassis_length']}" />
+<xacro:property name="chassis_thinkness" value="${props['chassis_thinkness']}" />
+<xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" />
+
+<xacro:include filename="$(find nuturtle_description)/urdf/macro.xacro" />
+<xacro:include filename="$(find nuturtle_gazebo)/urdf/diff_drive.gazebo" />
+<xacro:include filename="$(find nuturtle_gazebo)/urdf/material.urdf.xacro" />
+
+<xacro:macro name="robot_dd" params="mode">
+<gazebo reference="base_body">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="link_left_wheel">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="link_right_wheel">
+    <material>Gazebo/Red</material>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename="nuturtle_gazebo_plugin.so" name="turtle_drive_plugin">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>20</updateRate>
+      <!-- <leftJoint>joint_left_wheel</leftJoint>
+      <rightJoint>joint_right_wheel</rightJoint> -->
+      <left_wheel_joint>odometer/joint_left_wheel</left_wheel_joint>
+      <right_wheel_joint>odometer/right_wheel_joint</right_wheel_joint>
+      <sensor_frequency>Hz</sensor_frequency>
+      <wheel_cmd_topic>wheel_cmd</wheel_cmd_topic>
+      <sensor_data_topic>sensor_data</sensor_data_topic>
+      
+    </plugin>
+  </gazebo>
+
+</xacro:macro>
+</robot>

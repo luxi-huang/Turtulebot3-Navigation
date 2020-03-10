@@ -11,9 +11,15 @@
 <xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" />
 
 <xacro:include filename="$(find nuturtle_description)/urdf/macro.xacro" />
+<xacro:include filename="$(find nuturtle_gazebo)/urdf/diff_drive.gazebo" />
+<xacro:include filename="$(find nuturtle_gazebo)/urdf/material.urdf.xacro" />
+<xacro:arg name="mode" default="0" />
 
+  <link name="base_link">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </link>
 
-  <link name="base_link" >
+  <link name="base_body" >
     <pose>0 0 ${chassis_thinkness/2 + wheel_radius-wheel_axel_offset} 0 0 0</pose>
 
     <inertial>
@@ -23,6 +29,7 @@
     </inertial>
 
     <collision name="collision_chassis">
+      <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-wheel_axel_offset}"/>
       <geometry>
         <box size="${chassis_length} ${wheel_base+Wheel_width} ${chassis_thinkness}"/>
       </geometry>
@@ -33,9 +40,9 @@
       <geometry>
           <box size="${chassis_length} ${wheel_base+Wheel_width} ${chassis_thinkness}"/>
        </geometry>
-       <material name="black_mat">
+       <!-- <material name="black_mat">
            <color rgba="0.203125 0.23828125 0.28515625 1.0"/>
-       </material>
+       </material> -->
      </visual>
 
 
@@ -48,10 +55,12 @@
        <surface>
          <friction>
            <ode>
-             <mu>0</mu>
-             <mu2>0</mu2>
-             <slip1>1.0</slip1>
-             <slip2>1.0</slip2>
+             <mu>0.0</mu>
+             <mu2>0.0</mu2>
+             <minDepth>0.001</minDepth>
+             <maxVel>1.0</maxVel>
+             <kp>1000000</kp>
+             <kd>100</kd>
            </ode>
          </friction>
        </surface>
@@ -60,66 +69,10 @@
       <origin rpy="0 0 0" xyz="${-chassis_length/2 + (wheel_radius/2-wheel_axel_offset/2)} 0 ${wheel_radius/2-wheel_axel_offset/2}"/>
        <geometry>
          <sphere radius="${wheel_radius/2-wheel_axel_offset/2}"/>
-         <!-- </material> -->
        </geometry>
      </visual>
-
   </link>
 
-  <!-- <link name="link_right_wheel">
-    <inertial>
-      <mass value="0.03"/>
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
-      <inertia ixx="${0.03*(3*wheel_radius*wheel_radius+Wheel_width*Wheel_width)/12.0}" ixy="0" ixz="0" iyy="${0.03*(3*wheel_radius*wheel_radius+Wheel_width*Wheel_width)/12.0}" iyz="0" izz="${0.03*wheel_radius*wheel_radius/2.0}"/>
-    </inertial>
-
-    <collision name="link_right_collision">
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
-      </geometry>
-    </collision>
-
-    <visual name="link_right_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
-      </geometry>
-      <material name="red_mat">
-          <color rgba="1 0 0 0.5" />
-      </material>
-    </visual>
-  </link>
-
-  <joint name="odometer/right_wheel_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="${wheel_radius} ${(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
-    <child link="link_right_wheel"/>
-    <parent link="base_link"/>
-    <axis rpy="0 0 0" xyz="0 1 0"/>
-    <limit effort="10000" velocity="1000"/>
-    <joint_properties damping="1.0" friction="1.0"/>
-  </joint>
-
-  <link name="link_left_wheel">
-    <visual name="link_left_wheel_visual">
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
-      </geometry>
-      <material name="red_mat">
-          <color rgba="1 0 0 0.5" />
-      </material>
-    </visual>
-  </link>
-
-  <joint name="odometer/left_wheel_joint" type="continuous">
-    <origin rpy="0 0 0" xyz="${wheel_radius} ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"/>
-    <child link="link_left_wheel"/>
-    <parent link="base_link"/>
-    <axis rpy="0 0 0" xyz="0 1 0"/>
-    <limit effort="10000" velocity="1000"/>
-    <joint_properties damping="1.0" friction="1.0"/>
-  </joint> -->
 
   <xacro:link_wheel name="link_right_wheel" />
   <xacro:joint_wheel name="odometer/right_wheel_joint"  child="link_right_wheel"  origin_xyz="${wheel_radius} ${(wheel_base+Wheel_width)/2} ${wheel_radius}"  />
@@ -128,6 +81,8 @@
   <xacro:link_wheel name="link_left_wheel" />
   <xacro:joint_wheel name="odometer/left_wheel_joint"   child="link_left_wheel"   origin_xyz="${wheel_radius} ${-(wheel_base+Wheel_width)/2} ${wheel_radius}"  />
 
+  <!-- <xacro:robot_dd mode="$(arg mode)" /> -->
+
   <link name="base_scan">
       <origin rpy="0 0 1.5707" xyz="0 0 ${wheel_radius-0.02+chassis_thinkness}"/>
   </link>
@@ -135,11 +90,17 @@
   <joint name="joint_caster" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 ${wheel_radius-0.02+chassis_thinkness}"/>
     <child link="base_scan"/>
+    <parent link="base_body"/>
+  </joint>
+
+  <joint name="base_link_base_body_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <child link="base_body"/>
     <parent link="base_link"/>
   </joint>
 
 
-
+  <xacro:robot_dd mode="$(arg mode)" />
 
 
 </robot>
