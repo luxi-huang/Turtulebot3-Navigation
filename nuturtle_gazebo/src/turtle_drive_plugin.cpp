@@ -39,7 +39,7 @@ public:
             return;
         }
 
-        ros::NodeHandle nh("gazebo_client");
+        ros::NodeHandle nh;
 
         // get sensor frequency
         if (!_sdf->HasElement("sensor_frequency"))
