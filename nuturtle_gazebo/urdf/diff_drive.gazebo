@@ -24,12 +24,12 @@
   <gazebo>
     <plugin filename="libnuturtle_gazebo_plugin.so" name="turtle_drive_plugin">
       <alwaysOn>true</alwaysOn>
-      <updateRate>20</updateRate>
+      <!-- <updateRate>200</updateRate> -->
       <!-- <leftJoint>joint_left_wheel</leftJoint>
       <rightJoint>joint_right_wheel</rightJoint> -->
       <left_wheel_joint>odometer/left_wheel_joint</left_wheel_joint>
       <right_wheel_joint>odometer/right_wheel_joint</right_wheel_joint>
-      <sensor_frequency>Hz</sensor_frequency>
+      <sensor_frequency>200</sensor_frequency>
       <wheel_cmd_topic>wheel_cmd</wheel_cmd_topic>
       <sensor_data_topic>sensor_data</sensor_data_topic>
 

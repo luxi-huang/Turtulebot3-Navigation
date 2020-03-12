@@ -22,17 +22,17 @@
   <node name="real_waypoint" pkg="nuturtle_robot" type="real_waypoint" output="screen">
   </node>
 
-  <node name="fake_odometer" pkg="rigid2d" type="odometer" output="screen">
+  <!-- <node name="fake_odometer" pkg="rigid2d" type="odometer" output="screen">
     <param name="joint_state_topic" value="/fake/joint_states"/>
     <param name="odom_frame_id" value="/fake_odom_frame_id"/>
     <param name="base_link" value="/fake_base_link"/>
     <remap from="odom" to="fake_odom"/>
     <remap from="joint_state" to="/fake/joint_states"/>
-  </node>
+  </node> -->
 
-  <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
+  <!-- <node name="fake_diff_encoders" pkg="rigid2d" type="fake_diff_encoders" output="screen">
     <param name="joint_state_topic" value="/fake/joint_states"/>
-  </node>
+  </node> -->
 
   <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
     <param name="joint_state_topic" value="/joint_states"/>
@@ -67,7 +67,5 @@
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
   </include>
-
-
 
 </launch>

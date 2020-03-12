@@ -26,6 +26,8 @@ class SetJointVelocityPlugin : public ModelPlugin
 public:
     virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
+        last_time_ = ros::Time::now();
+        ROS_INFO("plugin_works!!!!!!!!!");
         this->model = _model;
         this->updateConnection = event::Events::ConnectWorldUpdateBegin(
             std::bind(&SetJointVelocityPlugin::Update, this, std::placeholders::_1));
@@ -134,9 +136,11 @@ public:
 
         ros::Time current_time = ros::Time::now();
         double time_gap = (current_time - last_time_).toSec();
-
+        ROS_INFO("time_gap!!!!,%f", time_gap);
+        ROS_INFO("comparing, %f", 1.0/sensor_frequency_);
         if (time_gap >= (1.0 / sensor_frequency_))
         {
+            ROS_INFO("INLUPE");
             last_time_ = current_time;
             double left_pos = normalize_angle(this->model->GetJoint(left_wheel_joint_)->Position());
             double right_pos = normalize_angle(this->model->GetJoint(right_wheel_joint_)->Position());
@@ -146,7 +150,7 @@ public:
             nuturtlebot::SensorData sensor_data;
             sensor_data.left_encoder = (left_pos / (2 * PI)) * encoder_ticks_per_rev_;
             sensor_data.right_encoder = (right_pos / (2 * PI)) * encoder_ticks_per_rev_;
-
+            ROS_INFO("sensor_data.left %d",sensor_data.left_encoder) ;
             sensor_data_pub_.publish(sensor_data);
         }
     }
@@ -172,7 +176,7 @@ private:
     std::string sensor_data_topic_;
     std::string wheel_cmd_topic_;
 
-    ros::Time last_time_ = ros::Time::now();
+    ros::Time last_time_;
 };
 
 GZ_REGISTER_MODEL_PLUGIN(SetJointVelocityPlugin)
