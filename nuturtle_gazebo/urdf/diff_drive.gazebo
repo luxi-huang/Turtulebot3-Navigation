@@ -9,9 +9,6 @@
 <xacro:property name="chassis_thinkness" value="${props['chassis_thinkness']}" />
 <xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" />
 
-<xacro:include filename="$(find nuturtle_description)/urdf/macro.xacro" />
-<xacro:include filename="$(find nuturtle_gazebo)/urdf/diff_drive.gazebo" />
-<xacro:include filename="$(find nuturtle_gazebo)/urdf/material.urdf.xacro" />
 
 <xacro:macro name="robot_dd" params="mode">
 <gazebo reference="base_body">
@@ -35,7 +32,7 @@
       <sensor_frequency>Hz</sensor_frequency>
       <wheel_cmd_topic>wheel_cmd</wheel_cmd_topic>
       <sensor_data_topic>sensor_data</sensor_data_topic>
-      
+
     </plugin>
   </gazebo>
 
