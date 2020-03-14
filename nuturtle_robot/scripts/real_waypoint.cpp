@@ -88,14 +88,14 @@ int main(int argc, char **argv)
 	ROS_INFO ("frequency :%d, The frequency of the control loop",frequency);
 
 
-	double frac_vel = 0.8;
+	double frac_vel = 0.5;
 	double maximum_translational_velocity = 0.22;
 	double maximum_rotational_velocity_robot = 2.84;
 	n.getParam("frac_vel",frac_vel);
 	n.getParam("maximum_translational_velocity", maximum_translational_velocity);
 	n.getParam("maximum_rotational_velocity_robot", maximum_rotational_velocity_robot);
 	double translation_velocity = frac_vel*maximum_translational_velocity;
-	double rotation_velocity = frac_vel*maximum_rotational_velocity_robot;
+	double rotation_velocity = 0.1*maximum_rotational_velocity_robot;
 
 	// initial waypoints;
 	std::vector<Vector2D> p;
@@ -113,8 +113,8 @@ int main(int argc, char **argv)
 	way = Waypoints(p,vel);
 	int goal = way.print_goal();
 
-	double linear_threshold = 0.1;
-	double angular_threshold = 0.1;
+	double linear_threshold = 0.05;
+	double angular_threshold = 0.01;
 	int count =0;
 
 	Pose init_pose;
@@ -158,6 +158,7 @@ int main(int argc, char **argv)
 					count = 0;
 					check_error_diff=DiffDrive(pose_odom,0.0,0.0);
 				}
+
 				if(last_goal == 0 && current_goal == 1){
 					while(1)
 					{

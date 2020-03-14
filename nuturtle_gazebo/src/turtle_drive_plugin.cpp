@@ -27,7 +27,8 @@ public:
     virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
         last_time_ = ros::Time::now();
-        ROS_INFO("plugin_works!!!!!!!!!");
+        sensor_data.left_encoder = 0;
+        sensor_data.right_encoder = 0;
         this->model = _model;
         this->updateConnection = event::Events::ConnectWorldUpdateBegin(
             std::bind(&SetJointVelocityPlugin::Update, this, std::placeholders::_1));
@@ -103,6 +104,12 @@ public:
         nh.getParam("maximum_rotational_velocity_robot", max_rot_vel_);
         nh.getParam("maximum_rotational_velocity_motor", max_mot_vel_);
         nh.getParam("encoder_ticks", encoder_ticks_per_rev_);
+
+        last_left_vel = wheel_command_.left_velocity / 265.0 * max_mot_vel_;
+        last_right_vel = wheel_command_.right_velocity / 265.0 * max_mot_vel_;
+
+
+
     }
 
     void callback_wheel_cmd(const nuturtlebot::WheelCommands &msg)
@@ -120,38 +127,46 @@ public:
 
     void Update(const common::UpdateInfo &_info)
     {
-        double left_vel = wheel_command_.left_velocity / 256.0 * max_mot_vel_;
-        double right_vel = wheel_command_.right_velocity / 256.0 * max_mot_vel_;
-
-        // std::cout << "Left/Right wheel velocity (rad/s): " << left_vel << " / " << right_vel << std::endl;
-
-        // Joint velocity using joint motors
-        // left wheel
-        this->model->GetJoint(left_wheel_joint_)->SetParam("fmax", 0, 100.0);
-        this->model->GetJoint(left_wheel_joint_)->SetParam("vel", 0, left_vel);
-
-        // right wheel
-        this->model->GetJoint(right_wheel_joint_)->SetParam("fmax", 0, 100.0);
-        this->model->GetJoint(right_wheel_joint_)->SetParam("vel", 0, right_vel);
 
         ros::Time current_time = ros::Time::now();
         double time_gap = (current_time - last_time_).toSec();
-        ROS_INFO("time_gap!!!!,%f", time_gap);
-        ROS_INFO("comparing, %f", 1.0/sensor_frequency_);
+        ROS_INFO("time_gap,%f", time_gap);
+
+        double left_vel = wheel_command_.left_velocity / 265.0 * max_mot_vel_;
+        ROS_INFO("wheel_cmd_left %f", left_vel);
+        double right_vel = wheel_command_.right_velocity / 265.0 * max_mot_vel_;
+        ROS_INFO("wheel_cmd_right %f", right_vel);
+      // std::cout << "Left/Right wheel velocity (rad/s): " << left_vel << " / " << right_vel << std::endl;
+
+      // Joint velocity using joint motors
+      // left wheel
+        this->model->GetJoint(left_wheel_joint_)->SetParam("fmax", 0, 100.0);
+        this->model->GetJoint(left_wheel_joint_)->SetParam("vel", 0, left_vel);
+
+      // right wheel
+        this->model->GetJoint(right_wheel_joint_)->SetParam("fmax", 0, 100.0);
+        this->model->GetJoint(right_wheel_joint_)->SetParam("vel", 0, right_vel);
+
         if (time_gap >= (1.0 / sensor_frequency_))
         {
-            ROS_INFO("INLUPE");
-            last_time_ = current_time;
-            double left_pos = normalize_angle(this->model->GetJoint(left_wheel_joint_)->Position());
-            double right_pos = normalize_angle(this->model->GetJoint(right_wheel_joint_)->Position());
+            // ROS_INFO("INLUPE");
+            // last_time_ = current_time;
+            double left_pos = this->model->GetJoint(left_wheel_joint_)->Position();
+            double right_pos = this->model->GetJoint(right_wheel_joint_)->Position();
+            // double left_pos = normalize_angle(last_left_vel*time_gap);
+            // double right_pos = normalize_angle(last_right_vel*time_gap);
 
-            // std::cout << "Left/Right Position is: " << left_pos << " / " << right_pos << std::endl;
+            std::cout << "Left/Right Position is: " << left_pos << " / " << right_pos << std::endl;
 
-            nuturtlebot::SensorData sensor_data;
+            last_left_vel = wheel_command_.left_velocity / 265.0 * max_mot_vel_;
+            last_right_vel = wheel_command_.right_velocity / 265.0 * max_mot_vel_;
+
+            // nuturtlebot::SensorData sensor_data;
             sensor_data.left_encoder = (left_pos / (2 * PI)) * encoder_ticks_per_rev_;
             sensor_data.right_encoder = (right_pos / (2 * PI)) * encoder_ticks_per_rev_;
-            ROS_INFO("sensor_data.left %d",sensor_data.left_encoder) ;
+            // ROS_INFO("sensor_data.left %d",sensor_data.left_encoder) ;
             sensor_data_pub_.publish(sensor_data);
+            last_time_ = current_time;
         }
     }
 
@@ -172,11 +187,15 @@ private:
     std::string right_wheel_joint_;
     std::string left_wheel_joint_;
     double sensor_frequency_ = 200;
+    nuturtlebot::SensorData sensor_data;
 
     std::string sensor_data_topic_;
     std::string wheel_cmd_topic_;
 
     ros::Time last_time_;
+
+    double last_left_vel;
+    double last_right_vel;
 };
 
 GZ_REGISTER_MODEL_PLUGIN(SetJointVelocityPlugin)

@@ -12,11 +12,11 @@
               <geometry>
                 <cylinder length="${Wheel_width}" radius="${wheel_radius}"/>
               </geometry>
-              <surface>
+              <!-- <surface>
                 <friction>
                   <ode>
-                    <mu1>0.3</mu1>
-                    <mu2>0.3</mu2>
+                    <mu1>0</mu1>
+                    <mu2>0</mu2>
                     <minDepth>0.001</minDepth>
                     <fdir1>1 0 0 </fdir1>
                     <maxVel>0.1</maxVel>
@@ -24,7 +24,7 @@
                     <kd>10</kd>
                   </ode>
                 </friction>
-              </surface>
+              </surface> -->
             </collision>
             <visual name="${name}_visual">
               <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>

@@ -28,7 +28,7 @@
       <inertia ixx="${0.94*((wheel_base+Wheel_width)*(wheel_base+Wheel_width)+chassis_thinkness*chassis_thinkness)/12.0}" ixy="0" ixz="0" iyy="${0.94*(chassis_length*chassis_length+chassis_thinkness*chassis_thinkness)/12.0}" iyz="0" izz="${0.94*((wheel_base+Wheel_width)*(wheel_base+Wheel_width)+chassis_length*chassis_length)/12.0}"/>
     </inertial>
 
-    <collision name="collision_chassis">
+    <collision>
       <origin rpy="0 0 0" xyz="0 0 ${chassis_thinkness/2 + wheel_radius-wheel_axel_offset}"/>
       <geometry>
         <box size="${chassis_length} ${wheel_base+Wheel_width} ${chassis_thinkness}"/>
@@ -40,32 +40,19 @@
       <geometry>
           <box size="${chassis_length} ${wheel_base+Wheel_width} ${chassis_thinkness}"/>
        </geometry>
-       <!-- <material name="black_mat">
-           <color rgba="0.203125 0.23828125 0.28515625 1.0"/>
-       </material> -->
      </visual>
+  </link>
 
-
+   <link name="ball_caster">
      <!-- caster front -->
      <collision name="caster_top_collision">
        <origin rpy="0 0 0" xyz="${-chassis_length/2 + (wheel_radius/2-wheel_axel_offset/2)} 0 ${wheel_radius/2-wheel_axel_offset/2}"/>
        <geometry>
          <sphere radius="${wheel_radius/2-wheel_axel_offset/2}"/>
        </geometry>
-       <surface>
-         <friction>
-           <ode>
-             <mu>0.0</mu>
-             <mu2>0.0</mu2>
-             <minDepth>0.001</minDepth>
-             <maxVel>1.0</maxVel>
-             <kp>1000000</kp>
-             <kd>100</kd>
-           </ode>
-         </friction>
-       </surface>
      </collision>
-     <visual name="caster_top_visual">
+
+     <visual>
       <origin rpy="0 0 0" xyz="${-chassis_length/2 + (wheel_radius/2-wheel_axel_offset/2)} 0 ${wheel_radius/2-wheel_axel_offset/2}"/>
        <geometry>
          <sphere radius="${wheel_radius/2-wheel_axel_offset/2}"/>
@@ -99,6 +86,12 @@
     <parent link="base_link"/>
   </joint>
 
+
+  <joint name="caster_chassis" type="fixed">
+    <parent link="base_body"/>
+    <child link="ball_caster"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
 
   <xacro:robot_dd mode="$(arg mode)" />
 
