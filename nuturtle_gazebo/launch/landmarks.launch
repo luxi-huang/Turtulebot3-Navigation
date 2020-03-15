@@ -1,0 +1,73 @@
+<launch>
+  <arg name="robot" default="-1"/>
+
+  <group if="$(eval arg('robot') == 0)">
+    <machine name="turtlebot" address="localhost"/>
+  </group>
+
+
+  <!-- <group if="$(eval arg('robot') != 0)">
+    <machine name="turtlebot" address="turtlebot2" env-loader="/home/student/luxi_install/env.sh" user="student"  />
+  </group>
+
+  <node name="serial_node" pkg="rosserial_python" type="serial_node.py" machine="turtlebot">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="115200"/>
+  </node>  -->
+
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find nuturtlebot)/worlds/block.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <node name="turtle_interface" pkg="nuturtle_robot" type="turtle_interface" output="screen">
+    <remap from="turtle1/cmd_vel" to="cmd_vel"/>
+  </node>
+
+  <!-- <node name="real_waypoint" pkg="nuturtle_robot" type="real_waypoint" output="screen">
+  </node> -->
+
+  <node name="odometer" pkg="rigid2d" type="odometer" output="screen">
+    <param name="joint_state_topic" value="/joint_states"/>
+    <param name="odom_frame_id" value="/odom_frame_id"/>
+    <param name="base_link" value="/base_link"/>
+  </node>
+
+  <param name="robot_description"
+       command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
+  <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
+
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 odom_frame_id fake_odom_frame_id" /> -->
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_robot)/config/config.rviz" />
+
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="z" default="0"/>
+
+  <node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+        args="-urdf -param robot_description -model diff_ddrive -x $(arg x) -y $(arg y) -z $(arg z)" />
+
+
+  <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_key.launch"/>
+    <!-- <arg name="TURTLEBOT3_MODE" value="{TB3_MODEL}"/> -->
+    <!-- <env name="TURTLEBOT3_MODEL" value="burger" /> -->
+  <!-- </include> -->
+
+  <!-- <group if="$(eval arg('robot') != 0)"> -->
+    <!-- <machine name="turtlebot" address="localhost"/> -->
+    <!-- <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_twist_keyboard.launch"/> -->
+    <!-- <env name="TURTLEBOT3_MODEL" value="burger" /> -->
+  <!-- </group> -->
+
+  <!-- <node name="twist_teleop_keyboard_node" pkg="turtlebot3_teleop" type="teleop_twist_keyboard.py"/> -->
+
+
+</launch>
