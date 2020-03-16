@@ -57,17 +57,7 @@
 
 
   <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_key.launch"/>
-    <!-- <arg name="TURTLEBOT3_MODE" value="{TB3_MODEL}"/> -->
-    <!-- <env name="TURTLEBOT3_MODEL" value="burger" /> -->
-  <!-- </include> -->
-
-  <!-- <group if="$(eval arg('robot') != 0)"> -->
-    <!-- <machine name="turtlebot" address="localhost"/> -->
-    <!-- <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_twist_keyboard.launch"/> -->
-    <!-- <env name="TURTLEBOT3_MODEL" value="burger" /> -->
-  <!-- </group> -->
-
-  <!-- <node name="twist_teleop_keyboard_node" pkg="turtlebot3_teleop" type="teleop_twist_keyboard.py"/> -->
+  <node name="landmark" pkg="nuturtle_gazebo" type="landmark" output="screen"/>
 
 
 </launch>

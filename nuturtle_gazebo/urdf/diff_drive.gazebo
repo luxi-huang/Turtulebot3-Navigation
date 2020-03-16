@@ -16,8 +16,8 @@
   </gazebo>
   <gazebo reference="link_left_wheel">
     <material>Gazebo/Red</material>
-      <mu1>15.0</mu1>
-      <mu2>15.0</mu2>
+      <mu1>1000.0</mu1>
+      <mu2>1000.0</mu2>
       <minDepth>0.001</minDepth>
       <fdir1>1 0 0 </fdir1>
       <maxVel>0.1</maxVel>
@@ -28,8 +28,8 @@
 
   <gazebo reference="ball_caster">
     <material>Gazebo/Red</material>
-    <mu1>0.0</mu1>
-    <mu2>0.0</mu2>
+    <mu1>10.0</mu1>
+    <mu2>10.0</mu2>
     <minDepth>0.001</minDepth>
     <maxVel>0.1</maxVel>
     <kp>1000000</kp>
@@ -39,8 +39,8 @@
 
   <gazebo reference="link_right_wheel">
     <material>Gazebo/Red</material>
-      <mu1>10.0</mu1>
-      <mu2>10.0</mu2>
+      <mu1>1000.0</mu1>
+      <mu2>1000.0</mu2>
       <minDepth>0.001</minDepth>
       <fdir1>1 0 0 </fdir1>
       <maxVel>0.1</maxVel>

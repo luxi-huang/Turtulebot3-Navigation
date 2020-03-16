@@ -5,6 +5,10 @@ project(nuturtle_gazebo)
 # add_compile_options(-std=c++11)
 add_compile_options(-Wall -std=c++17 -Werror)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -14,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   gazebo_ros
   nuturtlebot
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -109,7 +114,7 @@ add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_gazebo
- CATKIN_DEPENDS roscpp rospy std_msgs gazebo_ros nuturtlebot
+ CATKIN_DEPENDS roscpp rospy std_msgs gazebo_ros nuturtlebot sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -124,6 +129,11 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_executable(landmark scripts/landmark.cpp)
+add_dependencies(landmark ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(landmark
+  ${catkin_LIBRARIES}
+)
 
 # include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
@@ -187,7 +197,16 @@ add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${ca
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 # )
+install(PROGRAMS
+  # scripts/my_python_script
+  scripts/landmark.cpp
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
+)
 
+
+install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+# install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
+install(DIRECTORY src/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

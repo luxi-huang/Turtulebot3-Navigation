@@ -128,8 +128,9 @@ int main(int argc, char **argv)
   ros::Time last_time;
   current_time = ros::Time::now();
   last_time = current_time;
-
+  ros::Duration(0.5).sleep();
   while(ros::ok()){
+    // ros::Duration(0.5).sleep();
     ros::spinOnce();
     current_time = ros::Time::now();
     duration = (current_time - last_time).toSec();

@@ -130,12 +130,12 @@ public:
 
         ros::Time current_time = ros::Time::now();
         double time_gap = (current_time - last_time_).toSec();
-        ROS_INFO("time_gap,%f", time_gap);
+        // ROS_INFO("time_gap,%f", time_gap);
 
         double left_vel = wheel_command_.left_velocity / 265.0 * max_mot_vel_;
-        ROS_INFO("wheel_cmd_left %f", left_vel);
+        // ROS_INFO("wheel_cmd_left %f", left_vel);
         double right_vel = wheel_command_.right_velocity / 265.0 * max_mot_vel_;
-        ROS_INFO("wheel_cmd_right %f", right_vel);
+        // ROS_INFO("wheel_cmd_right %f", right_vel);
       // std::cout << "Left/Right wheel velocity (rad/s): " << left_vel << " / " << right_vel << std::endl;
 
       // Joint velocity using joint motors
@@ -156,7 +156,7 @@ public:
             // double left_pos = normalize_angle(last_left_vel*time_gap);
             // double right_pos = normalize_angle(last_right_vel*time_gap);
 
-            std::cout << "Left/Right Position is: " << left_pos << " / " << right_pos << std::endl;
+            // std::cout << "Left/Right Position is: " << left_pos << " / " << right_pos << std::endl;
 
             last_left_vel = wheel_command_.left_velocity / 265.0 * max_mot_vel_;
             last_right_vel = wheel_command_.right_velocity / 265.0 * max_mot_vel_;

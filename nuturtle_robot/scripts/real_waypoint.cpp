@@ -48,13 +48,12 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
 
 uint32_t shape = visualization_msgs::Marker::CUBE;
 Pose pose_odom;
-int server_value = 0;
+int server_value = 1;
 
 bool start_callback(nuturtle_robot::start::Request  &req,
                   nuturtle_robot::start::Response &resp)
 {
 	// set_pose_client();
-
 	if (req.clockwise_forward == 1){
 		server_value = 1;
 		ROS_INFO("start_service111");
@@ -125,6 +124,7 @@ int main(int argc, char **argv)
 	check_error_diff=DiffDrive(init_pose,0.0,0.0);
 
 	while (ros::ok()){
+    ros::Duration(0.1).sleep();
 		ros::spinOnce();
 		if (server_value == 1)
 		{
