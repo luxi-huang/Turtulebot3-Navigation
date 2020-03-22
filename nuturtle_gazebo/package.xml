@@ -56,11 +56,19 @@
   <build_depend>gazebo</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>nuturtlebot</build_depend>
+  <build_depend>rigid2d</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>Eigen3</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>rigid2d</build_export_depend>
+  <build_export_depend>nav_msgs</build_export_depend>
+  <build_export_depend>tf</build_export_depend>
+  <build_export_depend>Eigen3</build_export_depend>
 
 
   <exec_depend>roscpp</exec_depend>
@@ -70,8 +78,10 @@
   <exec_depend>gazebo</exec_depend>
   <exec_depend>nuturtlebot</exec_depend>
   <build_depend>sensor_msgs</build_depend>
-
-
+  <build_depend>rigid2d</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>Eigen3</build_depend>
 
 
 

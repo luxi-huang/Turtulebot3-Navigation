@@ -19,7 +19,13 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
   nuturtlebot
   sensor_msgs
+  rigid2d
+  nav_msgs
+  tf
+  # Eigen3 3.3
 )
+
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 ## System dependencies are found with CMake's conventions
 find_package(gazebo REQUIRED)
@@ -114,7 +120,7 @@ add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES nuturtle_gazebo
- CATKIN_DEPENDS roscpp rospy std_msgs gazebo_ros nuturtlebot sensor_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs gazebo_ros nuturtlebot sensor_msgs rigid2d nav_msgs tf
 #  DEPENDS system_lib
 )
 
@@ -133,6 +139,7 @@ add_executable(landmark scripts/landmark.cpp)
 add_dependencies(landmark ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(landmark
   ${catkin_LIBRARIES}
+  Eigen3::Eigen
 )
 
 # include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
