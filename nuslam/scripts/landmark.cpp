@@ -10,13 +10,13 @@
 #include <tf/tf.h>
 #include "cmath"
 #include <Eigen/Dense>
-#include "nuslam/TurtleMap.h"
 
 using rigid2d::Pose;
 using rigid2d::Vector2D;
 using rigid2d::normalize_angle;
 using rigid2d::rad2deg;
 using namespace Eigen;
+using rigid2d::deg2rad;
 
 ros::Subscriber scan;
 ros::Subscriber odomSub;
@@ -26,7 +26,7 @@ std::vector<int> circle_group;
 std::vector<double> circle_R;
 std::vector<double> circle_center_x;
 std::vector<double> circle_center_y;
-ros::Publisher landmark_pub;
+
 
 void scanCallback(const sensor_msgs::LaserScan::ConstPtr & scan_data);
 void clustering_groups();
@@ -36,27 +36,23 @@ double vector_norm(Vector2D vec);
 void circle_fitting_algorithm();
 
 
-double angle_min = 0.0 ;
-double angle_max = 0.0;
-float thredhold = 0.1;
+float thredhold = 0.08;
 std::vector<float> laser_data;
 
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "landmark");
+  ros::init(argc, argv, "test_landmark");
   ros::NodeHandle n;
 
   scan =  n.subscribe("/scan",1,scanCallback);
   odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 10, odomCallback);
-  ros::Publisher landmark_pub = n.advertise<nuslam::TurtleMap>("landmarks", 1);
-   //NOTE: add publish mesage
 
   while(ros::ok())
   {
     ros::spinOnce();
-    clustering_groups();
     circle_group.clear();
+    clustering_groups();
     check_circle();
     circle_fitting_algorithm();
     ros::Duration(5.0).sleep();
@@ -89,8 +85,9 @@ void clustering_groups()
   double angle = 0;
   double x_position = 0;
   double y_position = 0;
+  double rad = 0;
 
-  for(int i=0; i < laser_data_size; i++) {
+  for(int i=0; i < laser_data_size-1; i++) {
     if (std::abs(laser_data[i]-laser_data[i+1])<thredhold) {
        count ++;
     } else {
@@ -101,13 +98,13 @@ void clustering_groups()
           position[group_size].resize(end_value-start_value+1);
           int group_size_count = 0; // subgroup;
           for(int j=start_value; j < end_value+1; j++) {
-            angle = normalize_angle(pose_odom.theta + j);
-            x_position = pose_odom.x + laser_data[j]*cos(angle);
-            y_position = pose_odom.y + laser_data[j]*sin(angle);
-
-            // angle = normalize_angle(0 + j);
-            // x_position = 0 + laser_data[j]*cos(angle);
-            // y_position = 0 + laser_data[j]*sin(angle);
+            // angle = normalize_angle(pose_odom.theta + j);
+            // x_position = pose_odom.x + laser_data[j]*cos(angle);
+            // y_position = pose_odom.y + laser_data[j]*sin(angle);
+            rad = deg2rad(0+j);
+            angle = normalize_angle(rad);
+            x_position = 0 + laser_data[j]*cos(angle);
+            y_position = 0 + laser_data[j]*sin(angle);
 
             position[group_size][group_size_count].x = x_position;
             position[group_size][group_size_count].y = y_position;
@@ -120,8 +117,7 @@ void clustering_groups()
         } else {
 
         count = 0;
-        start_value = i;
-
+        start_value = i+1;
         }
       }
   }
@@ -164,13 +160,15 @@ void check_circle(){
   double angle = 0;
   double st_deviation = 0;
   double standard_deviation = 0;
+  ROS_INFO("group_number %d",group_number);
   for (int i = 0; i<group_number; i++){
     int group_size = position[i].size();
-    ROS_INFO("group_size!!! : %d", group_size);
+    // ROS_INFO("group_size!!! : %d", group_size);
     point_start = position[i][0];
     point_end = position[i][group_size-1];
     // calculate mean;
     sum_angle = 0;
+    int test_count = 0;
     for(int j = 1; j<group_size-1; j++){
       pp = position[i][j];
       vec_a.x = point_start.x - pp.x;
@@ -182,17 +180,20 @@ void check_circle(){
       norm_a = vector_norm(vec_a);
       norm_b = vector_norm(vec_b);
       sum_angle += acos(dot_product/(norm_a * norm_b));
-
+      test_count ++;
       // std::vector <std::vector<float>> group(360);
     }
+    ROS_INFO("test_count %d",test_count);
+    ROS_INFO("group_size %d",group_size);
 
 
     mean_rad = sum_angle / (group_size-2);
-    mean_degree = rad2deg(mean_rad);
-
-
+    mean_degree =std::abs(rad2deg(mean_rad));
+    ROS_INFO("mean_degree %f",mean_degree);
+    ROS_INFO("mean_rad %f",mean_rad);
     if (mean_degree > 90.0 && mean_degree < 135.0){ //check if mean satisfied the condition
       st_deviation = 0;
+      circle_group.push_back(i);
       for(int j = 1; j<group_size-1; j++){
         pp = position[i][j];
         vec_a.x = point_start.x - pp.x;
@@ -203,13 +204,15 @@ void check_circle(){
         norm_a = vector_norm(vec_a);
         norm_b = vector_norm(vec_b);
         angle = acos(dot_product/(norm_a * norm_b));
-        st_deviation += pow(angle-mean_rad,2.0);
+        double minus = angle-mean_rad;
+        st_deviation += pow(minus,2.0);
         // std::vector <std::vector<float>> group(360);
       }
       standard_deviation = sqrt(st_deviation/(group_size-2));
+      // ROS_INFO("standard_deviation %f",standard_deviation);
       if (standard_deviation < 0.15){
         ROS_INFO("st_deviation: %f",standard_deviation);
-        circle_group.push_back(i);
+        // circle_group.push_back(i);
       }
 
     }
@@ -257,7 +260,7 @@ void circle_fitting_algorithm(){
   double center_xx = 0;
   double center_yy = 0;
 
-  ROS_INFO("size:%d",size);
+  ROS_INFO("size!!!:%d",size);
   for(int i =0; i < size; i++){
     group_size = position[circle_group[i]].size();
     sum_x = 0;
@@ -312,6 +315,17 @@ void circle_fitting_algorithm(){
     // ROS_INFO("step_ten");
     JacobiSVD<MatrixXd> svd(Z_matrix, ComputeThinU | ComputeThinV);
     int singluar_size = svd.singularValues().size();
+    MatrixXd E_matrix(singluar_size,singluar_size);
+    for (int q = 0; q<singluar_size;q++){
+      for (int p = 0; p<singluar_size;p++){
+        if (p==q){
+          E_matrix(q,p)=svd.singularValues()(q);
+        }else{
+          E_matrix(q,p)=0;
+        }
+      }
+    }
+
     //step eleven;
     // ROS_INFO("step_eleven");
     singular_min = svd.singularValues()(0);
@@ -330,7 +344,7 @@ void circle_fitting_algorithm(){
       //step 12;
       // ROS_INFO("step_twelve");
       MatrixXd Y_matrix;
-      Y_matrix = svd.matrixV()*svd.matrixU().inverse()*Z_matrix;
+      Y_matrix = svd.matrixV()*E_matrix*svd.matrixV().transpose();
       MatrixXd Q_matrix;
       Q_matrix = Y_matrix * H_Matrix_inverse * Y_matrix;
       SelfAdjointEigenSolver<MatrixXd> es(Q_matrix);

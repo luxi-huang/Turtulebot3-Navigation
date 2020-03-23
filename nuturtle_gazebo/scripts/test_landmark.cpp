@@ -160,7 +160,6 @@ void check_circle(){
   double angle = 0;
   double st_deviation = 0;
   double standard_deviation = 0;
-  ROS_INFO("group_number %d",group_number);
   for (int i = 0; i<group_number; i++){
     int group_size = position[i].size();
     // ROS_INFO("group_size!!! : %d", group_size);
@@ -183,14 +182,10 @@ void check_circle(){
       test_count ++;
       // std::vector <std::vector<float>> group(360);
     }
-    ROS_INFO("test_count %d",test_count);
-    ROS_INFO("group_size %d",group_size);
 
 
     mean_rad = sum_angle / (group_size-2);
     mean_degree =std::abs(rad2deg(mean_rad));
-    ROS_INFO("mean_degree %f",mean_degree);
-    ROS_INFO("mean_rad %f",mean_rad);
     if (mean_degree > 90.0 && mean_degree < 135.0){ //check if mean satisfied the condition
       st_deviation = 0;
       circle_group.push_back(i);
@@ -211,7 +206,6 @@ void check_circle(){
       standard_deviation = sqrt(st_deviation/(group_size-2));
       // ROS_INFO("standard_deviation %f",standard_deviation);
       if (standard_deviation < 0.15){
-        ROS_INFO("st_deviation: %f",standard_deviation);
         // circle_group.push_back(i);
       }
 
@@ -260,7 +254,6 @@ void circle_fitting_algorithm(){
   double center_xx = 0;
   double center_yy = 0;
 
-  ROS_INFO("size!!!:%d",size);
   for(int i =0; i < size; i++){
     group_size = position[circle_group[i]].size();
     sum_x = 0;
@@ -344,7 +337,7 @@ void circle_fitting_algorithm(){
       //step 12;
       // ROS_INFO("step_twelve");
       MatrixXd Y_matrix;
-      Y_matrix = svd.matrixV()*(E_matrix*svd.matrixV().transpose());
+      Y_matrix = svd.matrixV()*E_matrix*svd.matrixV().transpose();
       MatrixXd Q_matrix;
       Q_matrix = Y_matrix * H_Matrix_inverse * Y_matrix;
       SelfAdjointEigenSolver<MatrixXd> es(Q_matrix);
@@ -352,12 +345,11 @@ void circle_fitting_algorithm(){
       eigen_value_size = es.eigenvalues().size();
       int eigen_count = 0;
       for (int n = 0; n<eigen_value_size; n++){
-        ROS_INFO("es.eigenvalues()(n), %f",es.eigenvalues()(n));
         if (es.eigenvalues()(n) > 0 ){
           eigenvalues_min = es.eigenvalues()(n);
           eigen_count = n;
+          break;
         }
-        break;
       }
 
       for (int n = 0; n<eigen_value_size; n++){
@@ -367,7 +359,6 @@ void circle_fitting_algorithm(){
         }
       }
 
-      ROS_INFO("eigen_count,%d",eigen_count);
       A_star_matrix = es.eigenvectors().col(eigen_count);
       // MatrixXd A_matrix;
       A_matrix = Y_matrix.inverse() *A_star_matrix;
@@ -387,11 +378,21 @@ void circle_fitting_algorithm(){
     center_xx = aa + x_hat;
     center_yy = bb + y_hat;
     // ROS_INFO("4444");
-    ROS_INFO("radius: %f", radius);
-    // for (size_t m = 0; m<circle_R, m++ )
-    circle_R.push_back(radius);
-    circle_center_x.push_back(center_xx);
-    circle_center_y.push_back(center_yy);
+    int check = 0;
+    int landmark_size  = 0;
+    landmark_size = circle_R.size();
+    for (int m = 0; m<landmark_size; m++ ){
+      double length = sqrt(pow(circle_center_x[m] -xx, 2.0)+pow(circle_center_x[m]-yy,2.0));
+      if (length > 0.1){
+        check ++;
+      }
+    }
+    if (check == landmark_size){
+      circle_R.push_back(radius);
+      circle_center_x.push_back(center_xx);
+      circle_center_y.push_back(center_yy);
+      ROS_INFO("yeah!!!!");
+    }
 
   }
 }
