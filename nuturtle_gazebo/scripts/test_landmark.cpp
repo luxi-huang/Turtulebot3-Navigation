@@ -36,8 +36,6 @@ double vector_norm(Vector2D vec);
 void circle_fitting_algorithm();
 
 
-double angle_min = 0.0 ;
-double angle_max = 0.0;
 float thredhold = 0.08;
 std::vector<float> laser_data;
 
@@ -262,7 +260,7 @@ void circle_fitting_algorithm(){
   double center_xx = 0;
   double center_yy = 0;
 
-  ROS_INFO("size:%d",size);
+  ROS_INFO("size!!!:%d",size);
   for(int i =0; i < size; i++){
     group_size = position[circle_group[i]].size();
     sum_x = 0;

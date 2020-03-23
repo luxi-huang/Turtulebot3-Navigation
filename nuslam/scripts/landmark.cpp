@@ -330,7 +330,7 @@ void circle_fitting_algorithm(){
       //step 12;
       // ROS_INFO("step_twelve");
       MatrixXd Y_matrix;
-      Y_matrix = svd.matrixV()*(svd.matrixU().inverse()*Z_matrix);
+      Y_matrix = svd.matrixV()*svd.matrixU().inverse()*Z_matrix;
       MatrixXd Q_matrix;
       Q_matrix = Y_matrix * H_Matrix_inverse * Y_matrix;
       SelfAdjointEigenSolver<MatrixXd> es(Q_matrix);
@@ -342,8 +342,8 @@ void circle_fitting_algorithm(){
         if (es.eigenvalues()(n) > 0 ){
           eigenvalues_min = es.eigenvalues()(n);
           eigen_count = n;
+          break;
         }
-        break;
       }
 
       for (int n = 0; n<eigen_value_size; n++){
