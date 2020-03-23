@@ -16,6 +16,7 @@ using rigid2d::Vector2D;
 using rigid2d::normalize_angle;
 using rigid2d::rad2deg;
 using namespace Eigen;
+using rigid2d::deg2rad;
 
 ros::Subscriber scan;
 ros::Subscriber odomSub;
@@ -37,13 +38,13 @@ void circle_fitting_algorithm();
 
 double angle_min = 0.0 ;
 double angle_max = 0.0;
-float thredhold = 0.022;
+float thredhold = 0.08;
 std::vector<float> laser_data;
 
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "landmark");
+  ros::init(argc, argv, "test_landmark");
   ros::NodeHandle n;
 
   scan =  n.subscribe("/scan",1,scanCallback);
@@ -52,18 +53,11 @@ int main(int argc, char **argv)
   while(ros::ok())
   {
     ros::spinOnce();
-    position.clear();
     circle_group.clear();
-    ROS_INFO("before_cluster_groups");
     clustering_groups();
-    ROS_INFO("after_clustering_groups");
     check_circle();
-    // ROS_INFO("after circle");
     circle_fitting_algorithm();
-
-
     ros::Duration(5.0).sleep();
-    // loop_rate.sleep();
   }
   return 0;
 }
@@ -72,6 +66,7 @@ int main(int argc, char **argv)
 void scanCallback(const sensor_msgs::LaserScan::ConstPtr & scan_data){
   laser_data.clear();
   laser_data= scan_data->ranges;
+  // int size = laser_data.size();
   //
   // auto print = [](const double& n) { std::cout << " " << n; };
   // std::cout << "before!!!!!!!!!!!!!!!!!!!!!!!!! :";
@@ -83,12 +78,7 @@ void scanCallback(const sensor_msgs::LaserScan::ConstPtr & scan_data){
 
 void clustering_groups()
 {
-  std::vector <std::vector<float>> group(360);
-  group.clear();
-  // std::vector<Vector2D> points(360);
-  // std::vector<std::vector<Vector2D>> position(360);
-
-
+  position.clear();
   int group_size = 0; //real group size
   int count = 0;
   int laser_data_size = laser_data.size();
@@ -97,31 +87,28 @@ void clustering_groups()
   double angle = 0;
   double x_position = 0;
   double y_position = 0;
+  double rad = 0;
 
-  ROS_INFO("laser_data_size:%d ",laser_data_size);
-  for(int i=0; i < laser_data_size; i++) {
+  for(int i=0; i < laser_data_size-1; i++) {
     if (std::abs(laser_data[i]-laser_data[i+1])<thredhold) {
-       // group[group_size][count] = laser_data[i];
        count ++;
     } else {
         if(count > 2) {
-          // group_size++;
           count = 0;
           end_value = i;
-          // std::cout<< "size: "<<end_value-start_value<<std::endl;
-          group[group_size].resize(end_value-start_value+1);
+          position.resize(group_size+1);
           position[group_size].resize(end_value-start_value+1);
           int group_size_count = 0; // subgroup;
-
           for(int j=start_value; j < end_value+1; j++) {
-            group[group_size][group_size_count] = laser_data[j];
-            // storing point position;
-            angle = normalize_angle(pose_odom.theta + i);
-            x_position = pose_odom.x + laser_data[j]*cos(angle);
-            y_position = pose_odom.y + laser_data[j]*sin(angle);
+            // angle = normalize_angle(pose_odom.theta + j);
+            // x_position = pose_odom.x + laser_data[j]*cos(angle);
+            // y_position = pose_odom.y + laser_data[j]*sin(angle);
+            rad = deg2rad(0+j);
+            angle = normalize_angle(rad);
+            x_position = 0 + laser_data[j]*cos(angle);
+            y_position = 0 + laser_data[j]*sin(angle);
 
             position[group_size][group_size_count].x = x_position;
-            // std::cout<<"position_x:"<< position[group_size][group_size_count].x;
             position[group_size][group_size_count].y = y_position;
             group_size_count ++;
           }
@@ -132,24 +119,10 @@ void clustering_groups()
         } else {
 
         count = 0;
-        start_value = i;
-
+        start_value = i+1;
         }
       }
   }
-
-
-  // print value
-  // for(int i=0;i<group_size;++i){
-  //   std::cout<< "group["<<i<<"]=={";
-  //   for(size_t j=0;j<group[i].size();++j){
-  //     if(j!=0) {
-  //       std::cout<<',';
-  //     }
-  //     std::cout<<group[i][j];
-  //   }
-  //   std::cout<<"}\n";
-  // }
 }
 
 
@@ -189,50 +162,59 @@ void check_circle(){
   double angle = 0;
   double st_deviation = 0;
   double standard_deviation = 0;
-  ROS_INFO("group_size: %d",group_number);
+  ROS_INFO("group_number %d",group_number);
   for (int i = 0; i<group_number; i++){
     int group_size = position[i].size();
+    // ROS_INFO("group_size!!! : %d", group_size);
     point_start = position[i][0];
     point_end = position[i][group_size-1];
-
     // calculate mean;
+    sum_angle = 0;
+    int test_count = 0;
     for(int j = 1; j<group_size-1; j++){
       pp = position[i][j];
       vec_a.x = point_start.x - pp.x;
       vec_a.y = point_start.y - pp.y;
       vec_b.x = point_end.x - pp.x;
       vec_b.y = point_end.y - pp.y;
-      dot_product = vec_a.x*vec_b.x+vec_a.y+vec_b.y;
+
+      dot_product = (vec_a.x*vec_b.x) + (vec_a.y*vec_b.y);
       norm_a = vector_norm(vec_a);
       norm_b = vector_norm(vec_b);
       sum_angle += acos(dot_product/(norm_a * norm_b));
-
+      test_count ++;
       // std::vector <std::vector<float>> group(360);
     }
+    ROS_INFO("test_count %d",test_count);
+    ROS_INFO("group_size %d",group_size);
 
-    mean_rad = sum_angle / (group_size-1);
-    mean_degree = rad2deg(mean_rad);
 
+    mean_rad = sum_angle / (group_size-2);
+    mean_degree =std::abs(rad2deg(mean_rad));
+    ROS_INFO("mean_degree %f",mean_degree);
+    ROS_INFO("mean_rad %f",mean_rad);
     if (mean_degree > 90.0 && mean_degree < 135.0){ //check if mean satisfied the condition
       st_deviation = 0;
-
+      circle_group.push_back(i);
       for(int j = 1; j<group_size-1; j++){
         pp = position[i][j];
         vec_a.x = point_start.x - pp.x;
         vec_a.y = point_start.y - pp.y;
         vec_b.x = point_end.x - pp.x;
         vec_b.y = point_end.y - pp.y;
-        dot_product = vec_a.x*vec_b.x+vec_a.y+vec_b.y;
+        dot_product = (vec_a.x*vec_b.x)+(vec_a.y*vec_b.y);
         norm_a = vector_norm(vec_a);
         norm_b = vector_norm(vec_b);
         angle = acos(dot_product/(norm_a * norm_b));
-        st_deviation += pow(angle-mean_rad,2);
+        double minus = angle-mean_rad;
+        st_deviation += pow(minus,2.0);
         // std::vector <std::vector<float>> group(360);
       }
-      standard_deviation = st_deviation/(group_size-1);
-      ROS_INFO("Standard_deviation: %f",standard_deviation);
+      standard_deviation = sqrt(st_deviation/(group_size-2));
+      // ROS_INFO("standard_deviation %f",standard_deviation);
       if (standard_deviation < 0.15){
-        circle_group.push_back(i);
+        ROS_INFO("st_deviation: %f",standard_deviation);
+        // circle_group.push_back(i);
       }
 
     }
@@ -241,12 +223,11 @@ void check_circle(){
   }
   // position[group_size][group_size_count].x
 
-
 }
 
 double vector_norm(Vector2D vec){
   double norm = 0;
-  norm = sqrt(pow(vec.x,2)+pow(vec.y,2));
+  norm = sqrt(pow(vec.x,2.0)+pow(vec.y,2.0));
   return norm;
 }
 
@@ -287,7 +268,8 @@ void circle_fitting_algorithm(){
     sum_x = 0;
     sum_y = 0;
     // step two;
-    ROS_INFO("step_two");
+    // ROS_INFO("step_two");
+    // ROS_INFO("group_size %d",group_size);
     for (int j = 0; j<group_size; j++){
       sum_x += position[circle_group[i]][j].x;
       sum_y += position[circle_group[i]][j].y;
@@ -295,7 +277,6 @@ void circle_fitting_algorithm(){
     x_hat = sum_x / group_size;
     y_hat = sum_y / group_size;
     // step three;
-    ROS_INFO("step_three");
     // circle_x[i].resize(group_size);
     // circle_y[i].resize(group_size);
     // circle_z[i].resize(group_size);
@@ -309,35 +290,46 @@ void circle_fitting_algorithm(){
       // circle_x[i][j] = xx;
       // circle_y[i][j] = yy;
       //step four;
-      ROS_INFO("step_four");
+      // ROS_INFO("step_four");
       zz = pow(xx,2.0)+pow(yy,2.0);
       sum_zz += zz;
       // circle_z[i][j] = zz;
 
       //step six;
-      ROS_INFO("step_six");
+      // ROS_INFO("step_six");
       Z_matrix(j,0) = zz;
       Z_matrix(j,1) = xx;
       Z_matrix(j,2) = yy;
       Z_matrix(j,3) = 1.0;
      }
     //step five;
-    ROS_INFO("step_five");
+    // ROS_INFO("step_five");
     z_bar = sum_zz / group_size;
     // step seven;
-    ROS_INFO("step_seven");
+    // ROS_INFO("step_seven");
     MatrixXd M_matrix(4, 4);
     M_matrix = (Z_matrix.transpose())*Z_matrix/group_size;
     //step eight, nigh;
-    ROS_INFO("step_eight_nigh");
+    // ROS_INFO("step_eight_nigh");
     MatrixXd H_Matrix_inverse(4,4);
-    H_Matrix_inverse << 0,0,0,0.5,0,1,0,0,0,0,1,0,0.5,0,0,-2*z_bar;
+    H_Matrix_inverse << 0.0,0.0,0.0,0.5,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.5,0.0,0.0,-2*z_bar;
     //step ten;
-    ROS_INFO("step_ten");
+    // ROS_INFO("step_ten");
     JacobiSVD<MatrixXd> svd(Z_matrix, ComputeThinU | ComputeThinV);
     int singluar_size = svd.singularValues().size();
+    MatrixXd E_matrix(singluar_size,singluar_size);
+    for (int q = 0; q<singluar_size;q++){
+      for (int p = 0; p<singluar_size;p++){
+        if (p==q){
+          E_matrix(q,p)=svd.singularValues()(q);
+        }else{
+          E_matrix(q,p)=0;
+        }
+      }
+    }
+
     //step eleven;
-    ROS_INFO("step_eleven");
+    // ROS_INFO("step_eleven");
     singular_min = svd.singularValues()(0);
     for(int m = 0; m < singluar_size; m++){
       if (svd.singularValues()(m) < singular_min){
@@ -347,14 +339,14 @@ void circle_fitting_algorithm(){
 
     if (singular_min < compare_value){
       A_matrix(0,0) = svd.matrixV()(0,3);
-      A_matrix(0,1) = svd.matrixV()(1,3);
-      A_matrix(0,2) = svd.matrixV()(2,3);
-      A_matrix(0,3) = svd.matrixV()(3,3);
+      A_matrix(1,0) = svd.matrixV()(1,3);
+      A_matrix(2,0) = svd.matrixV()(2,3);
+      A_matrix(3,0) = svd.matrixV()(3,3);
     } else {
       //step 12;
-      ROS_INFO("step_twelve");
+      // ROS_INFO("step_twelve");
       MatrixXd Y_matrix;
-      Y_matrix = svd.matrixV()*(svd.matrixU().inverse()*Z_matrix);
+      Y_matrix = svd.matrixV()*(E_matrix*svd.matrixV().transpose());
       MatrixXd Q_matrix;
       Q_matrix = Y_matrix * H_Matrix_inverse * Y_matrix;
       SelfAdjointEigenSolver<MatrixXd> es(Q_matrix);
@@ -362,6 +354,7 @@ void circle_fitting_algorithm(){
       eigen_value_size = es.eigenvalues().size();
       int eigen_count = 0;
       for (int n = 0; n<eigen_value_size; n++){
+        ROS_INFO("es.eigenvalues()(n), %f",es.eigenvalues()(n));
         if (es.eigenvalues()(n) > 0 ){
           eigenvalues_min = es.eigenvalues()(n);
           eigen_count = n;
@@ -376,20 +369,26 @@ void circle_fitting_algorithm(){
         }
       }
 
+      ROS_INFO("eigen_count,%d",eigen_count);
       A_star_matrix = es.eigenvectors().col(eigen_count);
-      MatrixXd A_matrix;
+      // MatrixXd A_matrix;
       A_matrix = Y_matrix.inverse() *A_star_matrix;
     }
 
-    //step 13;
-    ROS_INFO("step_threen");
-    aa = -A_matrix(0,1)/(2*A_matrix(0,0));
-    bb = -A_matrix(0,2)/(2*A_matrix(0,0));
-    radius = sqrt((pow(A_matrix(0,1),2.0)+pow(A_matrix(0,2),2.0) - 4*A_matrix(0,0)*A_matrix(0,3))/(4*pow(A_matrix(0,0),2.0)));
+    // step 13;
+    // ROS_INFO("step_threen");
+
+    aa = -A_matrix(1,0)/(2*A_matrix(0,0));
+    // ROS_INFO("11111");
+    bb = -A_matrix(2,0)/(2*A_matrix(0,0));
+    // ROS_INFO("2222");
+    radius = sqrt((pow(A_matrix(1,0),2.0)+pow(A_matrix(2,0),2.0) - 4*A_matrix(0,0)*A_matrix(3,0))/(4*pow(A_matrix(0,0),2.0)));
     //step 14;
-    ROS_INFO("step_fourteen");
+    // ROS_INFO("3333");
+    // ROS_INFO("step_fourteen");
     center_xx = aa + x_hat;
     center_yy = bb + y_hat;
+    // ROS_INFO("4444");
     ROS_INFO("radius: %f", radius);
     // for (size_t m = 0; m<circle_R, m++ )
     circle_R.push_back(radius);

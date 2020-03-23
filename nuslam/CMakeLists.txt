@@ -1,36 +1,44 @@
 cmake_minimum_required(VERSION 3.5.4)
-project(nuturtle_gazebo)
+project(nuslam)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
-add_compile_options(-Wall -std=c++17 -Werror)
-
+add_compile_options(-Wall -Wno-psabi -Wextra)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  gazebo_ros
-  nuturtlebot
-  sensor_msgs
-  rigid2d
+  gazebo_msgs
+  geometry_msgs
+  message_generation
+  message_runtime
   nav_msgs
-  tf
-  # Eigen3 3.3
+  rigid2d
+  roscpp
+  rostest
+  sensor_msgs
+  std_msgs
+  tf2
+  tf2_ros
+  visualization_msgs
 )
 
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+# find_package(rigid2d REQUIRED COMPONENTS)
+
+# # Check if rigid2d found
+# if(${rigid2d_FOUND})
+#   message("FOUND rigid2d in \n ${rigid2d_INCLUDE_DIRS}")
+# endif()
+
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 ## System dependencies are found with CMake's conventions
-find_package(gazebo REQUIRED)
+# find_package(Boost REQUIRED COMPONENTS system)
 
-add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -62,11 +70,12 @@ add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
+add_message_files(
+  FILES
+  TurtleMap.msg
 #   Message1.msg
 #   Message2.msg
-# )
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -83,10 +92,10 @@ add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -99,7 +108,7 @@ add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 ## * In this file (CMakeLists.txt):
 ##   * add "dynamic_reconfigure" to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * uncomment the "generate_dynamic_reconfigure_options" section below
+##   * uncomment the "" section below
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
@@ -118,11 +127,12 @@ add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES nuturtle_gazebo
- CATKIN_DEPENDS roscpp rospy std_msgs gazebo_ros nuturtlebot sensor_msgs rigid2d nav_msgs tf
+ # INCLUDE_DIRS include
+ # LIBRARIES ${PROJECT_NAME} rigid2d
+ CATKIN_DEPENDS gazebo_msgs geometry_msgs message_generation message_runtime nav_msgs rigid2d roscpp sensor_msgs std_msgs visualization_msgs
 #  DEPENDS system_lib
 )
+
 
 ###########
 ## Build ##
@@ -133,53 +143,93 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+#   ${rigid2d_INCLUDE_DIRS}
+  # ${Eigen3_INCLUDE_DIRS}
 )
-
-add_executable(landmark2 scripts/test_landmark.cpp)
-add_dependencies(landmark2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(landmark2
-  ${catkin_LIBRARIES}
-  Eigen3::Eigen
-)
-
-# include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/nuturtle_gazebo.cpp
+#   # src/${PROJECT_NAME}/ekf.cpp
+#   scripts/landmark.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
+add_executable(landmarks_node scripts/landmark.cpp)
+add_executable(draw_map scripts/draw_map.cpp)
+add_dependencies(landmarks_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/nuturtle_gazebo_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/nuslam_node.cpp)
+# add_executable(draw_map src/draw_map.cpp)
+# add_executable(analysis src/analysis.cpp)
+# add_executable(visualizer src/visualizer.cpp)
+# add_executable(slam src/slam.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+# set_target_properties(draw_map PROPERTIES OUTPUT_NAME draw_map PREFIX "")
+# set_target_properties(analysis PROPERTIES OUTPUT_NAME analysis PREFIX "")
+# set_target_properties(visualizer PROPERTIES OUTPUT_NAME visualizer PREFIX "")
+# set_target_properties(slam PROPERTIES OUTPUT_NAME slam PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS} ${rigid2d_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(analysis ${${PROJECT_NAME}_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS} ${rigid2d_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(visualizer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS} ${rigid2d_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(slam ${${PROJECT_NAME}_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS} ${rigid2d_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
+target_link_libraries(
+landmarks_node # this is my node that will use below libraries
+# ${rigid2d_LIBRARIES}
+Eigen3::Eigen
+# ${PROJECT_NAME} # this a library that my node will use
+${catkin_LIBRARIES} # this a library that my node will use
+)
+
+
+
+target_link_libraries(
+draw_map # this is my node that will use below libraries
+Eigen3::Eigen
+${catkin_LIBRARIES} # this a library that my node will use
+)
+
+# target_link_libraries(
+# analysis # this is my node that will use below libraries
+# ${rigid2d_LIBRARIES}
+# Eigen3::Eigen
+# ${PROJECT_NAME} # this a library that my node will use
+# ${catkin_LIBRARIES} # this a library that my node will use
 # )
-target_link_libraries(${PROJECT_NAME}_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+#
+# target_link_libraries(
+# visualizer # this is my node that will use below libraries
+# ${rigid2d_LIBRARIES}
+# Eigen3::Eigen
+# ${PROJECT_NAME} # this a library that my node will use
+# ${catkin_LIBRARIES} # this a library that my node will use
+# )
+#
+# target_link_libraries(
+# slam # this is my node that will use below libraries
+# ${rigid2d_LIBRARIES}
+# Eigen3::Eigen
+# ${PROJECT_NAME} # this a library that my node will use
+# ${catkin_LIBRARIES} # this a library that my node will use
+# )
 #############
 ## Install ##
 #############
-target_include_directories(${PROJECT_NAME}_plugin PUBLIC ${GAZEBO_INCLUDE_DIRS})
-
-add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
@@ -193,33 +243,31 @@ add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${ca
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS landmarks_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS draw_map
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
 install(PROGRAMS
   # scripts/my_python_script
   scripts/landmark.cpp
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
 )
 
+install(PROGRAMS
+  # scripts/my_python_script
+  scripts/draw_map.cpp
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
+)
 
-install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-# install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
-install(DIRECTORY src/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -233,10 +281,21 @@ install(DIRECTORY src/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_nuturtle_gazebo.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_nuslam.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+# if (CATKIN_ENABLE_TESTING)
+#     catkin_add_gtest(${PROJECT_NAME}_test tests/${PROJECT_NAME}_test.cpp)
+#     target_link_libraries(${PROJECT_NAME}_test Eigen3::Eigen ${rigid2d_LIBRARIES} ${catkin_LIBRARIES} gtest_main ${PROJECT_NAME})
+# endif()
+
+
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(${PROJECT_NAME}_test tests/tests.cpp)
+    target_link_libraries(${PROJECT_NAME}_test Eigen3::Eigen ${rigid2d_LIBRARIES} ${catkin_LIBRARIES} gtest_main ${PROJECT_NAME})
+endif()
