@@ -10,6 +10,7 @@
 #include <tf/tf.h>
 #include "cmath"
 #include <Eigen/Dense>
+#include "nuslam/TurtleMap.h"
 
 using rigid2d::Pose;
 using rigid2d::Vector2D;
@@ -20,6 +21,7 @@ using rigid2d::deg2rad;
 
 ros::Subscriber scan;
 ros::Subscriber odomSub;
+ros::Publisher landmark_pub;
 Pose pose_odom;
 std::vector<std::vector<Vector2D>> position(360);
 std::vector<int> circle_group;
@@ -34,7 +36,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
 void check_circle();
 double vector_norm(Vector2D vec);
 void circle_fitting_algorithm();
-
+void publish_landmark();
 
 float thredhold = 0.08;
 std::vector<float> laser_data;
@@ -42,11 +44,12 @@ std::vector<float> laser_data;
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "test_landmark");
+  ros::init(argc, argv, "landmark");
   ros::NodeHandle n;
 
   scan =  n.subscribe("/scan",1,scanCallback);
   odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 10, odomCallback);
+  landmark_pub = n.advertise<nuslam::TurtleMap>("landmarks", true);
 
   while(ros::ok())
   {
@@ -55,7 +58,11 @@ int main(int argc, char **argv)
     clustering_groups();
     check_circle();
     circle_fitting_algorithm();
-    ros::Duration(5.0).sleep();
+    int circle_center_x_size = circle_center_x.size();
+    if (circle_center_x_size>1){
+      publish_landmark();
+    }
+    // ros::Duration(5.0).sleep();
   }
   return 0;
 }
@@ -160,7 +167,7 @@ void check_circle(){
   double angle = 0;
   double st_deviation = 0;
   double standard_deviation = 0;
-  ROS_INFO("group_number %d",group_number);
+
   for (int i = 0; i<group_number; i++){
     int group_size = position[i].size();
     // ROS_INFO("group_size!!! : %d", group_size);
@@ -183,14 +190,11 @@ void check_circle(){
       test_count ++;
       // std::vector <std::vector<float>> group(360);
     }
-    ROS_INFO("test_count %d",test_count);
-    ROS_INFO("group_size %d",group_size);
 
 
     mean_rad = sum_angle / (group_size-2);
     mean_degree =std::abs(rad2deg(mean_rad));
-    ROS_INFO("mean_degree %f",mean_degree);
-    ROS_INFO("mean_rad %f",mean_rad);
+
     if (mean_degree > 90.0 && mean_degree < 135.0){ //check if mean satisfied the condition
       st_deviation = 0;
       circle_group.push_back(i);
@@ -211,7 +215,6 @@ void check_circle(){
       standard_deviation = sqrt(st_deviation/(group_size-2));
       // ROS_INFO("standard_deviation %f",standard_deviation);
       if (standard_deviation < 0.15){
-        ROS_INFO("st_deviation: %f",standard_deviation);
         // circle_group.push_back(i);
       }
 
@@ -259,8 +262,6 @@ void circle_fitting_algorithm(){
   double radius = 0;
   double center_xx = 0;
   double center_yy = 0;
-
-  ROS_INFO("size!!!:%d",size);
   for(int i =0; i < size; i++){
     group_size = position[circle_group[i]].size();
     sum_x = 0;
@@ -327,7 +328,6 @@ void circle_fitting_algorithm(){
     }
 
     //step eleven;
-    // ROS_INFO("step_eleven");
     singular_min = svd.singularValues()(0);
     for(int m = 0; m < singluar_size; m++){
       if (svd.singularValues()(m) < singular_min){
@@ -342,7 +342,6 @@ void circle_fitting_algorithm(){
       A_matrix(3,0) = svd.matrixV()(3,3);
     } else {
       //step 12;
-      // ROS_INFO("step_twelve");
       MatrixXd Y_matrix;
       Y_matrix = svd.matrixV()*E_matrix*svd.matrixV().transpose();
       MatrixXd Q_matrix;
@@ -352,7 +351,6 @@ void circle_fitting_algorithm(){
       eigen_value_size = es.eigenvalues().size();
       int eigen_count = 0;
       for (int n = 0; n<eigen_value_size; n++){
-        ROS_INFO("es.eigenvalues()(n), %f",es.eigenvalues()(n));
         if (es.eigenvalues()(n) > 0 ){
           eigenvalues_min = es.eigenvalues()(n);
           eigen_count = n;
@@ -367,7 +365,6 @@ void circle_fitting_algorithm(){
         }
       }
 
-      ROS_INFO("eigen_count,%d",eigen_count);
       A_star_matrix = es.eigenvectors().col(eigen_count);
       // MatrixXd A_matrix;
       A_matrix = Y_matrix.inverse() *A_star_matrix;
@@ -387,11 +384,55 @@ void circle_fitting_algorithm(){
     center_xx = aa + x_hat;
     center_yy = bb + y_hat;
     // ROS_INFO("4444");
-    ROS_INFO("radius: %f", radius);
+    // ROS_INFO("radius %f", radius);
     // for (size_t m = 0; m<circle_R, m++ )
-    circle_R.push_back(radius);
-    circle_center_x.push_back(center_xx);
-    circle_center_y.push_back(center_yy);
+
+    // circle_R.push_back(radius);
+    // circle_center_x.push_back(center_xx);
+    // circle_center_y.push_back(center_yy);
+    int check = 0;
+    int landmark_size  = 0;
+    landmark_size = circle_R.size();
+    for (int m = 0; m<landmark_size; m++ ){
+      double length = sqrt(pow(circle_center_x[m] -center_xx, 2.0)+pow(circle_center_y[m]-center_yy,2.0));
+      if (length > 0.05){
+        check ++;
+      }
+    }
+    if (check == landmark_size){
+      circle_R.push_back(radius);
+      circle_center_x.push_back(center_xx);
+      circle_center_y.push_back(center_yy);
+      ROS_INFO("radius%f",radius);
+    }
+    landmark_size = circle_R.size();
+    ROS_INFO("landmark_size %d",landmark_size);
 
   }
+}
+
+void publish_landmark(){
+  nuslam::TurtleMap landmark_pts;
+  int size = circle_center_x.size();
+  ROS_INFO("size:%d",size);
+  landmark_pts.radi.resize(size);
+  landmark_pts.x_pose.resize(size);
+  landmark_pts.y_pose.resize(size);
+
+  int land_size = landmark_pts.x_pose.size();
+  ROS_INFO("land_size: %d",land_size);
+  for(int i; i < size ; i++){
+    landmark_pts.radi[i] = circle_R[i];
+    landmark_pts.x_pose[i] = circle_center_x[i];
+    landmark_pts.y_pose[i] = circle_center_y[i];
+  }
+  // double a = 0.7;
+  //
+  // for(int i; i < size ; i++){
+  // landmark_pts.radi[0] = a;
+  // landmark_pts.x_pose[0] = a;
+  // landmark_pts.y_pose[0] = a;
+  // }
+  //
+  landmark_pub.publish(landmark_pts);
 }

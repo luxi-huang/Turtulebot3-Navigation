@@ -57,7 +57,9 @@
 
 
   <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_key.launch"/>
-  <node name="landmark" pkg="nuturtle_gazebo" type="landmark2" output="screen"/>
+  <node name="landmark" pkg="nuslam" type="landmarks" output="screen"/>
+  <node name="draw_map" pkg="nuslam" type="draw_map" output="screen"/>
+
 
 
 </launch>

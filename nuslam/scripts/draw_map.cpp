@@ -23,118 +23,74 @@
 #include <visualization_msgs/Marker.h>
 
 // GLOBAL VARS
-bool callback_flag = false;
 nuslam::TurtleMap global_map;
+ros::Subscriber landmark_sub;
 
-void mapCallback(const nuslam::TurtleMap &map)
+// void mapCallback(const nuslam::TurtleMap &map)
+// {
+//   /// \brief store TurtleMap data for converting into marker coordinates
+//   /// \param nuslam::TurtleMap, which stores lists of x,y coordinates and radii of detected landmarks
+//   global_map = map;
+//
+//   // std::cout << "NUM OF CLUSTERS: " << global_map.radii.size() << std::endl;
+//
+//   callback_flag = true;
+// }
+
+// struct MyLandmark {
+//   double xx;
+//   double yy;
+//   double radius;
+//   MyLandmark(
+//     double x = 0.0,
+//     double y = 0.0,
+//     double r = 0.0): xx(x), yy(y), radius(r)
+//     {}
+// };
+std::vector<double> circle_R;
+std::vector<double> circle_center_x;
+std::vector<double> circle_center_y;
+
+//
+// MyLandmark landM;
+
+
+
+void mapCallback(const nuslam::TurtleMap::ConstPtr&map);
+
+
+
+int main(int argc, char **argv)
 {
-  /// \brief store TurtleMap data for converting into marker coordinates
-  /// \param nuslam::TurtleMap, which stores lists of x,y coordinates and radii of detected landmarks
-  global_map = map;
+  ros::init(argc, argv, "draw_map");
+  ros::NodeHandle n;
 
-  // std::cout << "NUM OF CLUSTERS: " << global_map.radii.size() << std::endl;
+  // scan =  n.subscribe("/scan",1,scanCallback);
+  // odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 10, odomCallback);
+  // ros::Publisher landmark_pub = n.advertise<nuslam::TurtleMap>("landmarks", 1);
+	// marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+  landmark_sub = n.subscribe("/landmarks", 1, mapCallback);
 
-  callback_flag = true;
+
+  while(ros::ok())
+  {
+    ros::spinOnce();
+
+  }
+  return 0;
 }
 
-int main(int argc, char** argv)
-/// The Main Function ///
+
+void mapCallback(const nuslam::TurtleMap::ConstPtr&map)
 {
-  ROS_INFO("STARTING NODE: draw_map");
-  // Vars
-  double frequency = 60.0;
-  std::string color = "scan";
+  int size = map->radi.size();
+  circle_R.resize(size);
+  circle_center_x.resize(size);
+  circle_center_y.resize(size);
 
-  ros::init(argc, argv, "draw_map"); // register the node on ROS
-  ros::NodeHandle nh; // get a handle to ROS
-  ros::NodeHandle nh_("~"); // get a handle to ROS
-  // Parameters
-  nh_.getParam("frequency", frequency);
-  nh_.getParam("color", color);
-
-  // Init Marker Publisher
-  ros::Publisher marker_pub = nh.advertise<visualization_msgs::Marker>("scan/marker", 1);
-
-  // Init Marker
-  visualization_msgs::Marker marker;
-  uint32_t shape = visualization_msgs::Marker::CYLINDER;
-  marker.type = shape;
-  marker.action = visualization_msgs::Marker::ADD;
-
-  // Set the color -- be sure to set alpha to something non-zero!
-  marker.color.r = 0.5f;
-  marker.color.g = 0.0f;
-  marker.color.b = 0.5f;
-  marker.color.a = 1.0;
-  if (color == "scan")
-  {
-    // Heighest Marker
-    marker.scale.z = 1.0;
-    marker.color.r = 0.5f;
-    marker.color.g = 0.0f;
-    marker.color.b = 0.5f;
-    marker.color.a = 1.0;
-  } else if (color == "gazebo")
-  {
-    // Lowest Marker
-    marker.scale.z = 0.25;
-    marker.color.r = 0.96f;
-    marker.color.g = 0.475f;
-    marker.color.b = 0.0f;
-    marker.color.a = 1.0;
-  } else if (color == "slam")
-  {
-    // Mid Marker
-    marker.scale.z = 0.5;
-    marker.color.r = 1.0f;
-    marker.color.g = 0.0f;
-    marker.color.b = 0.0f;
-    marker.color.a = 1.0;
+  for(int i = 0; i< size; i++ ){
+    circle_R[i] = map->radi[i];
+    circle_center_x[i] = map->x_pose[i];
+    circle_center_y[i] = map->y_pose[i];
   }
-
-  // Init Map Subscriber
-  ros::Subscriber lsr_sub = nh.subscribe("landmarks_node/landmarks", 1, mapCallback);
-
-  ros::Rate rate(frequency);
-
-  // Main While
-  while (ros::ok())
-  {
-  	ros::spinOnce();
-
-    if (callback_flag)
-    {
-      // Sync headers
-      marker.header.frame_id = global_map.header.frame_id;
-      marker.header.stamp = ros::Time::now();
-
-      // Populate Marker information for each landmark
-      // std::cout << "------------------------------------------" << std::endl;
-      for (long unsigned int i = 0; i < global_map.radii.size(); i++)
-      {
-        marker.id = i;
-        // Set the pose of the marker.
-        // This is a 6DOF pose wrt frame/time specified in the header
-        marker.pose.position.x = global_map.x_pts.at(i);
-        marker.pose.position.y = global_map.y_pts.at(i);
-        marker.pose.position.z = marker.scale.z / 2.0; // height
-        marker.pose.orientation.x = 0.0;
-        marker.pose.orientation.y = 0.0;
-        marker.pose.orientation.z = 0.0;
-        marker.pose.orientation.w = 1.0;
-        // Set the scale of the marker -- 1x1x1 here means 1m on a side
-        marker.scale.x = global_map.radii.at(i);
-        marker.scale.y = global_map.radii.at(i);
-        marker.lifetime = ros::Duration(0.5);
-        // std::cout << "POS: (" << global_map.x_pts.at(i) << ", " << global_map.y_pts.at(i) << ")" << std::endl;
-        marker_pub.publish(marker);
-
-      }
-      callback_flag = false;
-    }
-
-    rate.sleep();
-  }
-
-  return 0;
 }
