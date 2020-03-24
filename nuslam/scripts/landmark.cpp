@@ -48,13 +48,13 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   scan =  n.subscribe("/scan",1,scanCallback);
-  odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 10, odomCallback);
+  odomSub  = n.subscribe<nav_msgs::Odometry>("/odom", 1, odomCallback);
   landmark_pub = n.advertise<nuslam::TurtleMap>("landmarks", true);
 
   while(ros::ok())
   {
-    ros::spinOnce();
     circle_group.clear();
+    ros::spinOnce();
     clustering_groups();
     check_circle();
     circle_fitting_algorithm();
@@ -108,10 +108,10 @@ void clustering_groups()
             // angle = normalize_angle(pose_odom.theta + j);
             // x_position = pose_odom.x + laser_data[j]*cos(angle);
             // y_position = pose_odom.y + laser_data[j]*sin(angle);
-            rad = deg2rad(0+j);
+            rad = deg2rad(pose_odom.theta+j);
             angle = normalize_angle(rad);
-            x_position = 0 + laser_data[j]*cos(angle);
-            y_position = 0 + laser_data[j]*sin(angle);
+            x_position = pose_odom.x + laser_data[j]*cos(angle);
+            y_position = pose_odom.y + laser_data[j]*sin(angle);
 
             position[group_size][group_size_count].x = x_position;
             position[group_size][group_size_count].y = y_position;
@@ -395,18 +395,16 @@ void circle_fitting_algorithm(){
     landmark_size = circle_R.size();
     for (int m = 0; m<landmark_size; m++ ){
       double length = sqrt(pow(circle_center_x[m] -center_xx, 2.0)+pow(circle_center_y[m]-center_yy,2.0));
-      if (length > 0.05){
+      if (length > 0.1){
         check ++;
       }
     }
-    if (check == landmark_size){
+    if (check == landmark_size && radius <0.1){
       circle_R.push_back(radius);
       circle_center_x.push_back(center_xx);
       circle_center_y.push_back(center_yy);
-      ROS_INFO("radius%f",radius);
     }
     landmark_size = circle_R.size();
-    ROS_INFO("landmark_size %d",landmark_size);
 
   }
 }
@@ -414,25 +412,17 @@ void circle_fitting_algorithm(){
 void publish_landmark(){
   nuslam::TurtleMap landmark_pts;
   int size = circle_center_x.size();
-  ROS_INFO("size:%d",size);
   landmark_pts.radi.resize(size);
   landmark_pts.x_pose.resize(size);
   landmark_pts.y_pose.resize(size);
 
   int land_size = landmark_pts.x_pose.size();
-  ROS_INFO("land_size: %d",land_size);
   for(int i; i < size ; i++){
     landmark_pts.radi[i] = circle_R[i];
     landmark_pts.x_pose[i] = circle_center_x[i];
     landmark_pts.y_pose[i] = circle_center_y[i];
   }
-  // double a = 0.7;
-  //
-  // for(int i; i < size ; i++){
-  // landmark_pts.radi[0] = a;
-  // landmark_pts.x_pose[0] = a;
-  // landmark_pts.y_pose[0] = a;
-  // }
-  //
-  landmark_pub.publish(landmark_pts);
+  if (landmark_pts.radi[0]!=0){
+    landmark_pub.publish(landmark_pts);
+  }
 }

@@ -5,7 +5,7 @@ Author: Luxi Huang
 This README.md contains tasks completeness.
 
 
-
+### For Test S.000, please wait 20 seconds to see the landmark pop out on rivz.
 # Tasks submitted:
 A.000
 A.001
