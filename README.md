@@ -2,71 +2,14 @@
 
 Author: Luxi Huang
 
-This README.md contains tasks completeness.
+### Project Overview:
+This totally-from-scratch project involved modeling a Turtlebot3 in Gazebo and using Differential Drive Kinematics to perform Odometry calculations. The Gazebo Plugin was developed to emulate the low-level interface on the real Turtlebot3 for the ability to develop high-fidelity code in simulation. I also implemented landmark detection on the Turtlebot3’s LIDAR, and used these features to perform EKF SLAM with Unknown Data Association.
 
 
-### For Test S.000, please wait 20 seconds to see the landmark pop out on rivz.
-# Tasks submitted:
-A.000
-A.001
-A.002
-A.003
-A.004
+The core project components are:
 
-B.000
-B.001
-B.002
-B.003
-B.004          
-
-C.000
-C.001
-C.002
-C.003
-C.004
-# Tasks completed:
-
-### incomplete homework:
-
-## Erro note for A.000
-(The package description is under README.md inside the nuturtle_description in its package):
-
-#### Fixed Error1:     
-$ catkin_link -w2
-```
-nuturtle_description: warning: package 'std_msgs' should be listed in catkin_package()
- ```
-Solution:   In CMakeLists file uncomment line "CATKIN_DEPENDS roscpp rospy std_msgs" on catkin_package()
-
-#### Fixed Error2:
-$ catkin_link -w2
-```
-nuturtle_description: notice: package description starts with boilerplate 'nuturtle_description package is for'
- ```
-Solution:rewrite other words in the package.xml file
-
-#### Fixed Error3:
-$ roslaunach ...
-```
-File "/usr/lib/python2.7/subprocess.py", line 394, in __init__
-    errread, errwrite)
-  File "/usr/lib/python2.7/subprocess.py", line 1047, in _execute_child
-    raise child_exception
-OSError: [Errno 13] Permission denied
-```
-wrong solution:add "cat"on launch file:
-```
- <param name="robot_description" command="cat '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'"/>
-```
-correct solution:
-```
-<param name="robot_description"
-     command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
-  ```
-  #### fixed problem 4
-  * joint-joint_state_publisher control the wheels in right direction
-  > fixed by edit joint and link origin position.
-
-```
-catkin_make --only-pkg-with-deps my_package
-```
+- rigid2d library containing 2D Lie Group operations for Transforms, Vectors and Twists as well as differential drive robot kinematics for odometry updates.
+- nuturtle_description: houses the description of a differential drive robot with a caster wheel for support.
+- nuturtle_robot: interfaces with the real Turtlebot3’s low-level controls such as setting wheel speeds and reading sensors.
+- nuturtle_gazebo: contains a Gazebo Plugin to emulate the Turtlebot3’s low-level controls in Gazebo for the ability to develop in simulation.
+- nuslam: library containing LIDAR feature detection methods and EKF SLAM implementation with Unknown Data Association.

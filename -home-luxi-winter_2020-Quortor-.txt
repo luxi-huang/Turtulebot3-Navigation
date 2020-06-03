@@ -1,1 +1,0 @@
-/home/luxi/winter_2020/Quortor/week_student.cpp
