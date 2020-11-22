@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <launch>
+<arg name="pub_joint_state" default="true"/>
+<arg name="use_jsp_gui" default="true"/>
   <!-- This launch file is use to load diff_drive robot on rviz, then conver xacro model to urdf,
   impletment with robot configrations in yaml file, and add joint_state_publisher to control the robot,
   and applied robot_state_publisher to combine joint values-->
@@ -9,9 +11,12 @@
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
   <!-- send fake joint values -->
- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="use_gui" value="true"/>
+  <group if="$(arg pub_joint_state)">
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="$(eval use_jsp_gui)"/>
   </node>
+  </group>
+  
 
   <!-- Combine joint values -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>

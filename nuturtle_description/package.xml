@@ -2,7 +2,7 @@
 <package format="2">
   <name>nuturtle_description</name>
   <version>0.0.1</version>
-  <description>nuturtle_descrition is for ME495 Navigation homework </description>
+  <description>nuturtle_descrition is package to describe differential drive robot with a caster wheel</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

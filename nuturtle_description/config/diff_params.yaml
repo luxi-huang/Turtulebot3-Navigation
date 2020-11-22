@@ -2,7 +2,7 @@ wheel_width: 0.018 # The width of the wheels
 wheel_radius: 0.033 # The radius of the wheels, change values in rigid2d package car.yaml
 wheel_base: 0.16 # The distance between the centers wheels,change values in rigid2d package car.yaml
 chassis_length: 0.138 # The length of the main chassis link
-chassis_thinkness: 0.140 # The thickness of the plate that forms the chassis
+chassis_thickness: 0.140 # The thickness of the plate that forms the chassis
 encoder_ticks: 4096.0 #(360.0)/(0.066*2*3.1415926) #number of encoder ticks per revolution of the wheels
 maximum_translational_velocity: 0.22 # m/s
 maximum_rotational_velocity_robot: 2.84 # rad/s
