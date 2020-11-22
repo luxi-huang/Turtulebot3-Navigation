@@ -40,5 +40,10 @@
 
 * saved view of robot that displaying on rivz.
 
-
-
+## Launch Files 
+```
+$ roslaunch nuturtle_description view_diff_drive.launch --ros-args
+```
+Optional Arguments:
+  - `use_jsp_gui` (default "true"):  Launch the joint_state_publisher gui to publish joint angles
+    - `roslaunch nuturtle_description view_diff_drive.launch use_jsp_gui:=true`
