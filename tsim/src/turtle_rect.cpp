@@ -1,246 +1,216 @@
-// turtle_rect: enable the turtle to follow the trajectory of
-// a rectangle
-//
-// PUBLISHERS:
-//   + turtle1/cmd_vel (Twist) ~ publish turtle velocity.
-// 	+ pose_error (Pose_error) ~ publish the pose error of turtle.
-//
-// SUBSCRIBERS:
-//   + turtle1/pose (Pose) ~ subscribe the current pose of the turtle1 turtle (x, y, theta)
+#include "turtle_rect.hpp"
 
-
-#include "ros/ros.h"
-#include <sstream>
-#include "turtlesim/Pose.h"
-#include "geometry_msgs/Twist.h"
-#include "turtlesim/SetPen.h"
-#include "turtlesim/TeleportAbsolute.h"
-#include "std_srvs/Empty.h"
-#include <cstdlib>
-#include "tsim/PoseError.h"
-
-
-using namespace std; // use for count
-
-ros::Publisher velocity_publisher;
-ros::Subscriber pose_subscriber;
-turtlesim::Pose turtlesim_pose;
-ros::Publisher PoseError_publisher;
-// ros::NodeHandles n;
-
-void go_stright(double speed, double distance, bool ifForward,double xvalue, double yalue, int dirct);
-void rotate (double angular_vel, double relative_rotate_angle_degree, bool clockwise);
-void set_relative_angle(double desired_angle_degree);
-void poseCallback(const turtlesim::Pose::ConstPtr & pose_message);
-int turtle_setpen_client(int off);
-int traj_rest_client();
-int Error_pose(int x, int y, int theta);
-
-int main(int argc, char **argv)
+namespace turtle_rect
 {
-	ros::init(argc, argv, "turtle_rect");
-	ros::NodeHandle n;
-	// publich:: n;
-	velocity_publisher = n.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 1000);
-	PoseError_publisher = n.advertise<tsim::PoseError>("pose_error", 1000);
-	pose_subscriber = n.subscribe("/turtle1/pose", 10, poseCallback);
+	TurtleRect::TurtleRect(ros::NodeHandle* nodehandle):nh_(*nodehandle)
+	{
+		/* THIS IS CLASS CONSTRCTOR */
+		getting_parameter();
+		initial_publishers_subscribers();
+		turtle_move(0);
+		// ros::spin();
 
-	// get parameter
-	int x_value;
-	int y_value;
-	int width;
-	int height;
-	int trans_vel;
-	int rot_vel;
-	int frequency;
-
-	n.getParam("x",x_value);
-	n.getParam("y",y_value);
-	n.getParam("width",width);
-	n.getParam("height",height);
-	n.getParam("trans_vel",trans_vel);
-	n.getParam("rot_vel",rot_vel);
-	n.getParam("frequency",frequency);
-
-	ROS_INFO ("x :%d, The x coordinate of the lower left corner of a rectangle",x_value);
-	ROS_INFO ("y :%d, The y coordinate of the lower left corner of a rectangle",y_value);
-	ROS_INFO ("width :%d, The width of the rectangle",width);
-	ROS_INFO ("height :%d, The height of the rectangle",height);
-	ROS_INFO ("trans_vel :%d, The translational velocity of the robot",trans_vel);
-	ROS_INFO ("rot_vel :%d, The rotational velocity of the robot",rot_vel);
-	ROS_INFO ("frequency :%d, The frequency of the control loop",frequency);
-
-	ros::Rate loop_rate(1000);
-	while (ros::ok()){
-		ros::spinOnce();
-		ros::Duration(2).sleep();
-		traj_rest_client();
-		ros::Duration(2).sleep();
-		turtle_setpen_client(0);
-		go_stright(trans_vel,width,true,x_value, y_value, 0);
-		// Error_pose(x_value+width, y_value, 0);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true,x_value+width, y_value, 90);
-		// Error_pose(x_value+width, y_value+height, 90);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,width,true,x_value+width, y_value+height, 180);
-		// Error_pose(x_value, y_value+height, 180);
-		rotate(rot_vel,90.0,false);
-		go_stright(trans_vel,height,true,x_value, y_value+height,-90);
-		// Error_pose(x_value, y_value+height, -90);
 	}
-}
 
-void go_stright(double speed, double distance, bool ifForward,double xvalue, double yvalue, int direct){
-	geometry_msgs::Twist go_stright_msg;
+	void TurtleRect::getting_parameter() 
+	{
+		/* GET PARAMETERS FROM YAML FILE */
+		nh_.getParam("x", x); // The x coordinate of the lower left corner of a rectangle
+		nh_.getParam("y",y); // The y coordinate of the lower left corner of a rectangle
+		nh_.getParam("width",width); // The width of the rectangle
+		nh_.getParam("height",height); // The height of the rectangles
+		nh_.getParam("trans_vel",trans_vel); // The translational velocity of the robot
+		nh_.getParam("rot_vel",rot_vel); // The rotational velocity of the robot
+		nh_.getParam("frequency",frequency); // The frequency of the control loop
+		std::cout << "x" << x << "\n";
+	}
 
-	if (ifForward)
-		go_stright_msg.linear.x =abs(speed);
-	else
-		go_stright_msg.linear.x =-abs(speed);
+	void TurtleRect::initial_publishers_subscribers()
+	{	
+		/* subscribers */
+		pose_subs = nh_.subscribe("/turtle1/pose", 1, &TurtleRect::pose_callback,this);
+		/* publishers */
+		vel_pub = nh_.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 1000);
+		PoseError_pub= nh_.advertise<tsim::PoseError>("pose_error", 1000);
+	}
 
-	go_stright_msg.linear.y =0;
-	go_stright_msg.linear.z =0;
-	go_stright_msg.angular.x = 0;
-	go_stright_msg.angular.y = 0;
-	go_stright_msg.angular.z =0;
+	void TurtleRect::pose_callback(const turtlesim::Pose::ConstPtr & pose_message) {
+		/* This is turtle pose subscrber callback function */ 
+		turtlesim_pose.x=pose_message->x;
+		turtlesim_pose.y=pose_message->y;
+		turtlesim_pose.theta=pose_message->theta;
+	}
 
-	double start_time = ros::Time::now().toSec();
-	double current_distance = 0.0;
-	ros::Rate loop_rate(100);
+	int TurtleRect::turtle_setpen_client(int off) 
+	{	
+		/*  Setup set pen survice;
+		*	 Lift pen when input is true; */
+		ros::ServiceClient client= nh_.serviceClient<turtlesim::SetPen>("turtle1/set_pen");
+		turtlesim::SetPen SetPen_srv;
+		SetPen_srv.request.r = 0;
+		SetPen_srv.request.g = 0;
+		SetPen_srv.request.b = 0;
+		SetPen_srv.request.width = 1;
+		SetPen_srv.request.off = off;
 
-	//if current_distanace samller than desired distance, keep moving straight
-	do{
-		// double current_time = ros::Time::now().toSec();
-		velocity_publisher.publish(go_stright_msg);
-		double current_time = ros::Time::now().toSec();
-		current_distance = speed * (current_time-start_time);
+		ros::service::waitForService("turtle1/set_pen");
+		if (client.call(SetPen_srv))
+			{
+				ROS_INFO("Pen Lifted");
+			}
+			else
+			{
+				ROS_ERROR("Failed to call service set_pen");
+				return 1;
+			}
+		return 0;
+	}
 
-		if (direct == 0) {
-			Error_pose(current_distance + xvalue, yvalue, direct);
-		}else if (direct == 90){
-			Error_pose(xvalue, current_distance + yvalue, direct);
-		}else if (direct == -180){
-			Error_pose(xvalue - current_distance, yvalue, direct);
-		}else if (direct == -90){
-			Error_pose(xvalue, yvalue-current_distance, direct);
-		}
+	int TurtleRect::Teleport_client() 
+	{
+		/*  Setup set pen survice;
+		*	teleport turtle to the left corner of window; */
+		ros::ServiceClient client= nh_.serviceClient<turtlesim::TeleportAbsolute>("turtle1/teleport_absolute");
+		turtlesim::TeleportAbsolute teleport_absolute_req;
+		teleport_absolute_req.request.x = x;
+		teleport_absolute_req.request.y = y;
+		teleport_absolute_req.request.theta = 0;
 
+		ros::service::waitForService("turtle1/teleport_absolute");
+		if (client.call(teleport_absolute_req))
+			{
+				ROS_INFO("Teleport to left corner");
+			}
+			else
+			{
+				ROS_ERROR("Failed to call service teleport_absolute");
+				return 1;
+			}
+		return 0;
+	}
 
+	void TurtleRect::go_stright(double speed, double distance)
+	{
+		/*This function control robot go straight,
+		* and calculate pose error. */
 
+		// setup speed;
+		geometry_msgs::Twist go_stright_msg;
+		go_stright_msg.linear.x = speed;
+		go_stright_msg.linear.y = 0;
+		go_stright_msg.linear.z = 0;
+		go_stright_msg.angular.x = 0;
+		go_stright_msg.angular.y = 0;
+		go_stright_msg.angular.z = 0;
 
-		ros::spinOnce();
-		loop_rate.sleep();
-	}while(current_distance<distance);
+		ros::Rate loop_rate(frequency);
+		int times = (int) (distance / speed * frequency);
+		float dist = 0.0;
+		float rot = 0.0;
 
-	// after arrived,set the velocity equal to immediently
-	go_stright_msg.linear.x =0;
-	velocity_publisher.publish(go_stright_msg);
-
-
-}
-
-// turtle_rotate function is for rotate the turtle to relative_angle with direction
-void rotate (double angular_vel, double relative_rotate_angle_degree, bool clockwise){
-  double relative_rotate_angle_radius = relative_rotate_angle_degree * M_PI /180.0;
-	// double relative_rotate_angle_radius;
-	// initial linear and angular velocity with all directions for 0
-	geometry_msgs::Twist angular_msg;
-	angular_msg.linear.x =0;
-	angular_msg.linear.y =0;
-	angular_msg.linear.z =0;
-	angular_msg.angular.x = 0;
-	angular_msg.angular.y = 0;
-	angular_msg.angular.z = 0;
-
-	// relative_rotate_angle_radius = relative_rotate_angle * M_PI /180.0;
-	if (clockwise)
-		angular_msg.angular.z =-abs(angular_vel);
-	else
-		angular_msg.angular.z =abs(angular_vel);
-
-	double rotate_angle = 0.0;
-	double start_time = ros::Time::now().toSec();
-
-	// keep rotate until the rotate angle equal to relative_rotate_angle
-	ros::Rate loop_rate(1000);
-	do{
-	  // double current_time = ros::Time::now().toSec();
-		velocity_publisher.publish(angular_msg);
-		double current_time = ros::Time::now().toSec();
-		rotate_angle = angular_vel * (current_time-start_time);
-		ros::spinOnce();
-		loop_rate.sleep();
-		// ROS_INFO("%f", rotate_angle);
-	}while(rotate_angle<relative_rotate_angle_radius);
-
-	// after reach to desired angle, set angle to 0
-	angular_msg.angular.z =0;
-	velocity_publisher.publish(angular_msg);
-
-}
-
-void poseCallback(const turtlesim::Pose::ConstPtr & pose_message){
-	turtlesim_pose.x=pose_message->x;
-	turtlesim_pose.y=pose_message->y;
-	turtlesim_pose.theta=pose_message->theta;
-}
-
-void set_relative_angle (double desired_angle_degree){
-	double desired_angle_radians = desired_angle_degree * M_PI /180.0;
-	double relative_angle_radians = desired_angle_radians - turtlesim_pose.theta;
-	double relative_angle_degree =relative_angle_radians *180.0/M_PI;
-	bool clockwise = ((relative_angle_degree<0)?true:false);
-	rotate (0.2, abs(relative_angle_degree), clockwise);
-
-}
-
-int turtle_setpen_client(int off){
-	ros::NodeHandle n;
-	ros::ServiceClient client= n.serviceClient<turtlesim::SetPen>("turtle1/set_pen");
-  turtlesim::SetPen SetPen_srv;
-  SetPen_srv.request.r = 0;
-	SetPen_srv.request.g = 0;
-	SetPen_srv.request.b = 0;
-	SetPen_srv.request.width = 1;
-	SetPen_srv.request.off = off;
-
-	ros::service::waitForService("turtle1/set_pen");
-	if (client.call(SetPen_srv))
+		for (int i = 0; i < times; i++)
 		{
-			ROS_INFO("Sum");
+			vel_pub.publish(go_stright_msg);
+			dist +=  distance / (float) times;
+			predict(dist,rot);
+			Error_pose();
+			ros::spinOnce();
+			loop_rate.sleep();
 		}
-		else
+		// after arrived,set the velocity equal to immediately
+		go_stright_msg.linear.x = 0;
+		vel_pub.publish(go_stright_msg);
+	}
+
+
+	void TurtleRect::rotate(double speed, double angle)
+	{
+		// setup speed;
+		geometry_msgs::Twist rotate_msg;
+		rotate_msg.linear.x = speed;
+		rotate_msg.linear.y = 0;
+		rotate_msg.linear.z = 0;
+		rotate_msg.angular.x = 0;
+		rotate_msg.angular.y = 0;
+		rotate_msg.angular.z = speed;
+
+		ros::Rate loop_rate(frequency);
+		int times = (int) (angle / speed * frequency);
+		float dist = 0.0;
+		float rot = 0.0;
+
+		for (int i = 0; i < times; i++)
 		{
-			ROS_ERROR("Failed to call service set_pen");
-			return 1;
+			vel_pub.publish(rotate_msg);
+			rot +=  speed / (float) times;
+			predict(dist,rot);
+			Error_pose();
+			ros::spinOnce();
+			loop_rate.sleep();
 		}
-	return 0;
-}
 
-int traj_rest_client(){
-	ros::NodeHandle n;
-  ros::ServiceClient client= n.serviceClient<std_srvs::Empty>("turtle1/trajectory_reset", 1000);
-  std_srvs::Empty srv;
-  ros::service::waitForService("turtle1/trajectory_reset");
-  if (client.call(srv))
-          {
-                  ROS_INFO("CALL RESET");
-          }
-          else
-          {
-                  ROS_ERROR("Failed to call service teleport");
-                  return 1;
-          }
-  return 0;
-}
+		// after arrived,set the velocity equal to immediately
+		rotate_msg.angular.z = 0;
+		vel_pub.publish(rotate_msg);
+	}
 
-int Error_pose(int x, int y, int theta){
-	tsim::PoseError p_error;
-	p_error.x_error = turtlesim_pose.x - x;
-	p_error.y_error = turtlesim_pose.y - y ;
-	theta = theta * M_PI/180;
-	p_error.theta_error = turtlesim_pose.theta - theta;
-	PoseError_publisher.publish(p_error);
-	return 0;
-}
+	void TurtleRect::predict (float dist,float rot){
+			predict_pose.theta += rot;
+			predict_pose.x += dist*cos(predict_pose.theta);
+			predict_pose.y += dist*sin(predict_pose.theta);
+	}
+
+	void TurtleRect::Error_pose(){
+		tsim::PoseError p_error;
+		p_error.x_error = turtlesim_pose.x - predict_pose.x;
+		p_error.y_error = turtlesim_pose.y - predict_pose.y;
+		p_error.theta_error = turtlesim_pose.theta - predict_pose.theta;
+		PoseError_pub.publish(p_error);
+	}
+
+
+	void TurtleRect::init_predict_pose(){
+		predict_pose.x = 0.0;
+		predict_pose.y = 0.0;
+		predict_pose.theta = 0.0;
+	}	
+
+	void TurtleRect::turtle_move(int state) 
+	{
+		/* Setup robot state machine */
+		switch (state)
+		{
+		// case 0: inital the robot	
+		case 0:
+			/*  1. lift pen
+			*	2. teleport robot 
+			*	3. put pen down */
+			turtle_setpen_client(1); 
+			Teleport_client();
+			turtle_setpen_client(0);  
+			init_predict_pose();
+			state = 1;
+			break;
+		// case 1: move forward;
+		case 1:
+			go_stright(trans_vel, x);
+			rotate (rot_vel, 90 * M_PI/180.0);
+		// case 2:
+
+			
+
+		default:
+			// compiling error 
+			ROS_INFO("Unexpected State.");
+			break;
+		}
+	} 
+
+
+
+
+}	
+
+
+
+

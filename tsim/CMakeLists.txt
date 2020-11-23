@@ -20,7 +20,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_srvs
   std_msgs
   rigid2d
+  turtlesim
 )
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -110,9 +112,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES tsim
- CATKIN_DEPENDS geometry_msgs message_runtime roscpp rospy std_msgs std_srvs rigid2d
+ CATKIN_DEPENDS geometry_msgs message_runtime roscpp rospy std_msgs std_srvs turtlesim
 #  DEPENDS system_lib
 )
 
@@ -123,8 +125,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+include
   ${catkin_INCLUDE_DIRS}
+  ${rigid2d_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -140,7 +143,12 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(turtle_rect src/turtle_rect.cpp)
+add_executable(turtle_rect 
+  include/turtle_rect.hpp  
+  src/turtle_rect_node.cpp
+  src/turtle_rect.cpp
+)
+
 add_executable(reset_sever src/reset_sever.cpp)
 add_executable(turtle_way src/turtle_way.cpp)
 
@@ -165,6 +173,7 @@ target_link_libraries(reset_sever
 
 target_link_libraries(turtle_way
   ${catkin_LIBRARIES}
+  ${rigid2d_INCLUDE_DIRS}
 )
 #############
 ## Install ##

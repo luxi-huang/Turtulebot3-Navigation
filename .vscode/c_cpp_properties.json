@@ -11,7 +11,8 @@
                 "/home/luxi/catkin_ws/src/gazebo_ros_pkgs/gazebo_plugins/include/**",
                 "/home/luxi/catkin_ws/src/gazebo_ros_pkgs/gazebo_ros/include/**",
                 "/home/luxi/catkin_ws/src/gazebo_ros_pkgs/gazebo_ros_control/include/**",
-                "/usr/include/**"
+                "/usr/include/**",
+                "${workspaceFolder}/tsim/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

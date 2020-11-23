@@ -1,6 +1,6 @@
 # README.md for nuturtle_description Package
 - Author: Luxi Huang
-- Skills: ROS (Rviz, xacro, macro.xacro, yaml) 
+- Skills: ROS (Rviz, xacro, macro.xacro, yaml, URDF) 
 
 ---
 
