@@ -7,9 +7,10 @@ namespace turtle_rect
 		/* THIS IS CLASS CONSTRCTOR */
 		getting_parameter();
 		initial_publishers_subscribers();
-		turtle_move(0);
-		// ros::spin();
-
+		while (ros::ok())
+		{
+			turtle_move();
+		}
 	}
 
 	void TurtleRect::getting_parameter() 
@@ -127,7 +128,7 @@ namespace turtle_rect
 	{
 		// setup speed;
 		geometry_msgs::Twist rotate_msg;
-		rotate_msg.linear.x = speed;
+		rotate_msg.linear.x = 0;
 		rotate_msg.linear.y = 0;
 		rotate_msg.linear.z = 0;
 		rotate_msg.angular.x = 0;
@@ -160,7 +161,8 @@ namespace turtle_rect
 			predict_pose.y += dist*sin(predict_pose.theta);
 	}
 
-	void TurtleRect::Error_pose(){
+	void TurtleRect::Error_pose()
+	{
 		tsim::PoseError p_error;
 		p_error.x_error = turtlesim_pose.x - predict_pose.x;
 		p_error.y_error = turtlesim_pose.y - predict_pose.y;
@@ -169,13 +171,14 @@ namespace turtle_rect
 	}
 
 
-	void TurtleRect::init_predict_pose(){
+	void TurtleRect::init_predict_pose()
+	{
 		predict_pose.x = 0.0;
 		predict_pose.y = 0.0;
 		predict_pose.theta = 0.0;
 	}	
 
-	void TurtleRect::turtle_move(int state) 
+	void TurtleRect::turtle_move() 
 	{
 		/* Setup robot state machine */
 		switch (state)
@@ -184,20 +187,39 @@ namespace turtle_rect
 		case 0:
 			/*  1. lift pen
 			*	2. teleport robot 
-			*	3. put pen down */
+			*	3. put pen down
+			* 	4. move to case 1  */
 			turtle_setpen_client(1); 
 			Teleport_client();
 			turtle_setpen_client(0);  
-			init_predict_pose();
+			init_predict_pose(); 
 			state = 1;
+			edge = 0;
 			break;
-		// case 1: move forward;
+		
 		case 1:
-			go_stright(trans_vel, x);
+			/* 	1. move straight on x axis 
+			 * 	2. rotate 90 degrees;
+			 * 	3. move to state 2 */
+			go_stright(trans_vel, width);
 			rotate (rot_vel, 90 * M_PI/180.0);
-		// case 2:
+			edge ++;
+			state = 2;
+			break;
 
-			
+		case 2:
+			/* 	1. move straight on y axis 
+			 * 	2. rotate 90 degrees;
+			 * 	3. move to state 1 */
+			go_stright(trans_vel, height);
+			rotate (rot_vel, 90 * M_PI/180.0);
+			edge ++;
+			if (edge == 4) {
+				state = 0;
+			} else {
+				state = 1;
+			}
+			break;
 
 		default:
 			// compiling error 

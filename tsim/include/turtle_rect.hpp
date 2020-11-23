@@ -20,10 +20,6 @@ namespace turtle_rect
     private:
         //***************** NODE HANDLES ***************//
         ros::NodeHandle nh_;
-
-        // //***************** NODE SERVICE ***************//
-        // ros::ServiceClient client;
-        
         //***************** NODE PUBLISHER ***************//
         ros::Publisher vel_pub;
         ros::Publisher PoseError_pub;
@@ -41,11 +37,8 @@ namespace turtle_rect
         /* other parameters */
         turtlesim::Pose turtlesim_pose; 
         turtlesim::Pose predict_pose;
-         
-        /* state machine flag */
-        // int state;
-        // int path_state;
-
+        int edge; 
+        int state;
 
     public:
         //***************** FUNCTIONS **********************//
@@ -53,7 +46,7 @@ namespace turtle_rect
         void getting_parameter();
         int turtle_setpen_client(int off);
         int Teleport_client();
-        void turtle_move(int state);
+        void turtle_move();
         void initial_publishers_subscribers();
         void pose_callback(const turtlesim::Pose::ConstPtr & pose_message);
         void go_stright(double speed, double distance);
@@ -62,9 +55,7 @@ namespace turtle_rect
         void init_predict_pose();
         void Error_pose();
     };
-
 }    
-
 #endif
 
 
