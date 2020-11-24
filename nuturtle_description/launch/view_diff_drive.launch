@@ -1,26 +1,33 @@
 <?xml version="1.0"?>
-<launch>
-<arg name="pub_joint_state" default="true"/>
-<arg name="use_jsp_gui" default="true"/>
+  <!-- DESCRIPTION -->
   <!-- This launch file is use to load diff_drive robot on rviz, then conver xacro model to urdf,
   impletment with robot configrations in yaml file, and add joint_state_publisher to control the robot,
   and applied robot_state_publisher to combine joint values-->
+
+<launch>
+
+  <!-- INITIAL ARGUMENTS -->
+  <arg name="pub_joint_state" default="true"/> 
+  <arg name="use_jsp_gui" default="true"/>
+
+  <!-- LOAD ROBOT URDF MODEL -->  
   <param name="robot_description"
        command="$(find xacro)/xacro $(find nuturtle_description)/urdf/diff_drive.urdf.xacro"/>
-  <!-- <param name="robot_description" command="cat '$(find nuturtle_description)/urdf/diff_drive.urdf.xacro'"/> -->
+
+  <!-- YAML FILE: ROBOT CONFIURATIONS-->     
   <rosparam command="load" file="$(find nuturtle_description)/config/diff_params.yaml" />
 
-  <!-- send fake joint values -->
+  <!-- SEND FAKE JOINT STATE  -->
   <group if="$(arg pub_joint_state)">
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
     <param name="use_gui" value="$(eval use_jsp_gui)"/>
   </node>
   </group>
   
-
-  <!-- Combine joint values -->
+  <!-- ROBOT STATE PUBLISER -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
-  <!-- Show in Rviz   -->
+  
+  <!-- Show in Rviz -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find nuturtle_description)/config/config.rviz" />
 
 </launch>

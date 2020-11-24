@@ -1,21 +1,32 @@
+<?xml version="1.0"?>
 <launch>
-    <!-- My Package launch file -->
-    <node pkg="tsim" type="turtle_rect" name="turtle_rect"  output="screen">
-    </node>
+    <!-- DESCRIPTION -->
+    <!-- This launch files is use to control turtle runing in rectanfular shape. 
+    It implemnts trajectary parameters from ymal file, and plot path error in 
+    rqt graph  -->
 
-    <!-- <node pkg="tsim" type="reset_sever" name="reset_sever"  output="screen">
-    </node> -->
+    <!-- INITIAL ARGUMENTS -->
+    <arg name="plot_gui" default='false' doc="Launch rqt_plot to plot error"/>
 
+    <!-- NODE in FUNCTION of CONTROL TRUTLE -->
+    <node pkg="tsim" type="turtle_rect" name="turtle_rect"  output="screen"/>
+
+    <!-- LOAD TURTLE -->
     <node name="turtlesim_node" pkg="turtlesim" type="turtlesim_node" />
+    
+    <!--YMAL FILE: ROBOT CONTROL PARAMETERS -->
     <rosparam command="load" file="$(find tsim)/config/turtle_rect.yaml" />
-    <!-- <node name="pos_vel_plot" pkg="rqt_plot" type="rqt_plot" args="/pose_error" />
-
-    <param name="x" value="3" />
+    <!-- <param name="x" value="3" />
     <param name="y" value="2" />
     <param name="width" value="4" />
     <param name="height" value="5" />
     <param name="trans_vel" value="2" />
     <param name="rot_vel" value="1" />
     <param name="frequency" value="100" /> -->
+    
+    <!-- PLOT ROBOT ERROR -->
+    <group if="$(eval arg('plot_gui') == true)">
+         <node name="pos_vel_plot" pkg="rqt_plot" type="rqt_plot" args="/pose_error" />
+    </group>
 
 </launch>

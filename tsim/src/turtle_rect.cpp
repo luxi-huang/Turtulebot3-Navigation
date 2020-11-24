@@ -7,6 +7,7 @@ namespace turtle_rect
 		/* THIS IS CLASS CONSTRCTOR */
 		getting_parameter();
 		initial_publishers_subscribers();
+		initial_reset_server();
 		while (ros::ok())
 		{
 			turtle_move();
@@ -26,6 +27,12 @@ namespace turtle_rect
 		std::cout << "x" << x << "\n";
 	}
 
+	void TurtleRect::initial_reset_server()
+	{
+		/* create a service to reset the turtle */
+    	traj_reset_server = nh_.advertiseService("/traj_reset", &TurtleRect::traj_reset_callback,this);
+	}
+
 	void TurtleRect::initial_publishers_subscribers()
 	{	
 		/* subscribers */
@@ -40,6 +47,13 @@ namespace turtle_rect
 		turtlesim_pose.x=pose_message->x;
 		turtlesim_pose.y=pose_message->y;
 		turtlesim_pose.theta=pose_message->theta;
+	}
+
+	bool TurtleRect::traj_reset_callback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+	{
+		/* This is traj_rest service callback function */ 
+    	state = 0;
+    	return true;
 	}
 
 	int TurtleRect::turtle_setpen_client(int off) 
@@ -112,7 +126,7 @@ namespace turtle_rect
 		for (int i = 0; i < times; i++)
 		{
 			vel_pub.publish(go_stright_msg);
-			dist +=  distance / (float) times;
+			dist =  distance / (float) times;
 			predict(dist,rot);
 			Error_pose();
 			ros::spinOnce();
@@ -143,7 +157,7 @@ namespace turtle_rect
 		for (int i = 0; i < times; i++)
 		{
 			vel_pub.publish(rotate_msg);
-			rot +=  speed / (float) times;
+			rot =  speed / (float) times;
 			predict(dist,rot);
 			Error_pose();
 			ros::spinOnce();
@@ -195,30 +209,31 @@ namespace turtle_rect
 			init_predict_pose(); 
 			state = 1;
 			edge = 0;
+			ros::Duration(0.5).sleep();
 			break;
 		
 		case 1:
 			/* 	1. move straight on x axis 
 			 * 	2. rotate 90 degrees;
 			 * 	3. move to state 2 */
+			state = 2;
 			go_stright(trans_vel, width);
 			rotate (rot_vel, 90 * M_PI/180.0);
 			edge ++;
-			state = 2;
 			break;
 
 		case 2:
 			/* 	1. move straight on y axis 
 			 * 	2. rotate 90 degrees;
 			 * 	3. move to state 1 */
-			go_stright(trans_vel, height);
-			rotate (rot_vel, 90 * M_PI/180.0);
 			edge ++;
 			if (edge == 4) {
 				state = 0;
 			} else {
 				state = 1;
 			}
+			go_stright(trans_vel, height);
+			rotate (rot_vel, 90 * M_PI/180.0);
 			break;
 
 		default:
@@ -227,10 +242,6 @@ namespace turtle_rect
 			break;
 		}
 	} 
-
-
-
-
 }	
 
 

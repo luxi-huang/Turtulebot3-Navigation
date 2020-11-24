@@ -20,11 +20,17 @@ namespace turtle_rect
     private:
         //***************** NODE HANDLES ***************//
         ros::NodeHandle nh_;
+
         //***************** NODE PUBLISHER ***************//
         ros::Publisher vel_pub;
         ros::Publisher PoseError_pub;
-        //***************** NODE PUBLISHER ***************//
+        
+        //***************** NODE Subscriber ***************//
         ros::Subscriber pose_subs;
+        
+        //***************** NODE SERVER ***************//
+        ros::ServiceServer traj_reset_server;
+        
         //******************** PARAMETERS *****************// 
         /* data from yaml file */  
         double x;
@@ -54,6 +60,8 @@ namespace turtle_rect
         void predict(float dist,float rot);
         void init_predict_pose();
         void Error_pose();
+        bool traj_reset_callback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+        void initial_reset_server();
     };
 }    
 #endif
