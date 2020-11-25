@@ -70,5 +70,14 @@
         "memory_resource": "cpp",
         "set": "cpp",
         "string": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled",
+    "cSpell.ignoreWords": [
+        "reset",
+        "srvs",
+        "std",
+        "std srvs",
+        "traj",
+        "traj reset"
+    ]
 }

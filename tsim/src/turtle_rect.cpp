@@ -1,3 +1,23 @@
+/* **********************************************************************************************************************
+ * FILE DESCRIPTION：
+ *	+ This is class Constructor for TurtleRect.
+ *  
+ * FUNCTIONS:
+ *	+ getting_parameter (void) : get parameters from yaml file. 
+ *	+ initial_reset_server (void) ： initial ros server. 
+ * 	+ initial_publishers_subscribers(void) : inital ros publisers and subscribers.
+ * 	+ pose_callback (void) : callback for turtle1/pose subscriber, which records the turtle's pose for use elsewhere.
+ * 	+ traj_reset_callback (bool) :  callback for /traj_reset server, it set the robot state to initial positions.
+ *  + turtle_setpen_client (int) : call setpen service to lift or place the pen to draw trajectory.
+ * 	+ Teleport_client(int) : call teleport service to teleport robot;
+ *  + go_straight (void) : control robot go straight.
+ *  + rotate (void) : control robot to rotate.
+ *  + predict (void) : predict robot current positions.
+ *  + init_predict_pose(void): inital robot predict position.
+ *  + Error_pose(void): calculate robot error pose
+ * 	+ turtle_move (void): control robot state machine. 
+ * **********************************************************************************************************************/
+ 
 #include "turtle_rect.hpp"
 
 namespace turtle_rect
@@ -24,7 +44,6 @@ namespace turtle_rect
 		nh_.getParam("trans_vel",trans_vel); // The translational velocity of the robot
 		nh_.getParam("rot_vel",rot_vel); // The rotational velocity of the robot
 		nh_.getParam("frequency",frequency); // The frequency of the control loop
-		std::cout << "x" << x << "\n";
 	}
 
 	void TurtleRect::initial_reset_server()
@@ -89,7 +108,7 @@ namespace turtle_rect
 		turtlesim::TeleportAbsolute teleport_absolute_req;
 		teleport_absolute_req.request.x = x;
 		teleport_absolute_req.request.y = y;
-		teleport_absolute_req.request.theta = 0;
+		teleport_absolute_req.request.theta = 0.0;
 
 		ros::service::waitForService("turtle1/teleport_absolute");
 		if (client.call(teleport_absolute_req))
@@ -104,19 +123,19 @@ namespace turtle_rect
 		return 0;
 	}
 
-	void TurtleRect::go_stright(double speed, double distance)
+	void TurtleRect::go_straight(double speed, double distance)
 	{
 		/*This function control robot go straight,
 		* and calculate pose error. */
 
 		// setup speed;
-		geometry_msgs::Twist go_stright_msg;
-		go_stright_msg.linear.x = speed;
-		go_stright_msg.linear.y = 0;
-		go_stright_msg.linear.z = 0;
-		go_stright_msg.angular.x = 0;
-		go_stright_msg.angular.y = 0;
-		go_stright_msg.angular.z = 0;
+		geometry_msgs::Twist go_straight_msg;
+		go_straight_msg.linear.x = speed;
+		go_straight_msg.linear.y = 0;
+		go_straight_msg.linear.z = 0;
+		go_straight_msg.angular.x = 0;
+		go_straight_msg.angular.y = 0;
+		go_straight_msg.angular.z = 0;
 
 		ros::Rate loop_rate(frequency);
 		int times = (int) (distance / speed * frequency);
@@ -125,16 +144,17 @@ namespace turtle_rect
 
 		for (int i = 0; i < times; i++)
 		{
-			vel_pub.publish(go_stright_msg);
+			vel_pub.publish(go_straight_msg);
 			dist =  distance / (float) times;
+
 			predict(dist,rot);
 			Error_pose();
 			ros::spinOnce();
 			loop_rate.sleep();
 		}
 		// after arrived,set the velocity equal to immediately
-		go_stright_msg.linear.x = 0;
-		vel_pub.publish(go_stright_msg);
+		go_straight_msg.linear.x = 0;
+		vel_pub.publish(go_straight_msg);
 	}
 
 
@@ -157,7 +177,7 @@ namespace turtle_rect
 		for (int i = 0; i < times; i++)
 		{
 			vel_pub.publish(rotate_msg);
-			rot =  speed / (float) times;
+			rot =  angle / (float) times;
 			predict(dist,rot);
 			Error_pose();
 			ros::spinOnce();
@@ -169,10 +189,19 @@ namespace turtle_rect
 		vel_pub.publish(rotate_msg);
 	}
 
-	void TurtleRect::predict (float dist,float rot){
+	void TurtleRect::predict (float dist,float rot)
+	{
+			/* Predict turtle states in x, y and theta  */
+			
+			// theta range in (-pi, pi)
 			predict_pose.theta += rot;
+			if (predict_pose.theta >= M_PI) {
+				predict_pose.theta = - predict_pose.theta;
+			}
+
 			predict_pose.x += dist*cos(predict_pose.theta);
 			predict_pose.y += dist*sin(predict_pose.theta);
+
 	}
 
 	void TurtleRect::Error_pose()
@@ -180,15 +209,22 @@ namespace turtle_rect
 		tsim::PoseError p_error;
 		p_error.x_error = turtlesim_pose.x - predict_pose.x;
 		p_error.y_error = turtlesim_pose.y - predict_pose.y;
+
 		p_error.theta_error = turtlesim_pose.theta - predict_pose.theta;
+		
+		// filter not valid error;
+		if (p_error.theta_error > 1) {
+			p_error.theta_error = 0.0;
+		}
+		
 		PoseError_pub.publish(p_error);
 	}
 
 
 	void TurtleRect::init_predict_pose()
 	{
-		predict_pose.x = 0.0;
-		predict_pose.y = 0.0;
+		predict_pose.x = x;
+		predict_pose.y = y;
 		predict_pose.theta = 0.0;
 	}	
 
@@ -217,7 +253,7 @@ namespace turtle_rect
 			 * 	2. rotate 90 degrees;
 			 * 	3. move to state 2 */
 			state = 2;
-			go_stright(trans_vel, width);
+			go_straight(trans_vel, width);
 			rotate (rot_vel, 90 * M_PI/180.0);
 			edge ++;
 			break;
@@ -232,7 +268,7 @@ namespace turtle_rect
 			} else {
 				state = 1;
 			}
-			go_stright(trans_vel, height);
+			go_straight(trans_vel, height);
 			rotate (rot_vel, 90 * M_PI/180.0);
 			break;
 

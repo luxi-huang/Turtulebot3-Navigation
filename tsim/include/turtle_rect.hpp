@@ -55,7 +55,7 @@ namespace turtle_rect
         void turtle_move();
         void initial_publishers_subscribers();
         void pose_callback(const turtlesim::Pose::ConstPtr & pose_message);
-        void go_stright(double speed, double distance);
+        void go_straight(double speed, double distance);
         void rotate(double speed, double angle);
         void predict(float dist,float rot);
         void init_predict_pose();
