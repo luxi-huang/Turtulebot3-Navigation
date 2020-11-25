@@ -12,8 +12,6 @@
 ##
  <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/master/img/rect.gif?raw=true" alt="drawing" /> </p>  
 
----
-
 ## Package files:
 ### 1. `src/turtle_rect_node.cpp`:
 - This file initial `NodeHandle` and create `turtle_rect` node. It includes `TurtleRect` class to make turtle move in  a rectangular trajectory infinitely.
@@ -52,4 +50,4 @@ Optional Arguments:
      - `roslaunch tsim trect.launch plot_gui：=true`
 
 ## Result rqt_plot for turtle_rect :
-![rqt_picture](https://github.com/ME495-Navigation/main-assignment-luxi-huang/tree/master/tsim/config/rqt_plot.png)
+ <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/master/img/turtleRect_errorPlot.png?raw=true" alt="drawing" /> </p>  
