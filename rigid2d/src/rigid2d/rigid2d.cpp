@@ -144,21 +144,28 @@ namespace rigid2d {
 
   std::ostream & operator<<(std::ostream & os, const Twist2D & twist)
   {
-    os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy <<"\n";
+    os << "rad_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy <<"\n";
     return os;
   }
 
   std::istream & operator>>(std::istream & is, Twist2D & twist)
   {
-    std::cout << "Enter twist.theta_dot:" << std::endl;
-    is >> twist.theta_dot;
+    double degree, radians;
+    Vector2D v;
+
+    std::cout << "Enter twist.theta_dot in degree:" << std::endl;
+    is >> degree;
 
     std::cout << "twist.vx" << std::endl;
-    is >> twist.vx;
+    is >> v.x;
 
     std::cout << "twist.vy" << std::endl;
-    is >> twist.vy;
+    is >> v.y;
+    
+    radians = deg2rad(degree);
+    Twist2D newtwist(radians, v.x, v.y);
 
+    twist = newtwist;
     return is;
   }
 
