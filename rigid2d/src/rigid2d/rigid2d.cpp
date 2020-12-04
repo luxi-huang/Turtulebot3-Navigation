@@ -3,178 +3,290 @@
 #include "cmath"
 #include <cstdlib> //c standard library
 
-namespace rigid2d{
 
-std::ostream & operator<<(std::ostream & os, const Vector2D & v){
-  os << "< " << v.x << " , " << v.y << " >";
-  return os;
-}
+namespace rigid2d {
 
-std::istream & operator>>(std::istream & is, Vector2D & v){
-  is >> v.x;
-  is >> v.y;
-  return is;
-}
-
-Vector2D Transform2D::operator()(Vector2D v) const{
-  v.x = v.x*T11 + v.y*T12 + T13;
-  v.y = v.x*T21 + v.y*T22 + T23;
-  return v;
-}
-//
-
-Transform2D::Transform2D(){
-  T11 = 1;
-  T12 = 0;// Vector2D m;
-  T13 = 0;
-  T21 = 0;
-  T22 = 1;
-  T23 = 0;
-  degree = 0;
-}
-
-Transform2D::Transform2D(const Vector2D & trans){
-  T11 = 1;
-  T12 = 0;// Vector2D m;
-  T13 = trans.x;
-  T21 = 0;
-  T22 = 1;
-  T23 = trans.y;
-  degree = 0;
-}
-
-Transform2D::Transform2D(double radians){
-  T11 = cos(radians);
-  T12 = -sin(radians);
-  T13 = 0;
-  T21 = sin(radians);
-  T22 = cos(radians);
-  T23 = 0;
-  degree = rad2deg(radians);
-
-}
-Transform2D::Transform2D(const Vector2D & trans, double radians){
-  T11 = cos(radians);
-  T12 = -sin(radians);
-  T13 = trans.x;
-  T21 = sin(radians);
-  T22 = cos(radians);
-  T23 = trans.y;
-  degree = rad2deg(radians);
-}
-
-Transform2D Transform2D::inv() const{
-  Transform2D T;
-  T.T11 = T11;
-  T.T12 = T21;
-  T.T21 = T12;
-  T.T22 = T22;
-  T.T13 = -T11*T13 -T21*T23;
-  T.T23 = -T12*T13 -T22*T23;
-  T.degree = -degree;
-  return T;
-}
-
-Transform2D& Transform2D::operator*=(const Transform2D & rhs){
-  Transform2D Q;
-  Q.T11 = T11*rhs.T11 + T12*rhs.T21;
-  Q.T12 = T11*rhs.T12 + T12*rhs.T22;
-  Q.T21 = T21*rhs.T11 + T22*rhs.T21;
-  Q.T22 = T21*rhs.T12 + T22*rhs.T22;
-  Q.T13 = T11*rhs.T13 + T12*rhs.T23 + T13;
-  Q.T23 = T21*rhs.T13 + T22*rhs.T23 + T23;
-
-  if (Q.T11 < 0){
-  Q.degree = rad2deg(std::acos(Q.T11));
-  }else{
-  Q.degree = rad2deg(std::atan(-Q.T12/Q.T11));
+  /***************** Vector2D *****************/
+  Vector2D::Vector2D()
+  {
+    x = 0;
+    y = 0;
+    norm_x = 0;
+    norm_y = 0;
+    rigid2d::Vector2D::normalize();
   }
-  // Q.degree = rad2deg(asin(Q.T21));
 
-  *this = Q;
-  return *this;
-}
+  Vector2D::Vector2D(double x_, double y_)
+  {
+    x = x_;
+    y = y_;
+    rigid2d::Vector2D::normalize();
+  }
 
-std::ostream & operator<<(std::ostream & os, const Transform2D & tf){
-  os << "degree" << tf.degree << " dx " << tf.T13 << "dy "<< tf.T23;
-  return os;
-}
+  void Vector2D::normalize()
+  {
+    if (x != 0)
+      {
+        norm_x = x / sqrt(pow(x, 2) + pow(y, 2));
+      } else {
+        norm_x = 0;
+      }
 
+      if (y != 0)
+      {
+        norm_y = y / sqrt(pow(x, 2) + pow(y, 2));
+      } else {
+        norm_y = 0;
+      }
+  }
 
-std::istream & operator>>(std::istream & is, Transform2D & tf){
-  Vector2D v;
-  double degree, radians;
-  std::cout <<"x";
-  is >> v.x;
-  std::cout << "y";
-  is >> v.y;
-  std::cout << "degree";
-  is >> degree;
-  radians = deg2rad(degree);
+  Vector2D & Vector2D::operator+=(const Vector2D & rhs)
+  {
+    x += rhs.x;
+    y += rhs.y;
+    Vector2D::normalize();
+    return *this;
+  }
 
-  Transform2D tf_new(v, radians);
-  tf = tf_new;
-  return is;
-}
+  Vector2D operator+(Vector2D lhs, const Vector2D & rhs)
+  {
+    lhs+=rhs;
+    return lhs;
+  }
 
-Transform2D operator*(Transform2D lhs, const Transform2D & rhs){
-  lhs*=rhs;
-  // A = lhs;
-  return lhs;
-}
+  Vector2D & Vector2D::operator-=(const Vector2D & rhs)
+  {
+    x -= rhs.x;
+    y -= rhs.y;
+    Vector2D::normalize();
+    
+    return *this;
+  }
 
-std::ostream & operator<<(std::ostream & os, const Twist2D & twist){
-  os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy;
-  return os;
-}
+  Vector2D operator-(Vector2D lhs, const Vector2D & rhs)
+  {
+    lhs-=rhs;
+    return lhs;
+  }
 
-std::istream & operator>>(std::istream & is, Twist2D & twist){
-  is >> twist.theta_dot;
-  is >> twist.vx;
-  is >> twist.vy;
-  return is;
-}
+  Vector2D & Vector2D::operator*=(const double & scalar)
+  {
+    x *= scalar;
+    y *= scalar;
+    Vector2D::normalize();
+    
+    return *this;
+  }
 
-Twist2D Transform2D::operator()(Twist2D tw) const{
-  Twist2D twist;
-  twist.theta_dot = tw.theta_dot;
-  twist.vx = tw.theta_dot*T23 +T11*tw.vx + T12*tw.vy;
-  twist.vy = -tw.theta_dot*T13+T21*tw.vx + T22*tw.vy;
-  return twist;
-}
+  Vector2D operator*(Vector2D v, const double & scalar)
+  {
+    // alternate definition (left multiply)
+    // call operator*=() member function of lhs object (just above)
+    v*=scalar;
+    return v;
+  }
 
+  Vector2D operator*(const double & scalar, rigid2d::Vector2D v)
+  {
+    // alternate definition (right multiply)
+    // call operator*=() member function of lhs object (just above)
+    v*=scalar;
+    return v;
+  }
 
-//Vector multiplication, scaler on left side;
+  double Vector2D::length(const rigid2d::Vector2D & v)
+  {
+    return sqrt(pow(v.x, 2) + pow(v.y, 2));
+  }
 
-Vector2D operator*(double s, const Vector2D v)
-{
-  Vector2D a;
-  a.x = v.x*s;
-  a.y = v.y*s;
-  return a;
-}
+  double Vector2D::distance(const Vector2D & v1, const Vector2D & v2)
+  {
+    return sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2));
+  }
 
-//Vector multiplication, scaler on left side;
-Vector2D operator*=(double a, Vector2D &v)
-{
-  v.x = v.x*a;
-  v.y = v.y*a;
-  return v;
-}
+  double Vector2D::angle(const Vector2D & v)
+  {
+    return atan2(v.y, v.x);
+  }
 
-// std::ostream & operator<<(std::ostream & os, const Twist2D & twist){
-//   os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy;
-//   return os;
-// }
+  std::ostream & operator<<(std::ostream & os, const Vector2D & v)
+  {
+    os << "< " << v.x << " , " << v.y << " >" << "\n";
+    return os;
+  }
 
-Transform2D displacement(const Transform2D & T){
-  Transform2D t;
-  t = T;
-  return t;
-}
+  std::istream & operator>>(std::istream & is, Vector2D & v)
+  {
+    std::cout << "Enter x:" << std::endl;
+    is >> v.x;
 
+    std::cout << "Enter y:" << std::endl;
+    is >> v.y;
 
-// Transform2D rigid2d::integrateTwist(const Twist2D & V, const Transform2D & T){
-//
-// }
+    return is;
+  }
+
+  /***************** Twist2D *****************/
+
+  Twist2D::Twist2D()
+  {
+    theta_dot = 0.0;
+    vx = 0.0;
+    vy = 0.0;
+  }
+
+  Twist2D::Twist2D(double init_theta_dot, double init_vx, double init_vy)
+  {
+    theta_dot = init_theta_dot;
+    vx = init_vx;
+    vy = init_vy;
+  }
+
+  std::ostream & operator<<(std::ostream & os, const Twist2D & twist)
+  {
+    os << "degree_dt" << twist.theta_dot << " vx " << twist.vx << "vy "<< twist.vy <<"\n";
+    return os;
+  }
+
+  std::istream & operator>>(std::istream & is, Twist2D & twist)
+  {
+    std::cout << "Enter twist.theta_dot:" << std::endl;
+    is >> twist.theta_dot;
+
+    std::cout << "twist.vx" << std::endl;
+    is >> twist.vx;
+
+    std::cout << "twist.vy" << std::endl;
+    is >> twist.vy;
+
+    return is;
+  }
+
+  /********** Transform2D() ***********/
+
+  Transform2D::Transform2D()
+  {
+    trans_.x = 0.0;
+    trans_.y = 0.0; 
+    radians_ = 0.0;
+  }
+
+  Transform2D::Transform2D(const Vector2D & trans)
+  {
+    trans_.x = trans.x;
+    trans_.y = trans.y;
+    radians_ = 0.0;
+  }
+
+  Transform2D::Transform2D(double radians)
+  {
+    trans_.x = 0.0;
+    trans_.y = 0.0;
+    radians_ = radians;
+  }
+
+  Transform2D::Transform2D(const Vector2D & trans, double radians)
+  {
+    trans_.x = trans.x;
+    trans_.y = trans.y;
+    radians_ = radians;
+  }
+
+  Vector2D Transform2D::operator()(Vector2D v) const
+  {
+    Vector2D result;
+    result.x = v.x * std::cos(radians_) - v.y * std::sin(radians_) + trans_.x;
+    result.y = v.x * std::sin(radians_) + v.y * std::cos(radians_) + trans_.y;
+    return result;
+  }
+
+  Transform2D Transform2D::inv() const
+  {
+    double inv_radians = -radians_;
+    Vector2D inv_trans;
+    inv_trans.x = -trans_.x * std::cos(radians_) - trans_.y * std::sin(this->radians_);
+    inv_trans.y = trans_.x * std::sin(radians_) - trans_.y * std::cos(this->radians_);
+    Transform2D inv_result(inv_trans, inv_radians);
+    return inv_result;
+  }
+
+  Transform2D& Transform2D::operator*=(const Transform2D & rhs)
+  {
+    this->trans_.x = rhs.trans_.x * std::cos(this->radians_) - rhs.trans_.y * std::sin(this->radians_) + this->trans_.x;
+    this->trans_.y = rhs.trans_.x * std::sin(this->radians_) + rhs.trans_.y * std::cos(this->radians_) + this->trans_.y;
+    this->radians_ = normalize_angle(this->radians_ + rhs.radians_);
+    return *this;
+  }
+
+  std::ostream &operator<<(std::ostream &os, const Transform2D &tf)
+  {
+    os << "degrees:" << tf.radians_ << " "
+       << "dx:" << tf.trans_.x << " "
+       << "dy:" << tf.trans_.y << " " << std::endl;
+    return os;
+  }
+
+  std::istream & operator>>(std::istream & is, Transform2D & tf)
+  {
+    Vector2D v;
+    double degree, radians;
+    std::cout << "Enter tf.x:" << std::endl;
+    is >> v.x;
+    std::cout << "Enter tf.y:" << std::endl;
+    is >> v.y;
+    std::cout << "Enter tf.theta:" << std::endl;
+    is >> degree;
+
+    radians = deg2rad(degree);
+    Transform2D tf_new(v, radians);
+    tf = tf_new;
+    return is;
+  }
+
+  Transform2D operator*(Transform2D lhs, const Transform2D & rhs)
+  {
+    lhs*=rhs;
+    // A = lhs;
+    return lhs;
+  }
+
+  Twist2D Transform2D::operator()(Twist2D t) const
+  {
+    Twist2D result;
+    result.theta_dot = t.theta_dot;
+    result.vx = this->trans_.y * t.theta_dot + std::cos(this->radians_) * t.vx - std::sin(this->radians_) * t.vy;
+    result.vy = -this->trans_.x * t.theta_dot + std::sin(this->radians_) * t.vx + std::cos(this->radians_) * t.vy;
+    return result;
+  }
+
+  Transform2D displacement(const Transform2D & T)
+  {
+    Transform2D t;
+    t = T;
+    return t;
+  }
+
+  Transform2D integrateTwist(Twist2D twist)
+  {
+    if (almost_equal(twist.theta_dot, 0.0))
+    {
+      Vector2D result_vector(twist.vx, twist.vy);
+      Transform2D result_transform(result_vector, 0);
+      return result_transform;
+    }
+    else
+    {
+      double result_rad = twist.theta_dot;
+      Vector2D result_vector;
+      
+      twist.vx = twist.vx / twist.theta_dot;
+      twist.vy = twist.vy / twist.theta_dot;
+      result_vector.x = std::sin(twist.theta_dot) * twist.vx + (std::cos(twist.theta_dot) - 1) * twist.vy;
+      result_vector.y = (1 - std::cos(twist.theta_dot)) * twist.vx + std::sin(twist.theta_dot) * twist.vy;
+
+      Transform2D result_transform(result_vector, result_rad);
+      return result_transform;
+    }
+  }
+
 }

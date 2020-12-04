@@ -9,255 +9,196 @@
 
 namespace rigid2d
 {
-    /// \brief PI.  Not in C++ standard until C++20.
-    constexpr double PI=3.14159265358979323846;
+  /// \brief PI.  Not in C++ standard until C++20.
+  constexpr double PI=3.14159265358979323846;
 
-    /// \brief approximately compare two floating-point numbers using
-    ///        an absolute comparison
-    /// \param d1 - a number to compare
-    /// \param d2 - a second number to compare
-    /// \param epsilon - absolute threshold required for equality
-    /// \return true if abs(d1 - d2) < epsilon
-    /// Note: the fabs function in <cmath> (c++ equivalent of math.h) will
-    /// be useful here
-    // constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)
-    // {
-    // }
+  /// \brief approximately compare two floating-point numbers using
+  ///        an absolute comparison
+  /// \param d1 - a number to compare
+  /// \param d2 - a second number to compare
+  /// \param epsilon - absolute threshold required for equality
+  /// \return true if abs(d1 - d2) < epsilon
+  /// Note: the fabs function in <cmath> (c++ equivalent of math.h) will
+  /// be useful here
+  /// constexpr are all define in .hpp
 
-
-    constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)
-    {
-      if (abs(d1-d2)<epsilon){
-        return true;
-      }else{
-        return false;
-      }
+  constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)
+  {
+    if (abs(d1-d2)<epsilon){
+      return true;
+    }else{
+      return false;
     }
+  }
 
-    /// \brief convert degrees to radians
-    /// \param deg - angle in degrees
-    /// \returns radians
-    /// NOTE: implement this in the header file
-    /// constexpr means that the function can be computed at compile time
-    /// if given a compile-time constant as input
-    constexpr double deg2rad(double deg)
+  /// \brief convert degrees to radians
+  /// \param deg - angle in degrees
+  /// \returns radians
+  /// NOTE: implement this in the header file
+  /// constexpr means that the function can be computed at compile time
+  /// if given a compile-time constant as input
+  constexpr double deg2rad(double deg)
+  {
+    return deg * PI /180;
+  }
+
+  /// \brief convert radians to degrees
+  /// \param rad - angle in radians
+  /// \returns the angle in degrees
+  constexpr double rad2deg(double rad)
+  {
+    return rad * 180 / PI;
+  }
+
+  constexpr double normalize_angle(double rad) 
+  {
+    while (rad < - PI || rad > PI)
     {
-      return deg * PI /180;
-    }
-
-    /// \brief convert radians to degrees
-    /// \param rad - angle in radians
-    /// \returns the angle in degrees
-    constexpr double rad2deg(double rad)
-    {
-      return rad * 180 /rigid2d::PI;
-    }
-
-    // constexpr double normalize_angle(double rad);
-
-
-    constexpr double normalize_angle(double rad){
-      // return rad = rigid2d::PI;
-      while (rad<-rigid2d::PI||rad>rigid2d::PI){
-        if (rad < -rigid2d::PI){
-          rad = rad + 2*rigid2d::PI;
-        }
-        else if (rad > rigid2d::PI)
-        {
-          rad = rad - 2*rigid2d::PI;
-        }
-      }
-      return rad;
-    }
-
-    /// static_assertions test compile time assumptions.
-    /// You should write at least one more test for each function
-    /// You should also purposely (and temporarily) make one of these tests fail
-    /// just to see what happens
-    //
-    //
-    // constexpr bool check_angle(double radi){
-    //   if (normalize_angle(radi) > 1){
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
-
-
-    static_assert(normalize_angle(1.3)-rigid2d::PI<0 && normalize_angle(1.3)+rigid2d::PI>0, "okk");
-    static_assert(normalize_angle(6)-rigid2d::PI<0 && normalize_angle(6)+rigid2d::PI>0, "okk");
-    static_assert(normalize_angle(-6)-rigid2d::PI<0 && normalize_angle(-6)+rigid2d::PI>0, "okk");
-
-    static_assert(almost_equal(0, 0), "is_zero failed");
-    static_assert(almost_equal(0.001, 0.005, 1.0e-2), "is_zero failed");
-
-    static_assert(almost_equal(deg2rad(0.0), 0.0), "deg2rad failed");
-
-    static_assert(almost_equal(rad2deg(0.0), 0.0), "rad2deg) failed");
-
-    static_assert(almost_equal(deg2rad(rad2deg(2.1)), 2.1), "deg2rad failed");
-
-
-    /// \brief A 2-Dimensional Vector
-    struct Vector2D
-    {
-      double x = 0.0;
-      double y = 0.0;
-
-      Vector2D operator+(const Vector2D & v){
-        Vector2D a;
-        a.x = v.x + x ;
-        a.y = v.y + y ;
-        return a;
-      }
-
-      Vector2D & operator+=(const Vector2D & v){
-        x = v.x + x ;
-        y = v.y + y ;
-        return *this;
-      }
-
-      Vector2D operator-(const Vector2D & v){
-        Vector2D a;
-        a.x = x-v.x ;
-        a.y = y-v.y ;
-        return a;
-      }
-
-      Vector2D & operator-=(const Vector2D & v){
-        x = x - v.x ;
-        y = y - v.y;
-        return *this;
-      }
-      // Transform2D rigid2d::operator*(Transform2D lhs, const Transform2D & rhs)
-      // Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
-
-      // Vector multiplication  scalar on right side;
-      Vector2D operator*(double s) const
+      if (rad < - PI)
       {
-        Vector2D a;
-        a.x = x*s ;
-        a.y = y*s ;
-        return a;
+        rad = rad + 2 * PI;
       }
-
-      Vector2D & operator*=(const double s){
-        x = x*s ;
-        y = y*s ;
-        return *this;
+      else if (rad > PI)
+      {
+        rad = rad - 2 * PI;
       }
+    }
+    return rad;
+  }
 
-      double length(const Vector2D v){
-        double len;
-        len = sqrt(pow(v.x,2) + pow(v.y,2));
-        return len;
-      }
+  /// static_assertions test compile time assumptions.
+  /// You should write at least one more test for each function
+  /// You should also purposely (and temporarily) make one of these tests fail
+  /// just to see what happens
+  //
+  static_assert(normalize_angle(1.3)-rigid2d::PI<0 && normalize_angle(1.3)+rigid2d::PI>0, "normalized angle failed");
+  static_assert(normalize_angle(6)-rigid2d::PI<0 && normalize_angle(6)+rigid2d::PI>0, "normalized angle failed");
+  static_assert(normalize_angle(-6)-rigid2d::PI<0 && normalize_angle(-6)+rigid2d::PI>0, "normalized angle failed");
 
-      double distance(const Vector2D v1, const Vector2D v2){
-        double dis;
-        dis = sqrt((pow(v1.x-v2.x,2)+pow(v1.y-v2.y,2)));
-        return dis;
-      }
+  static_assert(almost_equal(0, 0), "is_zero failed");
+  static_assert(almost_equal(0.001, 0.005, 1.0e-2), "is_zero failed");
 
-      double angle(const Vector2D v1){
-        double angl;
-        angl = atan2(v1.y,v1.x);
-        return angl;
-      }
+  static_assert(almost_equal(deg2rad(0.0), 0.0), "deg2rad failed");
 
+  static_assert(almost_equal(rad2deg(0.0), 0.0), "rad2deg) failed");
 
+  static_assert(almost_equal(deg2rad(rad2deg(2.1)), 2.1), "deg2rad failed");
 
-    };
+  /// \brief A 2-Dimensional Vector
+  struct Vector2D
+  {
+    double x;
+    double y;
+    double norm_x;
+    double norm_y;
 
-    //Vector multiplication, scaler on left side;
-    Vector2D operator*(double s, const Vector2D v);
-    Vector2D operator*=(double a, Vector2D & v);
-    // {
-    //   Vector2D a;
-    //   a.x = v.x*s ;
-    //   a.y = v.y*s ;
-    //   return a;
-    // }
+    /// \brief constructor for Vector2D with no inputs, creates a zero vector
+    Vector2D();
 
+    /// \brief constructor for Vector2D with inputs, creates a zero vector
+    Vector2D(double x, double y);
 
+    /// \brief calculate the norm of vector 
+    void normalize();
 
-    struct Twist2D
-    {
-      double theta_dot = 0.0;
-      double vx = 0.0;
-      double vy = 0.0;
-    };
-    /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
-    /// os - stream to output to
-    /// v - the vector to print
-    std::ostream & operator<<(std::ostream & os, const Vector2D & v);
+    Vector2D & operator+=(const Vector2D & rhs);
 
-    /// \brief input a 2 dimensional vector
-    ///   You should be able to read vectors entered as two numbers
-    ///   separated by a newline or a space, or entered as [xcomponent ycomponent]
-    /// is - stream from which to read
-    /// v [out] - output vector
-    /// Hint: The following may be useful:
-    /// https://en.cppreference.com/w/cpp/io/basic_istream/peek
-    /// https://en.cppreference.com/w/cpp/io/basic_istream/get
-    std::istream & operator>>(std::istream & is, Vector2D & v);
+    Vector2D & operator-=(const Vector2D & rhs);
 
+    Vector2D & operator*=(const double & scalar);
 
+    double length(const Vector2D & v);
 
+    double distance(const Vector2D & v1, const Vector2D & v2);
+    
+    double angle(const Vector2D & v);
+    
+  };
+  
+  Vector2D operator+(Vector2D lhs, const Vector2D & rhs);
+  
+  Vector2D operator-(Vector2D lhs, const Vector2D & rhs);
+  
+  Vector2D operator*(Vector2D v, const double & scalar);
+  
+  Vector2D operator*(const double & scalar, Vector2D v);
 
-    /// \brief a rigid body transformation in 2 dimensions
-    class Transform2D
-    {
-      double T11 ;
-      double T12 ;// Vector2D m;
-      double T13 ;
-      double T21 ;
-      double T22 ;
-      double T23 ;
-      double degree;
+  /// \brief output a 2 dimensional vector as [xcomponent ycomponent]
+  /// os - stream to output to
+  /// v - the vector to print
+  std::ostream & operator<<(std::ostream & os, const Vector2D & v);
 
-    public:
-        /// \brief Create an identity transformation
-        Transform2D();
+  /// \brief input a 2 dimensional vector
+  ///   You should be able to read vectors entered as two numbers
+  ///   separated by a newline or a space, or entered as [xcomponent ycomponent]
+  /// is - stream from which to read
+  /// v [out] - output vector
+  /// Hint: The following may be useful:
+  /// https://en.cppreference.com/w/cpp/io/basic_istream/peek
+  /// https://en.cppreference.com/w/cpp/io/basic_istream/get
+  std::istream & operator>>(std::istream & is, Vector2D & v);
+  
+  struct Twist2D
+  {
+    double theta_dot;
+    double vx;
+    double vy;
 
-        /// \brief create a transformation that is a pure translation
-        /// \param trans - the vector by which to translate
-        explicit Transform2D(const Vector2D & trans);
+    Twist2D();
 
-        /// \brief create a pure rotation
-        /// \param radians - angle of the rotation, in radians
-        explicit Transform2D(double radians);
+    Twist2D(double init_theta_dot, double init_vx, double init_vy);
 
-        /// \brief Create a transformation with a translational and rotational
-        /// component
-        /// \param trans - the translation
-        /// \param rot - the rotation, in radians
-        Transform2D(const Vector2D & trans, double radians);
+  };
 
-        /// \brief apply a transformation to a Vector2D
-        /// \param v - the vector to transform
-        /// \return a vector in the new coordinate system
-        Vector2D operator()(Vector2D v) const;
+  std::ostream & operator<<(std::ostream & os, const Twist2D & twist);
+  
+  std::istream & operator>>(std::istream & is, Twist2D & twist);
 
-        /// \brief invert the transformation
-        /// \return the inverse transformation.
-        Transform2D inv() const;
+  /// \brief a rigid body transformation in 2 dimensions
+  class Transform2D
+  {
+    Vector2D trans_;
+    double radians_;
 
-        /// \brief compose this transform with another and store the result
-        /// in this object
-        /// \param rhs - the first transform to apply
-        /// \returns a reference to the newly transformed operator
-        Transform2D & operator*=(const Transform2D & rhs);
+  public:
+    /// \brief Create an identity transformation
+    Transform2D();
 
-        /// \brief \see operator<<(...) (declared outside this class)
-        /// for a description
-        friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
+    /// \brief create a transformation that is a pure translation
+    /// \param trans - the vector by which to translate
+    explicit Transform2D(const Vector2D & trans);
 
-        // Twist2D operator()(Twist2D tw) const;
-        Twist2D operator()(Twist2D V) const;
-        // Transform2D (vector2D & v);
-    };
+    /// \brief create a pure rotation
+    /// \param radians - angle of the rotation, in radians
+    explicit Transform2D(double radians);
+
+    /// \brief Create a transformation with a translational and rotational
+    /// component
+    /// \param trans - the translation
+    /// \param rot - the rotation, in radians
+    Transform2D(const Vector2D & trans, double radians);
+
+    /// \brief apply a transformation to a Vector2D
+    /// \param v - the vector to transform
+    /// \return a vector in the new coordinate system
+    Vector2D operator()(Vector2D v) const;
+
+    /// \brief invert the transformation
+    /// \return the inverse transformation.
+    Transform2D inv() const;
+
+    /// \brief compose this transform with another and store the result
+    /// in this object
+    /// \param rhs - the first transform to apply
+    /// \returns a reference to the newly transformed operator
+    Transform2D & operator*=(const Transform2D & rhs);
+
+    /// \brief \see operator<<(...) (declared outside this class)
+    /// for a description
+    friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
+
+    Twist2D operator()(Twist2D V) const;
+  };
 
     // class Twist2D{
     //   double theta_dot;
@@ -287,14 +228,15 @@ namespace rigid2d
     /// HINT: This function can be implemented in terms of *=
     Transform2D operator*(Transform2D lhs, const Transform2D & rhs);
 
-    // /// twist fucntion
-    std::ostream & operator<<(std::ostream & os, const Twist2D & twist);
-    std::istream & operator>>(std::istream & is, Twist2D & twist);
-
+    /// \brief returns the x, y, and theta values from the transform
+    /// \param &x, &y, &theta - reference for return multiple values
+    /// \returns the x, y, and theta values from the transform
     Transform2D displacement(const Transform2D & T);
 
+    /// \brief compute the transformation corresponding to a rigid body following a constant twist for one time unit
+    /// \param twist - the constant twist
+    /// \return the corresponding transformation
     Transform2D integrateTwist(const Twist2D & V, const Transform2D & T);
-
 
 }
 
