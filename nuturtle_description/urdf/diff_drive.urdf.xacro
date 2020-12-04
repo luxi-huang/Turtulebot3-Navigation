@@ -65,14 +65,11 @@
      </visual>
   </link>
 
-
   <xacro:link_wheel name="link_right_wheel" />
   <xacro:joint_wheel name="odometer/right_wheel_joint"  child="link_right_wheel"  origin_xyz="${wheel_radius} ${(wheel_base)/2} ${wheel_radius}"  />
 
-
   <xacro:link_wheel name="link_left_wheel" />
   <xacro:joint_wheel name="odometer/left_wheel_joint"   child="link_left_wheel"   origin_xyz="${wheel_radius} ${-(wheel_base)/2} ${wheel_radius}"  />
-
 
   <!-- <link name="base_scan">
       <origin rpy="0 0 1.5707" xyz="0 0 ${wheel_radius-0.02+chassis_thickness}"/>
@@ -98,6 +95,5 @@
   </joint>
 
   <!-- <xacro:robot_dd mode="$(arg mode)" /> -->
-
 
 </robot>

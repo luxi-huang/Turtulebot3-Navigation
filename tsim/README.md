@@ -50,4 +50,6 @@ Optional Arguments:
      - `roslaunch tsim trect.launch plot_gui：=true`
 
 ## Result rqt_plot for turtle_rect :
+
+The Below chart is the error between predict turtle pose and real turtle pose. 
  <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/master/img/turtleRect_errorPlot.png?raw=true" alt="drawing" /> </p>  
