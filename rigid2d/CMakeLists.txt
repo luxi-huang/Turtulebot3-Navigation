@@ -150,14 +150,9 @@ add_library( ${PROJECT_NAME}
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node
-  include/${PROJECT_NAME}/diff_drive.hpp
   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
-  include/${PROJECT_NAME}/waypoints.hpp
-  src/${PROJECT_NAME}/diff_drive.cpp
   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
-  src/${PROJECT_NAME}_node.cpp
-  src/rigid2d/waypoints.cpp
-  # scripts/odometer.cpp
+  bash_testing/main.cpp
 )
 
 add_executable(odometer
