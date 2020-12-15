@@ -237,12 +237,12 @@ namespace rigid2d {
   {
     Vector2D v;
     double degree, radians;
+    std::cout << "Enter tf.theta:" << std::endl;
+    is >> degree;
     std::cout << "Enter tf.x:" << std::endl;
     is >> v.x;
     std::cout << "Enter tf.y:" << std::endl;
     is >> v.y;
-    std::cout << "Enter tf.theta:" << std::endl;
-    is >> degree;
 
     radians = deg2rad(degree);
     Transform2D tf_new(v, radians);
@@ -266,11 +266,12 @@ namespace rigid2d {
     return result;
   }
 
-  Transform2D displacement(const Transform2D & T)
+  Transform2D Transform2D::displacement(Transform2D & T)
   {
-    Transform2D t;
-    t = T;
-    return t;
+    T.trans_.x = this->trans_.x;  
+    T.trans_.y = this->trans_.y;
+    T.radians_ = this->radians_;  
+    return T;
   }
 
   Transform2D integrateTwist(Twist2D twist)

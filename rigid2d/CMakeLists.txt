@@ -149,10 +149,11 @@ add_library( ${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+
 add_executable(${PROJECT_NAME}_node
   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
   src/${PROJECT_NAME}/${PROJECT_NAME}.cpp
-  bash_testing/main.cpp
+  src/${PROJECT_NAME}_node.cpp
 )
 
 add_executable(odometer

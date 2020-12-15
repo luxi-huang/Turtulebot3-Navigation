@@ -1,34 +1,23 @@
+/******************************************************** 
+ * Author: Luxi Huang
+ * This is a test file for rigid2D library.
+ ********************************************************/
+
 #include "rigid2d/rigid2d.hpp"
 #include "rigid2d/diff_drive.hpp"
 
 #include <ros/ros.h>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <sstream>
+#include <cstring>
 #include <cmath>
 #include <fstream>
 
-// using namespace std;
+using namespace std;
 using namespace rigid2d;
 
-// TEST(TestSuite, test)
-// {
-//   struct Vector2D v;
-//
-//   // std::cout << "enter 1 for v.x\n";
-//   ROS_INFO ("enter 1 for v.x\n");
-//   std::cin >> v.x;
-//   // std::cout << "enter 1 for v.y\n";
-//   ROS_INFO ("enter 1 for v.y\n");
-//   std::cin >> v.y;
-//
-//   std::stringstream buffer;
-//   buffer << "v :"<<v.x<<","<<v.y;
-//   ASSERT_EQ(buffer.str(),"v :1,1");
-// }
-
-
-
-TEST(TestSuite, test1)
+TEST(TestSuite, almost_equal1)
 {
   int a;
   ROS_INFO ("enter 1");
@@ -36,29 +25,28 @@ TEST(TestSuite, test1)
   ASSERT_EQ(1,a) << "is zero faild";
 }
 
-TEST(TestSuite, test2)
+TEST(TestSuite, almost_equal2)
 {
   int a;
   a = almost_equal(0.001, 0.005, 1.0e-2);
   ASSERT_EQ(1,a)<< "is_zero failed" ;
 }
 
-TEST(TestSuite, test3)
+TEST(TestSuite, almost_equal3)
 {
   int a;
   a = almost_equal(deg2rad(0.0), 0.0);
   ASSERT_EQ(1,a) << "deg2rad failed";
 }
 
-TEST(TestSuite, test4)
+TEST(TestSuite, almost_equal4)
 {
   int a;
   a = almost_equal(rad2deg(0.0), 0.0);
   ASSERT_EQ(1,a) << "rad2deg) failed";
 }
 
-
-TEST(TestSuite, test5)
+TEST(TestSuite, almost_equal5)
 {
   int a;
   a = almost_equal(deg2rad(rad2deg(2.1)), 2.1);
@@ -66,83 +54,51 @@ TEST(TestSuite, test5)
 }
 
 // Test identity Transform2D;
-TEST(TestSuite, test6)
+TEST(TestSuite, InputOutput)
 {
-  Transform2D I;
-  I = Transform2D();
+    Transform2D trans_test;
+    ostringstream out;
 
-  std::stringstream buffer;
-  buffer << "I : "<<I;
-  ASSERT_EQ(buffer.str(),"I : degree0 dx 0dy 0");
+    istringstream in("90 1 4");
+
+    in >> trans_test;
+    out << trans_test;
+
+    std::string string_ = out.str();
+    const char *str1 = string_.c_str();
+
+    const char *str2 = "degrees:1.5708 dx:1 dy:4 \n";
+
+    ASSERT_STREQ(str1, str2);
 }
 
-//Test Transform2D Tab(v_ab);
-TEST(TestSuite, test7)
+TEST(TestSuite, normalize_angle)
 {
-  struct Vector2D v_ab;
-  v_ab.x =1;
-  v_ab.y =1;
-  Transform2D Tab(v_ab);
-
-  std::stringstream buffer;
-  buffer << "Tab : "<<Tab;
-  ASSERT_EQ(buffer.str(),"Tab : degree0 dx 1dy 1");
+  double a;
+  a = normalize_angle(3*PI);
+  ASSERT_EQ(PI,a) << "deg2rad failed";
 }
 
-// test Transform2D Tab(radians_ab)
-TEST(TestSuite, test8)
+TEST(TestSuite, TransferFunction_Vec_Rad)
 {
-  struct Vector2D v_ab;
-  double degree_ab, radians_ab;
-  v_ab.x =1;
-  v_ab.y =1;
-  degree_ab=30;
-  radians_ab = deg2rad(degree_ab);
-  Transform2D Tab(radians_ab);
-  std::stringstream buffer;
-  buffer << "Tab : "<<Tab;
-  ASSERT_EQ(buffer.str(),"Tab : degree30 dx 0dy 0");
-}
-
-//test Transform2D Tab(v_ab, radians_ab);
-TEST(TestSuite, test9)
-{
-  struct Vector2D v_ab;
+  Vector2D v_ab;
   double degree_ab, radians_ab;
   v_ab.x =1;
   v_ab.y =1;
   degree_ab=30;
   radians_ab = deg2rad(degree_ab);
   Transform2D Tab(v_ab, radians_ab);
-
   std::stringstream buffer;
   buffer << "Tab : "<<Tab;
-  ASSERT_EQ(buffer.str(),"Tab : degree30 dx 1dy 1");
+
+  const char *str2 = "Tab : degrees:0.523599 dx:1 dy:1 \n";
+  ASSERT_EQ(buffer.str(),str2);
 }
 
-
-// test inv;
-TEST(TestSuite, test10)
+// //test operator *=
+TEST(TestSuite, Identify)
 {
-  struct Vector2D v_ab;
-  double degree_ab, radians_ab;
-  v_ab.x =1;
-  v_ab.y =1;
-  degree_ab=30;
-  radians_ab = deg2rad(degree_ab);
-  Transform2D Tab(v_ab, radians_ab);
-  Transform2D Tba;
-
-  Tba = Tab.inv();
-  std::stringstream buffer;
-  buffer << "Tba : "<<Tba;
-  ASSERT_EQ(buffer.str(),"Tba : degree-30 dx -1.36603dy -0.366025");
-}
-
-//test operator *=
-TEST(TestSuite, test11)
-{
-  struct Vector2D v_ab;
+  Vector2D v_ab;
   double degree_ab, radians_ab;
   v_ab.x =1;
   v_ab.y =1;
@@ -156,13 +112,16 @@ TEST(TestSuite, test11)
   Tab *= I;
   std::stringstream buffer;
   buffer << "Tab : "<<Tab;
-  ASSERT_EQ(buffer.str(),"Tab : degree30 dx 1dy 1");
+
+  const char *str2 = "Tab : degrees:0.523599 dx:1 dy:1 \n";
+  ASSERT_EQ(buffer.str(),str2);
+  
 }
 
-//Test *
-TEST(TestSuite, test12)
+// //Test *
+TEST(TestSuite, Transfer2DMultiplicate)
 {
-  struct Vector2D v_ab, v_bc;
+  Vector2D v_ab, v_bc;
   double degree_ab, radians_ab,  degree_bc, radians_bc;
   v_ab.x =1;
   v_ab.y =1;
@@ -180,13 +139,14 @@ TEST(TestSuite, test12)
 
   std::stringstream buffer;
   buffer << "Tac : "<<Tac;
-  ASSERT_EQ(buffer.str(),"Tac : degree90 dx 2.23205dy 2.86603");
+  
+  const char *str2 = "Tac : degrees:1.5708 dx:2.23205 dy:2.86603 \n";
+  ASSERT_EQ(buffer.str(),str2);
 }
 
-// test operatpr ()
-TEST(TestSuite, test13)
+TEST(TestSuite, Transferwithvector)
 {
-  struct Vector2D v_ab, v_bc, v, va;
+  Vector2D v_ab, v_bc, v, va;
   double degree_ab, radians_ab,  degree_bc, radians_bc;
   v_ab.x =1;
   v_ab.y =1;
@@ -209,42 +169,12 @@ TEST(TestSuite, test13)
 
   std::stringstream buffer;
   buffer << "va : "<<va.x<<","<<va.y;
-  ASSERT_EQ(buffer.str(),"va : 0.232051,3.09808");
+
+   const char *str2 = "va : 0.232051,3.86603";
+  ASSERT_EQ(buffer.str(),str2);
 }
 
-
-
-// TEST(TestSuite, test14)
-// {
-//   struct Vector2D v;
-//
-//   // std::cout << "enter 1 for v.x\n";
-//   ROS_INFO ("enter 1 for v.x");
-//   std::cin >> v.x;
-//   // std::cout << "enter 1 for v.y\n";
-//   ROS_INFO ("enter 1 for v.y\n");
-//   std::cin >> v.y;
-//
-//   std::stringstream buffer;
-//   buffer << "v :"<<v.x<<","<<v.y;
-//   ASSERT_EQ(buffer.str(),"v :1,1");
-// }
-
-// integrate twist test;
-// TEST(TestSuite, test15)
-// {
-//   Twist2D tw1;
-//   Vector2D v;
-//   tw1.vx = 1;
-//   tw1.vy = 2;
-//   v = intergrateTwist(tw1);
-//
-//   std::stringstream buffer;
-//   buffer << "v :"<<v.x<<","<<v.y;
-//   ASSERT_EQ(buffer.str(),"v :1,2");
-// }
-
-TEST(TestSuite, test16)
+TEST(TestSuite, vectorplus)
 {
   Vector2D v1,v2,v3;
   v1.x = 1;
@@ -259,7 +189,7 @@ TEST(TestSuite, test16)
   ASSERT_EQ(buffer.str(),"v :4,6");
 }
 
-TEST(TestSuite, test17)
+TEST(TestSuite, vectorplus2)
 {
   Vector2D v1,v2;
   v1.x = 1;
@@ -274,7 +204,7 @@ TEST(TestSuite, test17)
   ASSERT_EQ(buffer.str(),"v :4,6");
 }
 
-TEST(TestSuite, test18)
+TEST(TestSuite, vector_minus)
 {
   Vector2D v1,v2,v3;
   v1.x = 1;
@@ -289,9 +219,8 @@ TEST(TestSuite, test18)
   ASSERT_EQ(buffer.str(),"v :-2,-2");
 }
 
-
 //test twist -= sign
-TEST(TestSuite, test19)
+TEST(TestSuite, vector_minus2)
 {
   Vector2D v1,v2,v3;
   v1.x = 1;
@@ -306,47 +235,28 @@ TEST(TestSuite, test19)
   ASSERT_EQ(buffer.str(),"v :-2,-2");
 }
 
-//Test operator vector*s
-TEST(TestSuite, test20)
+// //Test operator vector*s
+TEST(TestSuite, VectorMultiplier)
 {
   Vector2D v1,v2;
-  v1.x = 1;
-  v1.y = 2;
-
   double s=2;
 
-
+  v1.x = 1;
+  v1.y = 2;
   v2 = v1*s;
+
   std::stringstream buffer;
   buffer << "v :"<<v2.x<<","<<v2.y;
   ASSERT_EQ(buffer.str(),"v :2,4");
 }
 
-// test operator s*vector
-TEST(TestSuite, test21)
+// Test vector operator scaler*=vector
+TEST(TestSuite, vectorMultiplier2)
 {
   Vector2D v1,v2;
+  double s=2;
   v1.x = 1;
   v1.y = 2;
-
-  double s=2;
-
-
-  v2 = s*v1;
-  std::stringstream buffer;
-  buffer << "v :"<<v2.x<<","<<v2.y;
-  ASSERT_EQ(buffer.str(),"v :2,4");
-}
-
-// Test vector operator vector*=scaler
-TEST(TestSuite, test22)
-{
-  Vector2D v1,v2;
-  v1.x = 1;
-  v1.y = 2;
-
-  double s=2;
-
 
   v1*=s;
   std::stringstream buffer;
@@ -354,26 +264,7 @@ TEST(TestSuite, test22)
   ASSERT_EQ(buffer.str(),"v :2,4");
 }
 
-
-// Test vector operator scaler*=vector
-TEST(TestSuite, test23)
-{
-  Vector2D v1,v2;
-  v1.x = 1;
-  v1.y = 2;
-
-  double s=2;
-
-
-  s*=v1;
-  std::stringstream buffer;
-  buffer << "v :"<<v1.x<<","<<v1.y;
-  ASSERT_EQ(buffer.str(),"v :2,4");
-}
-
-
-// Test operator length
-TEST(TestSuite, test24)
+TEST(TestSuite, length)
 {
   Vector2D v1;
   v1.x = 1;
@@ -385,8 +276,7 @@ TEST(TestSuite, test24)
   EXPECT_FLOAT_EQ(len,1.4142135);
 }
 
-// test distance
-TEST(TestSuite, test25)
+TEST(TestSuite, distance)
 {
   Vector2D v1,v2;
   v1.x = 1;
@@ -395,15 +285,13 @@ TEST(TestSuite, test25)
   v2.x = 2;
   v2.y = 2;
 
-
   double distance;
   distance = v1.distance(v1,v2);
 
   EXPECT_FLOAT_EQ(distance,1.4142135);
 }
 
-//test angle;
-TEST(TestSuite, test26)
+TEST(TestSuite, VectorAngle)
 {
   Vector2D v1;
   v1.x = 1;
@@ -415,101 +303,123 @@ TEST(TestSuite, test26)
   EXPECT_FLOAT_EQ(angle,1.1071488);
 }
 
+
+TEST(Rigid2dTest, Inverse)
+{
+    Vector2D translation;
+    translation.x = 0;
+    translation.y = -1;
+    double degree, angle;
+    degree = 90;
+    angle = deg2rad(degree);
+
+    Transform2D trans_test(translation, angle);
+
+    rigid2d::Transform2D result = trans_test.inv();
+
+    Transform2D newtrans;
+    result.displacement(newtrans);
+
+    std::stringstream buffer;
+    buffer << "newtrans : "<<newtrans;
+  
+    const char *str2 = "newtrans : degrees:-1.5708 dx:1 dy:6.12323e-17 \n";
+    ASSERT_EQ(buffer.str(),str2);
+}
+
 //the following tests are from diff_drive.cpp
 // test twistTowheels works;
-TEST(TestSuite, test27){
-  Twist2D t;
-  WheelVelocities u;
-  double whe_base = 2.0;
-  double whe_radius =2.0;
-  t.theta_dot =2.0; //2.0
-  t.vx = 1.0;  //1.0
-  t.vy = 0.0;  //0.0
+// TEST(TestSuite, test27)
+// {
+//   Twist2D t;
+//   WheelVelocities u;
+//   double whe_base = 2.0;
+//   double whe_radius =2.0;
+//   t.theta_dot =2.0; //2.0
+//   t.vx = 1.0;  //1.0
+//   t.vy = 0.0;  //0.0
 
-  u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
-  u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+//   u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+//   u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
 
-  // u.u1 = (1.0/whe_radius)*((-D)*t.theta_dot + t.vx);
-  // u.u2 = (1.0/whe_radius)*((D)*t.theta_dot + t.vx);
-  u.u3 = u.u2;
-  u.u4 = u.u1;
-  std::stringstream buffer;
-  buffer <<"u1: " << u.u1 << " u2: " << u.u2 << " u3: "<< u.u3 << " u4: "<< u.u4;
-  ASSERT_EQ(buffer.str(),"u1: -0.5 u2: 1.5 u3: 1.5 u4: -0.5");
-}
+//   u.u3 = u.u2;
+//   u.u4 = u.u1;
+//   std::stringstream buffer;
+//   buffer <<"u1: " << u.u1 << " u2: " << u.u2 << " u3: "<< u.u3 << " u4: "<< u.u4;
+//   ASSERT_EQ(buffer.str(),"u1: -0.5 u2: 1.5 u3: 1.5 u4: -0.5");
+// }
 
-// test wheeltotwist function;
-TEST(TestSuite, test28){
-  WheelVelocities vel;
-  Twist2D t;
-  double whe_base = 2.0;
-  double D = whe_base/2.0;
-  double whe_radius =2.0;
-  double r = whe_radius/2.0;
+// // test wheeltotwist function;
+// TEST(TestSuite, test28){
+//   WheelVelocities vel;
+//   Twist2D t;
+//   double whe_base = 2.0;
+//   double D = whe_base/2.0;
+//   double whe_radius =2.0;
+//   double r = whe_radius/2.0;
 
-  vel.u1 = -0.5;
-  vel.u2 = 1.5;
-  vel.u3 = 1.5;
-  vel.u3 = -0.5;
+//   vel.u1 = -0.5;
+//   vel.u2 = 1.5;
+//   vel.u3 = 1.5;
+//   vel.u3 = -0.5;
 
-  t.vx = (vel.u1+vel.u2)*r;
-  t.theta_dot = (vel.u2/D-vel.u1/D)*r;
-  t.vy= 0;
+//   t.vx = (vel.u1+vel.u2)*r;
+//   t.theta_dot = (vel.u2/D-vel.u1/D)*r;
+//   t.vy= 0;
 
-  // t.theta_dot = (vel.u1+vel.u2)*whe_radius/2.0;
-  // t.vx = whe_radius*(vel.u2-vel.u1)/(2.0*D);
-  // t.vy = 0;
-  std::stringstream buffer;
-  buffer <<"theta_dot: " << t.theta_dot << " vx: " << t.vx << " vy: "<< t.vy;
-  ASSERT_EQ(buffer.str(),"theta_dot: 2 vx: 1 vy: 0");
-}
+//   // t.theta_dot = (vel.u1+vel.u2)*whe_radius/2.0;
+//   // t.vx = whe_radius*(vel.u2-vel.u1)/(2.0*D);
+//   // t.vy = 0;
+//   std::stringstream buffer;
+//   buffer <<"theta_dot: " << t.theta_dot << " vx: " << t.vx << " vy: "<< t.vy;
+//   ASSERT_EQ(buffer.str(),"theta_dot: 2 vx: 1 vy: 0");
+// }
 
-//test feedforward withonly angle;
-TEST(TestSuite, test29){
+// //test feedforward withonly angle;
+// TEST(TestSuite, test29){
 
-  Twist2D cmd;
-  cmd.theta_dot = 2.0;
-  cmd.vx = 0;
-  cmd.vy = 0;
-  DiffDrive D;
-  D.feedforward(cmd,1);
-  Pose p;
-  p = D.pose();
-  std::stringstream buffer;
-  buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
-  ASSERT_EQ(buffer.str(),"Pose_theta 2 x 0y 0");
-}
+//   Twist2D cmd;
+//   cmd.theta_dot = 2.0;
+//   cmd.vx = 0;
+//   cmd.vy = 0;
+//   DiffDrive D;
+//   D.feedforward(cmd,1);
+//   Pose p;
+//   p = D.pose();
+//   std::stringstream buffer;
+//   buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
+//   ASSERT_EQ(buffer.str(),"Pose_theta 2 x 0y 0");
+// }
 
-// test feedforward with only linear velocity;
-TEST(TestSuite, test30){
-  Twist2D cmd;
-  cmd.theta_dot = 0;
-  cmd.vx = 1;
-  cmd.vy = 0;
-  DiffDrive D;
-  D.feedforward(cmd,1);
-  Pose p;
-  p = D.pose();
-  std::stringstream buffer;
-  buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
-  ASSERT_EQ(buffer.str(),"Pose_theta 0 x 1y 0");
-}
+// // test feedforward with only linear velocity;
+// TEST(TestSuite, test30){
+//   Twist2D cmd;
+//   cmd.theta_dot = 0;
+//   cmd.vx = 1;
+//   cmd.vy = 0;
+//   DiffDrive D;
+//   D.feedforward(cmd,1);
+//   Pose p;
+//   p = D.pose();
+//   std::stringstream buffer;
+//   buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
+//   ASSERT_EQ(buffer.str(),"Pose_theta 0 x 1y 0");
+// }
 
-//test feedforward with only angular velocity;
-TEST(TestSuite, test31){
-  Twist2D cmd;
-  cmd.theta_dot = 1;
-  cmd.vx = 1;
-  cmd.vy = 0;
-  DiffDrive D;
-  D.feedforward(cmd,1);
-  Pose p;
-  p = D.pose();
-  std::stringstream buffer;
-  buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
-  ASSERT_EQ(buffer.str(),"Pose_theta 1 x 0.540302y 0.841471");
-}
-
+// //test feedforward with only angular velocity;
+// TEST(TestSuite, test31){
+//   Twist2D cmd;
+//   cmd.theta_dot = 1;
+//   cmd.vx = 1;
+//   cmd.vy = 0;
+//   DiffDrive D;
+//   D.feedforward(cmd,1);
+//   Pose p;
+//   p = D.pose();
+//   std::stringstream buffer;
+//   buffer <<"Pose_theta " << p.theta << " x " << p.x << "y "<< p.y;
+//   ASSERT_EQ(buffer.str(),"Pose_theta 1 x 0.540302y 0.841471");
+// }
 
 int main(int argc, char **argv){
   ROS_INFO("hello11111");

@@ -1,3 +1,11 @@
+/*************************************************************************
+ * Author： Luxi Huang
+ * 
+ * File Introduction: 
+ *    This is a library callled rigid2d for performing 2d Rigid body 
+ *    transformation. 
+ * **************************************************************************/
+
 #ifndef RIGID2D_INCLUDE_GUARD_HPP
 #define RIGID2D_INCLUDE_GUARD_HPP
 /// \file
@@ -198,6 +206,8 @@ namespace rigid2d
     friend std::ostream & operator<<(std::ostream & os, const Transform2D & tf);
 
     Twist2D operator()(Twist2D V) const;
+
+    Transform2D displacement(Transform2D & T);
   };
 
     // class Twist2D{
@@ -231,7 +241,6 @@ namespace rigid2d
     /// \brief returns the x, y, and theta values from the transform
     /// \param &x, &y, &theta - reference for return multiple values
     /// \returns the x, y, and theta values from the transform
-    Transform2D displacement(const Transform2D & T);
 
     /// \brief compute the transformation corresponding to a rigid body following a constant twist for one time unit
     /// \param twist - the constant twist
