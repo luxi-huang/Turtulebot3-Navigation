@@ -6,129 +6,102 @@
 
 namespace rigid2d{
 
-DiffDrive::DiffDrive(){
-  x = 0.0;
-  y = 0.0;
-  theta = 0.0;
+DiffDrive::DiffDrive()
+{
+  Vector2D vec(0,0);
+  Transform2D trans(vec, 0.0);
+  pose_ = trans;
+
   whe_base = 4.0;
   whe_radius = 2.0;
-  L = 5.0;
 }
 
-DiffDrive::DiffDrive(const Pose & p,double wheel_base, double wheel_radius){
-  x = p.x;
-  y = p.y;
-  theta = p.theta;
+DiffDrive::DiffDrive(Transform2D pose,double wheel_base, double wheel_radius)
+{
+  pose_ = pose;
   whe_base = wheel_base;
   whe_radius = wheel_radius;
 }
 
-WheelVelocities DiffDrive::twistToWheels(Twist2D t){
-  WheelVelocities u;
-  // double D = whe_base/2.0;
-  // mine orgianl
-  // u.u1 = (1.0/whe_radius)*((-D)*t.theta_dot + t.vx);
-  // u.u2 = (1.0/whe_radius)*((D)*t.theta_dot + t.vx);
-  //new
-  // u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
-  // u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
-  //lastest
-  u.u1 = (2.0*t.vx-t.theta_dot*whe_base)/(2*whe_radius);
-  u.u2 = (2.0*t.vx+t.theta_dot*whe_base)/(2*whe_radius);
+WheelVelocities DiffDrive::twistToWheels(Twist2D twist)
+{
+  WheelVelocities vel;
+  vel.ur = (2.0 * twist.vx + twist.theta_dot * whe_base) / (2 * whe_radius);
+  vel.ul = (2.0 * twist.vx - twist.theta_dot * whe_base) / (2 * whe_radius);
 
-  u.u3 = u.u2;
-  u.u4 = u.u1;
-  return u;
+  return vel;
 }
 
 Twist2D DiffDrive::wheelsToTwist(WheelVelocities vel){
   Twist2D t;
-  // double D = whe_base/2.0;
-  // mine original
-  // double r = whe_radius/2.0;
-  // t.theta_dot = ((-1/(D+L))*vel.u1 + (1/(D+L))*vel.u2 + (1/(D+L))*vel.u3 - (1/(D+L))*vel.u4)*(whe_radius/4);
-  // t.vx = vel.u1 + vel.u2 + vel.u3 + vel.u4;
-  // t.vy =-vel.u1 + vel.u2 - vel.u3 + vel.u4;
-
-  // fiexed
-  // t.vx = (vel.u1+vel.u2)*r;
-  // t.theta_dot = (vel.u2/D-vel.u1/D)*r;
-  // t.vy = 0;
 
   // latest
-  t.theta_dot = (vel.u2-vel.u1)*whe_radius/whe_base;
-  t.vx = (vel.u1+vel.u2)*whe_radius/2;
-  t.vy = 0;
-
-
-
+  t.theta_dot = (vel.ur - vel.ul) * whe_radius / whe_base;
+  t.vx = (vel.ur + vel.ul) * whe_radius / whe_base;
+  t.vy = 0.0;
   return t;
 }
 
-void DiffDrive::updateOdometry(double left_radians, double right_radians){
-  double R_D,L_D,D_T = 0;
-  R_D = whe_radius*right_radians;
-  L_D = whe_radius*left_radians;
-  theta += (R_D -L_D)/1.0/whe_base;
-  D_T = (R_D + L_D)/2.0;
-  x = -(D_T)*sin(theta);
-  y = (D_T)*cos(theta);
+void DiffDrive::updateOdometry(double left_radians, double right_radians)
+{
+  
+  WheelVelocities wheel_v;
+  wheel_v.ul = left_radians;
+  wheel_v.ur = right_radians;
+  Twist2D twist = wheelsToTwist(wheel_v);
+  Transform2D transformation = integrateTwist(twist);
+  pose_ *= transformation;
 }
 
-void DiffDrive::feedforward(Twist2D cmd,double ttime){
-  double new_theta;
-  new_theta = cmd.theta_dot* ttime + theta;
-  theta = normalize_angle(new_theta);
-  // std::cout<<"theta"<< theta<<"/n";
-  // double linear_velocity = sqrt(pow(cmd.vx,2)+pow(cmd.vy,2));
-  double linear_velocity = cmd.vx;
-  x += linear_velocity*cos(theta)*ttime;
-  y += linear_velocity*sin(theta)*ttime;
-  // std::cout<<"x"<< x<< "   ";
+void DiffDrive::feedforward(Twist2D cmd) 
+{
+    Transform2D transformation;
+    transformation = integrateTwist(cmd);
+    pose_ *= transformation;
 }
-//
-Pose DiffDrive::pose(){
-  Pose p;
-  p.x = x;
-  p.y = y;
-  p.theta = theta;
-  return p;
+
+Transform2D DiffDrive::getpose()
+{
+  return pose_;
 }
 
 WheelVelocities DiffDrive::wheelVelocitie(double delta_radians_L, double delta_radians_R) const {
-  WheelVelocities u;
-  double R_D = delta_radians_L*whe_radius;
-  double L_D = delta_radians_R*whe_radius;
-  u.u1 = R_D;
-  u.u2 = L_D;
-  u.u3 = u.u3;
-  u.u4 = u.u1;
-  return u;
+    WheelVelocities result;
+    result.ul = delta_radians_L;
+    result.ur = delta_radians_R;
+    return result;
 }
 
-std::ostream & operator<<(std::ostream & os, const Pose & pose){
-  os << "Pose_theta " << pose.theta << " x " << pose.x << "y "<< pose.y;
-  return os;
+void DiffDrive::reset(Twist2D ps)
+{
+  Transform2D reset_pose(Vector2D(ps.vx, ps.vy), ps.theta_dot);
+  pose_ = reset_pose;
 }
 
-std::istream & operator>>(std::istream & is, Pose & pose){
-  is >> pose.theta;
-  is >> pose.x;
-  is >> pose.y;
-  return is;
-}
 
-std::ostream & operator<<(std::ostream & os, const  WheelVelocities & wheel_v){
-  os << "u1 " << wheel_v.u1 << " u2 " << wheel_v.u2 << "u3 "<< wheel_v.u3 << "u4 "<< wheel_v.u4;
-  return os;
-}
+// std::ostream & operator<<(std::ostream & os, const Pose & pose){
+//   os << "Pose_theta " << pose.theta << " x " << pose.x << "y "<< pose.y;
+//   return os;
+// }
 
-std::istream & operator>>(std::istream & is, WheelVelocities & wheel_v){
-  is >> wheel_v.u1;
-  is >> wheel_v.u2;
-  is >> wheel_v.u3;
-  is >> wheel_v.u4;
-  return is;
-}
+// std::istream & operator>>(std::istream & is, Pose & pose){
+//   is >> pose.theta;
+//   is >> pose.x;
+//   is >> pose.y;
+//   return is;
+// }
+
+// std::ostream & operator<<(std::ostream & os, const  WheelVelocities & wheel_v){
+//   os << "u1 " << wheel_v.u1 << " u2 " << wheel_v.u2 << "u3 "<< wheel_v.u3 << "u4 "<< wheel_v.u4;
+//   return os;
+// }
+
+// std::istream & operator>>(std::istream & is, WheelVelocities & wheel_v){
+//   is >> wheel_v.u1;
+//   is >> wheel_v.u2;
+//   is >> wheel_v.u3;
+//   is >> wheel_v.u4;
+//   return is;
+// }
 
 }

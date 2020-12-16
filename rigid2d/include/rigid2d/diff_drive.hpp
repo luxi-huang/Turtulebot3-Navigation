@@ -1,3 +1,9 @@
+/*******************************************************
+ * Author: Luxi Huang
+ * This class will track the state of a differential drive robot as its 
+ * wheel positions as updated.
+ * *********************************************************/
+
 #ifndef diff_drive_INCLUDE_GUARD_HPP
 #define diff_drive_INCLUDE_GUARD_HPP
 /// \file
@@ -9,22 +15,13 @@
 
 namespace rigid2d
 {
-  struct Pose
-  {
-    double theta = 0.0;
-    double x = 0.0;
-    double y = 0.0;
-  };
-
-  std::ostream & operator<<(std::ostream & os, const Pose & pose);
-  std::istream & operator>>(std::istream & is, Pose & pose);
+  // std::ostream & operator<<(std::ostream & os, const Pose & pose);
+  // std::istream & operator>>(std::istream & is, Pose & pose);
 
   struct WheelVelocities
   {
-    double u1 = 0.0;
-    double u2 = 0.0;
-    double u3 = 0.0;
-    double u4 = 0.0;
+    double ul = 0.0;
+    double ur = 0.0;
   };
 
   std::ostream & operator<<(std::ostream & os, const  WheelVelocities & wheel_v);
@@ -32,16 +29,13 @@ namespace rigid2d
 
   class DiffDrive
   {
-    double theta = 0.0;
-    double x = 0.0;
-    double y = 0.0;
-    double whe_base = 4.0;
-    double whe_radius = 2.0;
-    double L = 5.0;
+  private:
+    Transform2D pose_;
+    double whe_base;
+    double whe_radius;
+    // double L = 5.0;
 
   public:
-
-
       // /// \brief the default constructor creates a robot at (0,0,0), with a fixed wheel base and wheel radius
       DiffDrive();
 
@@ -51,7 +45,7 @@ namespace rigid2d
       // / \param pose - the current position of the robot
       // / \param wheel_base - the distance between the wheel centers
       // / \param wheel_radius - the raidus of the wheels
-      explicit DiffDrive(const Pose &p,double wheel_base, double wheel_radius);
+      explicit DiffDrive(Transform2D pose,double wheel_base, double wheel_radius);
       //
       /// \brief determine the wheel velocities required to make the robot
       ///        move with the desired linear and angular velocities
@@ -74,10 +68,10 @@ namespace rigid2d
       // /// \brief update the odometry of the diff drive robot, assuming that
       // /// it follows the given body twist for one time  unit
       // /// \param cmd - the twist command to send to the robot
-      void feedforward(Twist2D cmd,double ttime);
+      void feedforward(Twist2D cmd);
       //
       // /// \brief get the current pose of the robot
-      Pose pose();
+      Transform2D getpose();
       //
       // /// \brief get the wheel speeds, based on the last encoder update
       // /// \returns the velocity of the wheels, which is equivalent to

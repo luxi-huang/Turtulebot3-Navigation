@@ -245,7 +245,7 @@ namespace rigid2d
     /// \brief compute the transformation corresponding to a rigid body following a constant twist for one time unit
     /// \param twist - the constant twist
     /// \return the corresponding transformation
-    Transform2D integrateTwist(const Twist2D & V, const Transform2D & T);
+    Transform2D integrateTwist(const Twist2D & V);
 
 }
 
