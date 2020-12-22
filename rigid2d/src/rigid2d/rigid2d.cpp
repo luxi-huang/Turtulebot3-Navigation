@@ -266,12 +266,11 @@ namespace rigid2d {
     return result;
   }
 
-  Transform2D Transform2D::displacement(Transform2D & T)
+  void Transform2D::displacement(double &x, double &y, double &theta)
   {
-    T.trans_.x = this->trans_.x;  
-    T.trans_.y = this->trans_.y;
-    T.radians_ = this->radians_;  
-    return T;
+    x = this->trans_.x;  
+    y = this->trans_.y;
+    theta = this->radians_;  
   }
 
   Transform2D integrateTwist(Twist2D twist)

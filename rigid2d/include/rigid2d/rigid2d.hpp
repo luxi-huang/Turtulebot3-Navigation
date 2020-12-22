@@ -207,7 +207,8 @@ namespace rigid2d
 
     Twist2D operator()(Twist2D V) const;
 
-    Transform2D displacement(Transform2D & T);
+    /// \brief transfer internal value
+    void displacement(double &x, double &y, double &theta);
   };
 
     // class Twist2D{

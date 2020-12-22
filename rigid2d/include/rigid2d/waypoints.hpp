@@ -1,7 +1,11 @@
+/*************************************************************
+ * Author: Luxi Huang
+ * This class helpes to control the robot trajectory in waypoints
+ * by sending its forward and angular velocities 
+ * **********************************************************/
+
 #ifndef waypoints_INCLUDE_GUARD_HPP
 #define waypoints_INCLUDE_GUARD_HPP
-/// \file
-/// \brief Library for two-dimensional rigid body transformations.
 
 #include <iosfwd> // contains forward definitions for iostream objects
 #include "cmath"
@@ -10,52 +14,70 @@
 #include <vector>
 
 
-namespace rigid2d{
-  struct Velocity{
-    double linear = 0;
-    double angular = 0;
+namespace rigid2d {
+  
+  enum CurrentState
+  {
+    Rotate_left, // robot state: rotate to left 
+    Rotate_right, // robot state: rotate to right 
+    Trans  //  robot state: go straight  
   };
-
-  class Waypoints{
-    // std::vector<int> v1 = {1,2};
-    // std::vector<Vector2D> point1={{0.5,0.0}};
-    // std::vector<Vector2D> point2={{1.0,0.5}};
-    // std::vector<Vector2D> point3={{0.5,1.0}};
-    // std::vector<Vector2D> point4={{0.0,0.5}};
-    std::vector<Vector2D> points={{0.5,0.0},{1.0,0.5},{0.5,1.0}};
-    std::vector<Velocity> vel = {{0,0}};
-    std::vector<Twist2D> tw = {{0,0,0}};
-    std::vector<Velocity> static_vel = {{0,0}};
-    int goal;
-
+  
+  class Waypoints 
+  {
+  private: 
+    
+    std::vector<Vector2D> points;
+    // std::vector<Velocity> vel;
+    Twist2D static_vel;
+    // std::vector<Velocity> static_vel;
+    int current_goal;
+    DiffDrive myDiffDrive;
+    double frequency; 
+    double linearThreshold;
+    double angularThreshold;
+    CurrentState state_;
+    
   public:
+    /// 
+    /// \brief: setup function with default private vairables; 
     Waypoints();
-    //set the goal
-    explicit Waypoints(std::vector<Vector2D> p, Velocity v);
 
-    // calcualte the rest_distance to goal point;
-    double left_distance(Pose pose);
-    //
-    // calculate left_angle;
-    double left_angle(Pose pose);
-    //
-    // calculate next twist velocities;
-    // void velocity_array(double rest_distance,double rest_angle, double steps);
-    //
-    // // set condition to move to nextWaypoint;
-    Twist2D nextWaypoint(double rest_distance,double rest_angle,double threshold_linear, double threshold_angular);
-    //
-    //
-    void convert_velocity_to_twist();
-    //
-    // // use twist array to update pose;
-    void update_current_pose(DiffDrive & a, double ttime);
+    /// \brief: initial private vairables
+    /// \param: diff_drive;
+    /// \param: waypoints;
+    /// \param: static_vel;
+    /// \param: threshold for linear and angle;
+    /// \param: frequency;
+    explicit Waypoints(std::vector<Vector2D> waypoints, Twist2D vel, DiffDrive my_diff, int hz, int l_thred, int a_thred);
 
-    void change_goal();
-    void reset_velocity();
-    int print_goal();
+    /// \brief: the pipline of combining all functions and moving forward
+    void pipeline();
 
+    /// \brief: update diff_drive state by feed forward 
+    /// \param: cmd 
+    void update_pose(Twist2D cmd);
 
+    /// \brief:update state base on the current position and goal point 
+    void update_state();
+
+    /// \brief: generate next point velocity;
+    /// \returns a Twist2D command
+    Twist2D nextWaypoint();
+
+    /// \brief: control robot to move forward:
+    Twist2D move_forward_cmd();
+    
+    /// \brief: control robot to turn left; 
+    Twist2D rotate_left();
+
+    /// \brief: control robot to turn left; 
+    Twist2D rotate_right();
+
+    /// \brief: update robot next goal;
+    void update_goal();
+    
+    bool ifClose(double x1, double y1, double x2, double y2); 
   };
 }
 #endif

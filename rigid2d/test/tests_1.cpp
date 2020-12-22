@@ -1,6 +1,6 @@
 /******************************************************** 
  * Author: Luxi Huang
- * This is a test file for rigid2D library.
+ * This is a test file for rigid2D and diffdrive library.
  ********************************************************/
 
 #include "rigid2d/rigid2d.hpp"
@@ -303,10 +303,11 @@ TEST(TestSuite, VectorAngle)
   EXPECT_FLOAT_EQ(angle,1.1071488);
 }
 
-
+///  \NOTE:changed format of displacement, need to change agagin 
 TEST(Rigid2dTest, Inverse)
 {
     Vector2D translation;
+
     translation.x = 0;
     translation.y = -1;
     double degree, angle;
@@ -317,11 +318,13 @@ TEST(Rigid2dTest, Inverse)
 
     rigid2d::Transform2D result = trans_test.inv();
 
-    Transform2D newtrans;
-    result.displacement(newtrans);
-
+    // Transform2D newtrans;
+    
+    // double x, y, theta; 
+    // result.displacement(x,y,theta);
+    
     std::stringstream buffer;
-    buffer << "newtrans : "<<newtrans;
+    buffer << "newtrans : "<<result;
   
     const char *str2 = "newtrans : degrees:-1.5708 dx:1 dy:6.12323e-17 \n";
     ASSERT_EQ(buffer.str(),str2);
@@ -329,25 +332,27 @@ TEST(Rigid2dTest, Inverse)
 
 //the following tests are from diff_drive.cpp
 // test twistTowheels works;
-// TEST(TestSuite, test27)
-// {
-//   Twist2D t;
-//   WheelVelocities u;
-//   double whe_base = 2.0;
-//   double whe_radius =2.0;
-//   t.theta_dot =2.0; //2.0
-//   t.vx = 1.0;  //1.0
-//   t.vy = 0.0;  //0.0
+TEST(TestSuite, twistToWheels)
+{
+  Twist2D t;
+  WheelVelocities u;
 
-//   u.u1 = -(whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
-//   u.u2 = (whe_base/(2.0*whe_radius))*t.theta_dot+(1.0/whe_radius)*t.vx;
+  double whe_base = 2.0;
+  double whe_radius = 2.0;
+  t.theta_dot = 2.0; //2.0
+  t.vx = 1.0;  //1.0
+  t.vy = 0.0;  //0.0
+  t.theta_dot = 0.0;
 
-//   u.u3 = u.u2;
-//   u.u4 = u.u1;
-//   std::stringstream buffer;
-//   buffer <<"u1: " << u.u1 << " u2: " << u.u2 << " u3: "<< u.u3 << " u4: "<< u.u4;
-//   ASSERT_EQ(buffer.str(),"u1: -0.5 u2: 1.5 u3: 1.5 u4: -0.5");
-// }
+  DiffDrive Diff_drive_test;
+  u = Diff_drive_test.twistToWheels(t);
+
+  // double wheel_radius = 0.1;
+
+  // std::stringstream buffer;
+  // buffer <<"u1: " << u.u1 << " u2: " << u.u2 << " u3: "<< u.u3 << " u4: "<< u.u4;
+  ASSERT_EQ(1.0,u.ul);
+}
 
 // // test wheeltotwist function;
 // TEST(TestSuite, test28){

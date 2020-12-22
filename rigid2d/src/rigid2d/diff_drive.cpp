@@ -36,7 +36,7 @@ Twist2D DiffDrive::wheelsToTwist(WheelVelocities vel){
   Twist2D t;
 
   // latest
-  t.theta_dot = (vel.ur - vel.ul) * whe_radius / whe_base;
+  t.theta_dot = (vel.ur - vel.ul) * whe_radius / 2.0;
   t.vx = (vel.ur + vel.ul) * whe_radius / whe_base;
   t.vy = 0.0;
   return t;

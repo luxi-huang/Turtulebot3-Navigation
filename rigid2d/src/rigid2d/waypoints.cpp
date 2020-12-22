@@ -1,3 +1,6 @@
+/// \file
+/// \brief Library for Waypoints class
+
 #include "rigid2d/waypoints.hpp"
 #include "rigid2d/rigid2d.hpp"
 #include "rigid2d/diff_drive.hpp"
@@ -9,100 +12,127 @@
 
 namespace rigid2d{
 
-Waypoints::Waypoints(){
-  std::vector<Vector2D> points={{0.5,0.0},{1.0,0.5},{0.5,1.0}};
-  std::vector<Velocity> vel = {{0,0}};
-  std::vector<Twist2D> tw = {{0,0,0}};
-  std::vector<Velocity> static_vel = {{0,0}};
-  // goal = 1;
+void Waypoints::pipeline() {
+  update_state ();
+  Twist2D vel = nextWaypoint();
+  update_pose(vel);
+}  
+
+Waypoints::Waypoints()
+{
+  points = {{0.0,0.0},{0.5,0.0},{0.5,1.0},{0.0,1.0}};
+  static_vel.vx = 0.5;
+  static_vel.vy = 0.0;
+  static_vel.theta_dot = 0.5;
+  current_goal = 1;
+  frequency = 10;
+  linearThreshold = 0.1;
+  angularThreshold = 0.1;
 }
 
-Waypoints::Waypoints(std::vector<Vector2D> p,Velocity v){
-  points = p;
-  static_vel[0] = v;
-  vel[0] =v;
-  goal = 1;
+Waypoints::Waypoints(std::vector<Vector2D> waypoints, Twist2D vel, DiffDrive my_diff, int hz, int l_thred, int a_thred)
+{
+  myDiffDrive = my_diff;
+  points = waypoints;
+  static_vel = vel;
+  current_goal = 1;
+  frequency = hz;
+  linearThreshold = l_thred;
+  angularThreshold = a_thred;
 }
 
-double Waypoints::left_distance(Pose pose){
-  double left_d;
-  left_d = sqrt(pow((pose.x - points[goal].x),2)+pow((pose.y-points[goal].y),2));
+void Waypoints::update_state() 
+{
+  double current_pose_x, current_pose_y, current_pose_angle;
+  Transform2D current_pose = myDiffDrive.getpose();
+  current_pose.displacement(current_pose_x, current_pose_y, current_pose_angle);
 
-  // std::cout<<"goal "<< goal << "goal.x " << points[goal].x<< "goal.y "<< points[goal].y;
-  return left_d;
-}
-//
-double Waypoints::left_angle(Pose pose){
-  Vector2D v1;
-  double diff_angle;
-  v1.x = points[goal].x - pose.x;
-  v1.y = points[goal].y - pose.y;
-  diff_angle = v1.angle(v1);
-  diff_angle -= pose.theta;
-  diff_angle = normalize_angle(diff_angle);
-  return diff_angle;
-}
-
-void Waypoints::convert_velocity_to_twist(){
-  tw.clear();
-  tw[0].theta_dot = vel[0].angular;
-  tw[0].vx = vel[0].linear * cos(vel[0].angular);
-  // tw[0].vy = vel[0].linear * sin(vel[0].angular);
-  tw[0].vy = 0;
-}
-
-void Waypoints::change_goal(){
-  if (goal < points.size()-1){
-    goal = goal+1;
-  } else{
-    goal =0;
-  }
-}
-
-// // get another array of velocity and chagne goal to next goal;
-Twist2D Waypoints::nextWaypoint(double rest_distance,double rest_angle,double threshold_linear,double threshold_angular){
-  Twist2D twist;
-  // std::cout << "goal"<<goal;
-  if ((rest_angle>0 && static_vel[0].angular<0)||(rest_angle<0 && static_vel[0].angular>0))
+  // if the current point is close to goal, we need to update goal;
+  if (ifClose(current_pose_x, current_pose_y, points[current_goal - 1].x, points[current_goal - 1].y)) 
   {
-    static_vel[0].angular = - static_vel[0].angular;
-  }
+    update_goal();
+  } 
 
-  if(std::abs(rest_angle) >= threshold_angular)
-  {
-    vel[0].linear = 0;
-    vel[0].angular = static_vel[0].angular;
-    // std::cout<< "11111111111";
-  }else
-  {
-    // ROS_INFO_STREAM("Rico test: rest_angle - threshold_angular, should be < 0: "<<rest_angle<<"threshold_angular: "<<threshold_angular);
-    // ROS_INFO(rest_angle);
-    // std::cout<<"rest angle"<<rest_angle<<std::endl;
-    if (std::abs(rest_distance) >=threshold_linear)
+  double angle_diff = normalize_angle(std::atan2(points[current_goal - 1].y - current_pose_y, points[current_goal - 1].x - current_pose_x) - current_pose_angle);
+  if (angle_diff < angularThreshold && - angularThreshold < angle_diff)
     {
-      vel[0].linear = static_vel[0].linear;
-      vel[0].angular = 0;
-      // std::cout << "222222222";
-    } else
-    {
-      vel[0].linear = 0;
-      vel[0].angular = 0;
-      change_goal();
-      // std::cout<< "33333333333";
+      state_ = Trans;
     }
-  }
-  convert_velocity_to_twist();
-  twist.vx = tw[0].vx;
-  // std::cout<< "twist.vx!!!"<< twist.vx;
-  // std::cout<< "static_vel.x!!!"<< static_vel[0].linear;
-  twist.vy = tw[0].vy;
-  twist.theta_dot = tw[0].theta_dot;
-  return twist;
+    else if (angle_diff > angularThreshold)
+    {
+      state_ = Rotate_left;
+    }
+    else
+    {
+      state_ = Rotate_right;
+    }
+
 }
 
-  int Waypoints::print_goal(){
-    return goal;
+bool Waypoints::ifClose(double x1, double y1, double x2, double y2) 
+{
+  return std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2)) < linearThreshold;
+}
+
+void Waypoints::update_goal() 
+{  
+  if (current_goal == points.size())
+  {
+    current_goal  = 0;
+  } else {
+    current_goal ++;
+  }
+}
+
+Twist2D Waypoints::nextWaypoint() 
+{
+  Twist2D cmd; 
+  if (state_ == Trans) {
+    cmd = move_forward_cmd();
+  } else if (state_ == Rotate_left) {
+    cmd = rotate_left();
+  } else if (state_ == Rotate_right) {
+    cmd = rotate_right();
   }
 
+  return cmd;
+}
+
+Twist2D Waypoints::move_forward_cmd() 
+{
+  Twist2D cmd;
+  cmd.vx = static_vel.vx;
+  cmd.vy = 0.0;
+  cmd.theta_dot = 0.0;
+  return cmd;
+}
+
+Twist2D Waypoints::rotate_left() 
+{
+  Twist2D cmd;
+  cmd.vx = 0.0;
+  cmd.vy = 0.0;
+  cmd.theta_dot = static_vel.theta_dot;
+  return cmd;
+}
+
+Twist2D Waypoints::rotate_right() 
+{
+  Twist2D cmd;
+  cmd.vx = 0.0;
+  cmd.vy = 0.0;
+  cmd.theta_dot = - static_vel.theta_dot;
+  return cmd;
+}
+
+void Waypoints::update_pose(Twist2D cmd) 
+{
+    // correct the twist according to frequency
+  cmd.theta_dot = cmd.theta_dot * (1.0 / frequency);
+  cmd.vx = cmd.vx * (1.0 / frequency);
+  cmd.vy = cmd.vy * (1.0 / frequency);
+
+  myDiffDrive.feedforward(cmd);
+}
 
 }
