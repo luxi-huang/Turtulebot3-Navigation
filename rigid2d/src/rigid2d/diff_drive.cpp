@@ -26,6 +26,8 @@ DiffDrive::DiffDrive(Transform2D pose,double wheel_base, double wheel_radius)
 WheelVelocities DiffDrive::twistToWheels(Twist2D twist)
 {
   WheelVelocities vel;
+  // std:: cout << "whe_radius: " << whe_radius <<"\n";
+  // std:: cout << "whe_base: " << whe_base <<"\n";
   vel.ur = (2.0 * twist.vx + twist.theta_dot * whe_base) / (2 * whe_radius);
   vel.ul = (2.0 * twist.vx - twist.theta_dot * whe_base) / (2 * whe_radius);
 
@@ -36,8 +38,8 @@ Twist2D DiffDrive::wheelsToTwist(WheelVelocities vel){
   Twist2D t;
 
   // latest
-  t.theta_dot = (vel.ur - vel.ul) * whe_radius / 2.0;
-  t.vx = (vel.ur + vel.ul) * whe_radius / whe_base;
+  t.vx = (vel.ur + vel.ul) * whe_radius / 2.0;
+  t.theta_dot = (vel.ur - vel.ul) * whe_radius / whe_base;
   t.vy = 0.0;
   return t;
 }
@@ -48,6 +50,7 @@ void DiffDrive::updateOdometry(double left_radians, double right_radians)
   WheelVelocities wheel_v;
   wheel_v.ul = left_radians;
   wheel_v.ur = right_radians;
+
   Twist2D twist = wheelsToTwist(wheel_v);
   Transform2D transformation = integrateTwist(twist);
   pose_ *= transformation;
@@ -57,6 +60,8 @@ void DiffDrive::feedforward(Twist2D cmd)
 {
     Transform2D transformation;
     transformation = integrateTwist(cmd);
+    double x, y, theta; 
+    transformation.displacement(x, y, theta);
     pose_ *= transformation;
 }
 
@@ -77,31 +82,5 @@ void DiffDrive::reset(Twist2D ps)
   Transform2D reset_pose(Vector2D(ps.vx, ps.vy), ps.theta_dot);
   pose_ = reset_pose;
 }
-
-
-// std::ostream & operator<<(std::ostream & os, const Pose & pose){
-//   os << "Pose_theta " << pose.theta << " x " << pose.x << "y "<< pose.y;
-//   return os;
-// }
-
-// std::istream & operator>>(std::istream & is, Pose & pose){
-//   is >> pose.theta;
-//   is >> pose.x;
-//   is >> pose.y;
-//   return is;
-// }
-
-// std::ostream & operator<<(std::ostream & os, const  WheelVelocities & wheel_v){
-//   os << "u1 " << wheel_v.u1 << " u2 " << wheel_v.u2 << "u3 "<< wheel_v.u3 << "u4 "<< wheel_v.u4;
-//   return os;
-// }
-
-// std::istream & operator>>(std::istream & is, WheelVelocities & wheel_v){
-//   is >> wheel_v.u1;
-//   is >> wheel_v.u2;
-//   is >> wheel_v.u3;
-//   is >> wheel_v.u4;
-//   return is;
-// }
 
 }

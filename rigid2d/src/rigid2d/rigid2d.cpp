@@ -209,7 +209,7 @@ namespace rigid2d {
 
   Transform2D Transform2D::inv() const
   {
-    double inv_radians = -radians_;
+    double inv_radians = - radians_;
     Vector2D inv_trans;
     inv_trans.x = -trans_.x * std::cos(radians_) - trans_.y * std::sin(this->radians_);
     inv_trans.y = trans_.x * std::sin(radians_) - trans_.y * std::cos(this->radians_);
@@ -276,7 +276,7 @@ namespace rigid2d {
   Transform2D integrateTwist(Twist2D twist)
   {
     if (almost_equal(twist.theta_dot, 0.0))
-    {
+    { 
       Vector2D result_vector(twist.vx, twist.vy);
       Transform2D result_transform(result_vector, 0);
       return result_transform;

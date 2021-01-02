@@ -14,6 +14,7 @@
 #include<iosfwd> // contains forward definitions for iostream objects
 #include "cmath"
 #include <stdlib.h>
+#include <iostream>
 
 namespace rigid2d
 {
@@ -32,11 +33,7 @@ namespace rigid2d
 
   constexpr bool almost_equal(double d1, double d2, double epsilon=1.0e-12)
   {
-    if (abs(d1-d2)<epsilon){
-      return true;
-    }else{
-      return false;
-    }
+    return std::abs(d1-d2) < epsilon;
   }
 
   /// \brief convert degrees to radians
@@ -246,7 +243,7 @@ namespace rigid2d
     /// \brief compute the transformation corresponding to a rigid body following a constant twist for one time unit
     /// \param twist - the constant twist
     /// \return the corresponding transformation
-    Transform2D integrateTwist(const Twist2D & V);
+    Transform2D integrateTwist(Twist2D twist);
 
 }
 

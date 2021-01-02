@@ -149,8 +149,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/nuslam_node.cpp)
-add_executable(landmarks scripts/landmark.cpp)
-add_executable(draw_map scripts/draw_map.cpp)
+# add_executable(landmarks scripts/landmark.cpp)
+# add_executable(draw_map scripts/draw_map.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -161,16 +161,16 @@ add_executable(draw_map scripts/draw_map.cpp)
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(landmarks ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(landmarks ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(draw_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(landmarks ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
-target_link_libraries(landmarks Eigen3::Eigen)
-target_link_libraries(draw_map ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+# target_link_libraries(landmarks ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+# target_link_libraries(landmarks Eigen3::Eigen)
+# target_link_libraries(draw_map ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 #############
 ## Install ##
 #############
@@ -189,9 +189,9 @@ target_link_libraries(draw_map ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 #install(DIRECTORY srv/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS landmarks draw_map
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS landmarks draw_map
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html

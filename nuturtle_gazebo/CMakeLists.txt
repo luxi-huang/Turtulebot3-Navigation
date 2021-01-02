@@ -30,7 +30,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 ## System dependencies are found with CMake's conventions
 find_package(gazebo REQUIRED)
 
-add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
+# add_library(${PROJECT_NAME}_plugin SHARED src/turtle_drive_plugin.cpp)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -135,12 +135,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(landmark2 scripts/test_landmark.cpp)
-add_dependencies(landmark2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(landmark2
-  ${catkin_LIBRARIES}
-  Eigen3::Eigen
-)
+# add_executable(landmark2 scripts/test_landmark.cpp)
+# add_dependencies(landmark2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(landmark2
+#   ${catkin_LIBRARIES}
+#   Eigen3::Eigen
+# )
 
 # include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} ${SDFormat_INCLUDE_DIRS})
 
@@ -173,13 +173,13 @@ target_link_libraries(landmark2
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(${PROJECT_NAME}_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+# target_link_libraries(${PROJECT_NAME}_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 #############
 ## Install ##
 #############
-target_include_directories(${PROJECT_NAME}_plugin PUBLIC ${GAZEBO_INCLUDE_DIRS})
+# target_include_directories(${PROJECT_NAME}_plugin PUBLIC ${GAZEBO_INCLUDE_DIRS})
 
-add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
@@ -204,16 +204,16 @@ add_dependencies(${PROJECT_NAME}_plugin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${ca
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 # )
-install(PROGRAMS
-  # scripts/my_python_script
-  scripts/landmark.cpp
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
-)
+# install(PROGRAMS
+#   # scripts/my_python_script
+#   scripts/landmark.cpp
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
+# )
 
 
-install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+# install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 # install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
-install(DIRECTORY src/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
+# install(DIRECTORY src/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

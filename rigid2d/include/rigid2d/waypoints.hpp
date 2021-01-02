@@ -49,7 +49,7 @@ namespace rigid2d {
     /// \param: static_vel;
     /// \param: threshold for linear and angle;
     /// \param: frequency;
-    explicit Waypoints(std::vector<Vector2D> waypoints, Twist2D vel, DiffDrive my_diff, int hz, int l_thred, int a_thred);
+    explicit Waypoints(std::vector<Vector2D> waypoint, Twist2D vel, DiffDrive my_diff, double hz, double l_thred, double a_thred);
 
     /// \brief: the pipline of combining all functions and moving forward
     void pipeline();
@@ -78,6 +78,8 @@ namespace rigid2d {
     void update_goal();
     
     bool ifClose(double x1, double y1, double x2, double y2); 
+
+    void getPose(double &x, double &y, double &theta);
   };
 }
 #endif

@@ -142,10 +142,10 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/nuturtle_robot_node.cpp)
-add_executable(turtle_interface scripts/turtle_interface.cpp)
-add_executable(rotation scripts/rotation.cpp)
-add_executable(trans scripts/trans.cpp)
-add_executable(real_waypoint scripts/real_waypoint.cpp)
+# add_executable(turtle_interface scripts/turtle_interface.cpp)
+# add_executable(rotation scripts/rotation.cpp)
+# add_executable(trans scripts/trans.cpp)
+# add_executable(real_waypoint scripts/real_waypoint.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -155,32 +155,32 @@ add_executable(real_waypoint scripts/real_waypoint.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(turtle_interface ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(trans ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(real_waypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(turtle_interface ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(trans ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(real_waypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # add_dependencies(WheelCommands ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(turtle_interface
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(turtle_interface
+#   ${catkin_LIBRARIES}
+# )
 
-target_link_libraries(rotation
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(rotation
+#   ${catkin_LIBRARIES}
+# )
 
 
-target_link_libraries(trans
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(trans
+#   ${catkin_LIBRARIES}
+# )
 
-target_link_libraries(real_waypoint
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(real_waypoint
+#   ${catkin_LIBRARIES}
+# )
 #############
 ## Install ##
 #############
@@ -197,24 +197,24 @@ target_link_libraries(real_waypoint
 
 
 
-install(PROGRAMS
-  # scripts/my_python_script
-  scripts/turtle_interface.cpp
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
-)
+# install(PROGRAMS
+#   # scripts/my_python_script
+#   scripts/turtle_interface.cpp
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/src
+# )
 
-install(TARGETS real_waypoint
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS real_waypoint
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
 # install(TARGETS ${PROJECT_NAME}_node
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-install(TARGETS turtle_interface
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS turtle_interface
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
 # install(TARGETS ${PROJECT_NAME}
@@ -229,10 +229,10 @@ install(TARGETS turtle_interface
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
 # )
-install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
+# install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+# install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
 # install(DIRECTORY scripts/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts)
-install(DIRECTORY srv/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
+# install(DIRECTORY srv/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
 #   # myfile1
@@ -243,13 +243,13 @@ install(DIRECTORY srv/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/srv)
 #############
 ## Testing ##
 #############
-if(CATKIN_ENABLE_TESTING)
-  find_package(rostest REQUIRED)
-  add_rostest_gtest(${PROJECT_NAME}-test launch/turtle_interface.test test/turtle_interface_test.cpp)
-  # add_rostest(launch/turtle_interface.test)
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
-endif()
-#
+# if(CATKIN_ENABLE_TESTING)
+#   find_package(rostest REQUIRED)
+#   add_rostest_gtest(${PROJECT_NAME}-test launch/turtle_interface.test test/turtle_interface_test.cpp)
+#   # add_rostest(launch/turtle_interface.test)
+#   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
+# endif()
+# #
 # if (CATKIN_ENABLE_TESTING)
 #    add_rostest(launch/turtle_interface.test)
 # endif()

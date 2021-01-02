@@ -231,9 +231,9 @@ target_link_libraries(fake_diff_encoders
 target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
 )
-#target_link_libraries(odometer_node
-   #${catkin_LIBRARIES}
-#)
+target_link_libraries(odometer
+   ${catkin_LIBRARIES}
+)
 # target_link_libraries(set_pose_service
 #    ${catkin_LIBRARIES}
 # )

@@ -30,10 +30,10 @@ Waypoints::Waypoints()
   angularThreshold = 0.1;
 }
 
-Waypoints::Waypoints(std::vector<Vector2D> waypoints, Twist2D vel, DiffDrive my_diff, int hz, int l_thred, int a_thred)
+Waypoints::Waypoints(std::vector<Vector2D> waypoint, Twist2D vel, DiffDrive my_diff, double hz, double l_thred, double a_thred)
 {
   myDiffDrive = my_diff;
-  points = waypoints;
+  points = waypoint;
   static_vel = vel;
   current_goal = 1;
   frequency = hz;
@@ -48,12 +48,12 @@ void Waypoints::update_state()
   current_pose.displacement(current_pose_x, current_pose_y, current_pose_angle);
 
   // if the current point is close to goal, we need to update goal;
-  if (ifClose(current_pose_x, current_pose_y, points[current_goal - 1].x, points[current_goal - 1].y)) 
+  if (ifClose(current_pose_x, current_pose_y, points[current_goal].x, points[current_goal].y)) 
   {
     update_goal();
   } 
 
-  double angle_diff = normalize_angle(std::atan2(points[current_goal - 1].y - current_pose_y, points[current_goal - 1].x - current_pose_x) - current_pose_angle);
+  double angle_diff = normalize_angle(std::atan2(points[current_goal].y - current_pose_y, points[current_goal].x - current_pose_x) - current_pose_angle);
   if (angle_diff < angularThreshold && - angularThreshold < angle_diff)
     {
       state_ = Trans;
@@ -66,7 +66,11 @@ void Waypoints::update_state()
     {
       state_ = Rotate_right;
     }
-
+  
+  // if (ifClose(current_pose_x, current_pose_y, points[current_goal].x, points[current_goal].y)) 
+  // {
+  //   update_goal();
+  // } 
 }
 
 bool Waypoints::ifClose(double x1, double y1, double x2, double y2) 
@@ -76,11 +80,10 @@ bool Waypoints::ifClose(double x1, double y1, double x2, double y2)
 
 void Waypoints::update_goal() 
 {  
+  current_goal ++;
   if (current_goal == points.size())
   {
     current_goal  = 0;
-  } else {
-    current_goal ++;
   }
 }
 
@@ -133,6 +136,15 @@ void Waypoints::update_pose(Twist2D cmd)
   cmd.vy = cmd.vy * (1.0 / frequency);
 
   myDiffDrive.feedforward(cmd);
+  double pose_x, pose_y, pose_theta;
+  Transform2D pose = myDiffDrive.getpose();
+  pose.displacement(pose_x, pose_y, pose_theta);
+}
+
+void Waypoints::getPose(double &x, double &y, double &theta)
+{
+  Transform2D pose = myDiffDrive.getpose();
+  pose.displacement(x, y, theta);
 }
 
 }
