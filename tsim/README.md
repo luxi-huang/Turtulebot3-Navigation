@@ -12,7 +12,7 @@
  <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/master/img/rect.gif?raw=true" alt="drawing" /> </p>  
 
 ## turtle_odom.launch example:
- <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/master/img/turtle-way-combine.gif?raw=true" alt="drawing" /> </p>  
+ <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/master/img/turtle_way_combine.gif?raw=true" alt="drawing" /> </p>  
 
 
 ## Package files:
