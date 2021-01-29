@@ -68,7 +68,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  set_pen.srv
+  set_pose.srv
 )
 
 ## Generate actions in the 'action' folder

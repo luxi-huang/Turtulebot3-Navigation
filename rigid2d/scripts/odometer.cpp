@@ -19,7 +19,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "geometry_msgs/TransformStamped.h"
-#include "rigid2d/set_pen.h"
+#include "rigid2d/set_pose.h"
 
 using std::string;
 
@@ -49,6 +49,7 @@ private:
   double wheel_radius;
   rigid2d::DiffDrive myRobot;
   MyJointState wheel1,wheel2;
+  ros::ServiceServer set_pose;
 
   ros::Time current_time;
   ros::Time last_time;
@@ -71,7 +72,7 @@ public:
     nh.getParam("base_link",base_link);
     nh.getParam("wheel_base",wheel_base);
     nh.getParam("wheel_radius",wheel_radius);
-
+    set_pose = nh.advertiseService("set_pose", &Odometer::callback_set_pose, this);
     // initial robot;
     rigid2d::Transform2D initPose;
     myRobot = rigid2d::DiffDrive(initPose, wheel_base, wheel_radius); 
@@ -86,7 +87,6 @@ public:
       send_TF(current_pose);
       rate.sleep();
       ros::spinOnce();
-      
     }
   }
 
@@ -104,6 +104,20 @@ public:
     wheel1.position = mesg->position[0];
     wheel2.position = mesg->position[1];
   }
+
+  bool callback_set_pose(rigid2d::set_pose::Request &req,
+                           rigid2d::set_pose::Response &res)
+    {
+        double x, y, theta;
+        x = req.x;
+        y = req.y;
+        theta = req.theta;
+
+        rigid2d::Twist2D pose_reset(theta, x, y);
+        myRobot.reset(pose_reset);
+
+        return true;
+    }
 
   void send_TF(rigid2d::Transform2D pose)
   {

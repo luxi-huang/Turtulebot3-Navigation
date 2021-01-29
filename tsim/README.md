@@ -63,9 +63,11 @@
    - `odometer` node: subscribe joint state and publish robot odometer and tf. 
 
 ## How to launch Files
-```
-$ roslaunch tsim trect.launch --ros-args
-```
+
+- To launch `turtle_rect` node that turtle move in a rectangular trajectory, run  ```$ roslaunch turtle_rect trect.launch --ros-args```
+- To launch `turtle_pent` node that turtle move in a pentgone trajectory, run  ```$ roslaunch turtle_rect trect_pent.launch ```
+- To launch robot model on rivz and do the same trajectory as turtle_pend, run  ```$ roslaunch turtle_rect trect_odom.launch ```
+
 Optional Arguments:
    - `plot_gui` （default "false"） : set value to true to draw rqt_plot of robot pose error (x, y, theta).
      - `roslaunch tsim trect.launch plot_gui：=true`
@@ -77,5 +79,5 @@ The below chart is the error between predict turtle pose and real turtle pose.
 
 ## Result rqt_plot for turtle_way:
 
-The below chart is the error between predict turtle pose and real turtle pose. 
+The below chart is the error between predict turtle pose and real turtle pose. All $x, y, theta$ angle are smaller than 0.1.
  <p align="middle"> <img src="https://github.com/luxi-huang/Turtulebot3-Navigation/blob/review/img/turtle_way_error.png?raw=true" alt="drawing" /> </p>  

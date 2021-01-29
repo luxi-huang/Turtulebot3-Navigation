@@ -16,9 +16,9 @@
     <param name="baud" value="115200"/>
   </node>
 
-  <node name="laser_node" pkg="hls_lfcd_lds_driver" type="hlds_laser_publisher">
+  <!-- <node name="laser_node" pkg="hls_lfcd_lds_driver" type="hlds_laser_publisher">
     <param name="port" value="/dev/ttyUSB0"/>
     <param name= "frame_id" value = "base_scan"/>
-  </node>
+  </node> -->
 
 </launch>

@@ -7,7 +7,7 @@ encoder_ticks: 4096.0 #(360.0)/(0.066*2*3.1415926) #number of encoder ticks per 
 maximum_translational_velocity: 0.22 # m/s
 maximum_rotational_velocity_robot: 2.84 # rad/s
 maximum_rotational_velocity_motor: 6.35492 # rad/s
-maximum_motor_power: 265 # -265 to 265z
+maximum_motor_power: 265 # -265 to 265
 frac_vel: 0.5 # fraction of max velocity
 wheel_axel_offset: 0.02 # distance from the bottom of the chassis.
 # joint_state_topic: joint_states
