@@ -66,6 +66,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   start.srv
+  Stop.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -145,7 +146,7 @@ include_directories(
 add_executable(turtle_interface scripts/turtle_interface.cpp)
 add_executable(rotation scripts/rotation.cpp)
 add_executable(trans scripts/trans.cpp)
-# add_executable(real_waypoint scripts/real_waypoint.cpp)
+add_executable(real_waypoint scripts/real_waypoint.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -158,7 +159,7 @@ add_executable(trans scripts/trans.cpp)
 add_dependencies(turtle_interface ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(rotation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(trans ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# add_dependencies(real_waypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(real_waypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # add_dependencies(WheelCommands ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -178,9 +179,9 @@ target_link_libraries(trans
   ${catkin_LIBRARIES}
 )
 
-# target_link_libraries(real_waypoint
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(real_waypoint
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############

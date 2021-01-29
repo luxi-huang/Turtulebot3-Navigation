@@ -58,6 +58,7 @@ namespace rigid2d {
     /// \param: cmd 
     void update_pose(Twist2D cmd);
 
+    void update_pose_close_loop(double x, double y,double theta); 
     /// \brief:update state base on the current position and goal point 
     void update_state();
 

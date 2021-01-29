@@ -141,6 +141,16 @@ void Waypoints::update_pose(Twist2D cmd)
   pose.displacement(pose_x, pose_y, pose_theta);
 }
 
+void  Waypoints::update_pose_close_loop(double x, double y,double theta)
+{
+  Transform2D pose = myDiffDrive.getpose();
+  pose.displacement(x, y, theta);
+}
+
+
+
+
+
 void Waypoints::getPose(double &x, double &y, double &theta)
 {
   Transform2D pose = myDiffDrive.getpose();
