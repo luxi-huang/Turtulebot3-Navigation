@@ -1,13 +1,13 @@
 <?xml version="1.0" ?>
 <robot name="diff_drive" xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-<xacro:property name="props" value= "${load_yaml('$(find nuturtle_description)/config/diff_params.yaml')}"/>
+<!-- <xacro:property name="props" value= "${load_yaml('$(find nuturtle_description)/config/diff_params.yaml')}"/>
 <xacro:property name="Wheel_width" value="${props['wheel_width']}" />
 <xacro:property name="wheel_radius" value="${props['wheel_radius']}" />
 <xacro:property name="wheel_base" value="${props['wheel_base']}" />
 <xacro:property name="chassis_length" value="${props['chassis_length']}" />
 <xacro:property name="chassis_thinkness" value="${props['chassis_thinkness']}" />
-<xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" />
+<xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" /> -->
 
 
 <xacro:macro name="robot_dd" params="mode">

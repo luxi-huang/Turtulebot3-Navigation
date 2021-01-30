@@ -11,7 +11,7 @@
 <xacro:property name="wheel_axel_offset" value="${props['wheel_axel_offset']}" />
 
 <xacro:include filename="$(find nuturtle_description)/urdf/macro.xacro" />
-<!-- <xacro:include filename="$(find nuturtle_gazebo)/urdf/diff_drive.gazebo" /> -->
+<xacro:include filename="$(find nuturtle_gazebo)/urdf/diff_drive.gazebo" />
 <!-- <xacro:include filename="$(find nuturtle_gazebo)/urdf/material.urdf.xacro" /> -->
 <xacro:arg name="mode" default="0" />
 
@@ -20,12 +20,10 @@
   </link>
 
   <link name="base_body" >
-    <!-- <pose>0 0 ${chassis_thickness/2 + wheel_radius-wheel_axel_offset} 0 0 0</pose> -->
-<!-- 
     <inertial>
-      <mass value="0.94"/>
+      <mass value="1.0"/>
       <origin rpy="0 0 0" xyz="0 0 ${chassis_thickness/2 + wheel_radius-wheel_axel_offset}"/>
-      <inertia ixx="${0.94*((wheel_base+Wheel_width)*(wheel_base+Wheel_width)+chassis_thickness*chassis_thickness)/12.0}" ixy="0" ixz="0" iyy="${0.94*(chassis_length*chassis_length+chassis_thickness*chassis_thickness)/12.0}" iyz="0" izz="${0.94*((wheel_base+Wheel_width)*(wheel_base+Wheel_width)+chassis_length*chassis_length)/12.0}"/>
+      <inertia ixx="${1.0*((wheel_base-Wheel_width)*(wheel_base-Wheel_width)+chassis_thickness*chassis_thickness)/12.0}" ixy="0" ixz="0" iyy="${1.0*(chassis_length*chassis_length+(wheel_base-Wheel_width)*(wheel_base-Wheel_width))/12.0}" iyz="0" izz="${1.0*(chassis_thickness*chassis_thickness + chassis_length*chassis_length)/12.0}"/>
     </inertial>
 
     <collision>
@@ -33,7 +31,7 @@
       <geometry>
         <box size="${chassis_length} ${wheel_base-Wheel_width} ${chassis_thickness}"/>
       </geometry>
-    </collision> -->
+    </collision>
 
     <visual>
       <origin rpy="0 0 0" xyz="0 0 ${chassis_thickness/2 + wheel_radius-wheel_axel_offset}"/>
@@ -43,25 +41,22 @@
      </visual>
   </link>
 
-   <link name="ball_caster">
 
-     <!-- <collision name="caster_top_collision">
+   <link name="ball_caster">
+     <collision name="caster_top_collision">
        <origin rpy="0 0 0" xyz="${chassis_length/2 - (wheel_radius/2-wheel_axel_offset/2)} 0 ${wheel_radius/2-wheel_axel_offset/2}"/>
        <geometry>
          <sphere radius="${wheel_radius/2-wheel_axel_offset/2}"/>
        </geometry>
-     </collision> -->
-
+     </collision>
      <visual>
       <origin rpy="0 0 0" xyz="${chassis_length/2 - (wheel_radius/2-wheel_axel_offset/2)} 0 ${wheel_radius/2-wheel_axel_offset/2}"/>
        <geometry>
          <sphere radius="${wheel_radius/2-wheel_axel_offset/2}"/>
        </geometry>
-
        <material name="blue">
                 <color rgba="0 0 1 1" />
        </material>
-
      </visual>
   </link>
 
@@ -71,15 +66,21 @@
   <xacro:link_wheel name="link_left_wheel" />
   <xacro:joint_wheel name="left_wheel_joint"   child="link_left_wheel"   origin_xyz="${wheel_radius} ${-(wheel_base)/2} ${wheel_radius}"  />
 
-  <!-- <link name="base_scan">
-      <origin rpy="0 0 1.5707" xyz="0 0 ${wheel_radius-0.02+chassis_thickness}"/>
-  </link> -->
+  <!-- add base scan link  -->
+  <link name="base_scan">
+      <visual name="base_scan_visual">
+          <geometry>
+              <cylinder radius="0.01" length="0.01"/>
+          </geometry>
+      </visual>
+  </link>
 
-  <!-- <joint name="joint_caster" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 ${wheel_radius-0.02+chassis_thickness}"/>
+  <joint name="joint_caster" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 ${wheel_radius-wheel_axel_offset+chassis_thickness/2}"/>
     <child link="base_scan"/>
     <parent link="base_body"/>
-  </joint> -->
+  </joint>
+
 
   <joint name="base_link_base_body_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -87,12 +88,12 @@
     <parent link="base_link"/>
   </joint>
 
-
   <joint name="caster_chassis" type="fixed">
     <parent link="base_body"/>
     <child link="ball_caster"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
+  
 
   <!-- <xacro:robot_dd mode="$(arg mode)" /> -->
 

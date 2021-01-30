@@ -289,23 +289,23 @@ void publish_marker(Pose p_pose,visualization_msgs::Marker marker, int number){
 }
 
 
-void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
-{
-	pose_odom.x = msg->pose.pose.position.x;
-	pose_odom.y = msg->pose.pose.position.y;
+// void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
+// {
+// 	pose_odom.x = msg->pose.pose.position.x;
+// 	pose_odom.y = msg->pose.pose.position.y;
 
-	tf::Quaternion q(
-		 msg->pose.pose.orientation.x,
-		 msg->pose.pose.orientation.y,
-		 msg->pose.pose.orientation.z,
-		 msg->pose.pose.orientation.w );
+// 	tf::Quaternion q(
+// 		 msg->pose.pose.orientation.x,
+// 		 msg->pose.pose.orientation.y,
+// 		 msg->pose.pose.orientation.z,
+// 		 msg->pose.pose.orientation.w );
 
-	tf::Matrix3x3 m(q);
-	double roll, pitch, yaw;
-	m.getRPY(roll, pitch, yaw);
-	pose_odom.theta = yaw;
-	// pub_pose_.publish(pose2d);
-}
+// 	tf::Matrix3x3 m(q);
+// 	double roll, pitch, yaw;
+// 	m.getRPY(roll, pitch, yaw);
+// 	pose_odom.theta = yaw;
+// 	// pub_pose_.publish(pose2d);
+// }
 
 int set_pose_client(){
 	ros::NodeHandle n;
